@@ -1,6 +1,6 @@
 import cv2
 
-imageOrVideo = "image"
+imageOrVideo = "video"
 
 def camera(grabFrames, grabFrameRate, grabFrameRun, imgOrVid):
     ## Grabbed from https://stackoverflow.com/questions/2601194/displaying-a-webcam-feed-using-opencv-and-python
