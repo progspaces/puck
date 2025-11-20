@@ -1,23 +1,23 @@
-import cv2
-## Grabbed from https://stackoverflow.com/questions/2601194/displaying-a-webcam-feed-using-opencv-and-python
+import cv2 
+# from testWebcam import camera 
+
+# camera(False, 10, 1 ,2)
+
+'''
+Start with encoding
+You get a list of programs.
+You assign each of them a unique id.
+You use that unique id to get a pattern of 20 dots. five per corner
+Four colours is 4^20? 1.0995116e+12 (seems overkill)
+Four colours and 4 dots is 4^4 which is only 16
+Four colours and 10 dots is 4^10 which is  1,048,576
+You store that list of dots as a dataframe for printing
+8 colours for david's thing
+
+So let's print 8 colors across the RGB specturm, different sizes, see what it can differentiate
+
+End with Decoding
+'''
 
 
-cv2.namedWindow("preview")
-vc = cv2.VideoCapture(0) # input index is 0, so first video input I assume 
-# returns a viedo capture object called vc
-
-if vc.isOpened(): # try to get the first frame
-    rval, frame = vc.read() # returns a value (boolean I think? true) and frame
-else:
-    rval = False
-
-while rval:
-    cv2.imshow("preview", frame)
-    rval, frame = vc.read() # returns the retreval value, and then. the image 
-    # combines grab and retrive in one call. if nothing grabbed, returns false.
-    key = cv2.waitKey(20)
-    if key == 27: # exit on ESC
-        break
-
-cv2.destroyWindow("preview")
-vc.release()
+r g b 
