@@ -18,6 +18,3 @@ So let's print 8 colors across the RGB specturm, different sizes, see what it ca
 
 End with Decoding
 '''
-
-
-r g b 
