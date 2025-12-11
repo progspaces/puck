@@ -17,3 +17,10 @@ dependencies = [
     "pyx>=0.17",
     "tex>=1.8",
 ]
+
+[project.scripts]
+puck = "puck.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
