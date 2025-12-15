@@ -25,6 +25,6 @@ class ExperimentConfig:
         '''
         with open(path_config_file) as f:
             pipeline_list = json.load(f) ## returns a dictionary
-            pipeline = [eval(x["type"])(**x) for x in pipeline_list]
+            pipeline_products= [eval(x["type"])(**x) for x in pipeline_list]
         return pipeline    
 
