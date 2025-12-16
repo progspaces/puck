@@ -9,7 +9,9 @@ drawing = False  # true if mouse is pressed
  # Coordinate
 x1, y1, x2, y2 = -1, -1, -1, -1
 
+
 def run(imgPath):
+    count = 0
     outputPath = imgPath[:-4] + "_annotated.jpg"
     annotationList = []
     img = cv.imread(imgPath)        
@@ -73,14 +75,19 @@ def run(imgPath):
           print("you've hit a")
       elif k == 13:
          #SAVES THE location
+         if count == 4:
+            print("NO MORE DOTS GOODBYE")
+            cv.imwrite(outputPath, img)
+            cv.destroyAllWindows()
+            break
          radius = calc_radius(x1, y1, holdx, holdy)
-         label = input("Describe this pixel using one word (e.g. dog) and press ENTER: ")
          text_x_pos = x1 + radius
          text_y_pos = y1
          cv.circle(img, (x1, y1), radius, (255, 0, 0), 1)
-         cv.putText(img, label, (text_x_pos,text_y_pos), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255,0), 2)
-         print(f"x is {x1}, y is {y1}, radius is {radius}, and the label is {label}")
-         entry = (label,x1,y1,radius)
+         cv.putText(img, str(count), (text_x_pos,text_y_pos), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255,0), 2)
+         print(f"x is {x1}, y is {y1}, radius is {radius}, and the label is {count}")
+         entry = (str(count),x1,y1,radius)
+         count +=1
          annotationList.append(entry)
          print("saves the location go to next thing")
       elif k == 27: # ESE to terminate a program
