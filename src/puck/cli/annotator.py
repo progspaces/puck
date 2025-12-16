@@ -69,7 +69,9 @@ def run(imgPath):
 
     while True:
       k = cv.waitKey(1)
-      if k == 13:
+      if k == ord('a'):
+          print("you've hit a")
+      elif k == 13:
          #SAVES THE location
          radius = calc_radius(x1, y1, holdx, holdy)
          label = input("Describe this pixel using one word (e.g. dog) and press ENTER: ")
