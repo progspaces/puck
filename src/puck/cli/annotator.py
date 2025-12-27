@@ -12,7 +12,8 @@ x1, y1, x2, y2 = -1, -1, -1, -1
 
 def run(imgPath):
     count = 0
-    outputPath = imgPath[:-4] + "_annotated.jpg"
+    imgPathstr = str(imgPath)
+    outputPath = imgPathstr[:-4] + "_annotated.jpg"
     annotationList = []
     img = cv.imread(imgPath)        
     cv.imshow('image', img)
