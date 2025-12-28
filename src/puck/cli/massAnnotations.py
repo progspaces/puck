@@ -10,6 +10,16 @@ def annotate(p):
     for file_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
         if file_path not in file_data:
             file_data.update({file_path:run(file_path)})
+            print("i've updated stuff")
+            print(file_data)
+            print("continue or no? press q for quit, any other key to continue")
+            k = cv.waitKey()
+            if k == ord("q"):
+              with open('src/puck/cli/annotations.json', 'w') as fp:
+                json.dump(file_data, fp)
+              break 
+            else:
+              print(f"k is {k}")
         else:
             print("you've already annotated this, let's do the next image")
             continue
