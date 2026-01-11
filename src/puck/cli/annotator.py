@@ -12,10 +12,9 @@ x1, y1, x2, y2 = -1, -1, -1, -1
 
 def run(imgPath):
     count = 0
-    imgPathstr = str(imgPath)
-    outputPath = imgPathstr[:-4] + "_annotated.jpg"
+    outputPath = imgPath[:-4] + "_annotated.jpg"
     annotationList = []
-    img = cv.imread(imgPath)        
+    img = cv.imread(imgPath)  
     cv.imshow('image', img)
     # Create a layer to draw circle. The layer has the same dimension of image
     layer = np.zeros((img.shape[0], img.shape[1], 3), dtype="uint8")
