@@ -55,9 +55,6 @@ def run(imgPath):
             # Set the value of mask to 0, to avoid color overlap problems
             _img[np.where(mask)] = 0
             # Merge two array using Numpy where function
-            print(f"x is {x1}")
-            print(f"y is {y1}")
-            print(f"radius is {radius}")
             cv.imshow('image', np.where(layer == 0, _img, layer))
 
   # Assig callback 
@@ -71,12 +68,10 @@ def run(imgPath):
 
     while True:
       k = cv.waitKey(1)
-      if k == ord('a'):
-          print("you've hit a")
-      elif k == 13:
+      if k == 13:
          #SAVES THE location
          if count == 4:
-            print("NO MORE DOTS GOODBYE")
+            print("There are no more dots to annotate in this image.")
             cv.imwrite(outputPath, img)
             cv.destroyAllWindows()
             break
@@ -89,7 +84,6 @@ def run(imgPath):
          entry = (str(count),x1,y1,radius)
          count +=1
          annotationList.append(entry)
-         print("saves the location go to next thing")
       elif k == 27: # ESE to terminate a program
           cv.imwrite(outputPath, img)
           cv.destroyAllWindows()
