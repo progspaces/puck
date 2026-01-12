@@ -68,7 +68,7 @@ def run(imgPath):
 
     while True:
       k = cv.waitKey(1)
-      if k == 13:
+      if k == ord("s"):
          #SAVES THE location
          if count == 4:
             print("There are no more dots to annotate in this image.")
