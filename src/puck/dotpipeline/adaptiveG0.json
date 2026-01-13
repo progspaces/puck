@@ -1,0 +1,17 @@
+{"blur_min":0,
+ "blur_max":5,
+ "blur_step":1,
+ 
+ "area_min": 0,
+ "area_max": 100,
+ "area_step":1,
+ "circ_step": 0.1,
+
+ "thresh": "adaptiveG",
+
+ "block_size_min":3,
+ "block_size_max":5,
+
+ "constant_min": 1,
+ "constant_max": 10,
+ "constant_step": 1}

@@ -1,0 +1,13 @@
+{"blur_min":0,
+ "blur_max":5,
+ "blur_step":1,
+ 
+ "area_min": 0,
+ "area_max": 100,
+ "area_step":1,
+ "circ_step": 0.1,
+
+ "thresh": "binary",
+ "binary_min":2,
+ "binary_max":5,
+ "binary_step":1}
