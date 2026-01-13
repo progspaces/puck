@@ -10,9 +10,9 @@ drawing = False  # true if mouse is pressed
 x1, y1, x2, y2 = -1, -1, -1, -1
 
 
-def run(imgPath):
+def run(imgPath, user):
     count = 0
-    outputPath = imgPath[:-4] + "_annotated.jpg"
+    outputPath = imgPath[:-4] + "_annotated_" + user + ".jpg"
     annotationList = []
     img = cv.imread(imgPath)  
     cv.imshow('image', img)
@@ -68,7 +68,7 @@ def run(imgPath):
 
     while True:
       k = cv.waitKey(1)
-      if k == ord("s"):
+      if k == 13:
          #SAVES THE location
          if count == 4:
             print("There are no more dots to annotate in this image.")
