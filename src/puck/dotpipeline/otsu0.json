@@ -1,9 +1,9 @@
-{"blur_min":0,
+{"blur_min":1,
  "blur_max":5,
  "blur_step":1,
  
- "area_min": 0,
- "area_max": 100,
+ "area_min": 300,
+ "area_max": 400,
  "area_step":1,
  "circ_step": 0.1,
 
