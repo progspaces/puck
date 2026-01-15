@@ -16,6 +16,7 @@ dependencies = [
     "pandas>=2.3.3",
     "pathlib>=1.0.1",
     "pyx>=0.17",
+    "scikit-learn>=1.6.1",
     "tex>=1.8",
 ]
 
