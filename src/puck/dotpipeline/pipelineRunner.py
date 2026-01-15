@@ -10,9 +10,9 @@ import math
 
 def blobParamFunc(minArea, minCircularity):
     params = cv.SimpleBlobDetector_Params()
-    # params.filterByCircularity = True
-    # params.minCircularity = minCircularity
-    # params.minArea=minArea
+    params.filterByCircularity = True
+    params.minCircularity = minCircularity
+    params.minArea=minArea
     params.blobColor = 0
     return params
 
@@ -45,6 +45,7 @@ for x in range(1,2,1):
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         _, thresholded = cv.threshold(gray, test_pipeline[3], 255, cv.THRESH_BINARY)
         print(thresholded.dtype)
+        print(thresholded)
         plt.imshow(thresholded, cmap="gray")
         plt.show()
     elif choice == 1: ## Adaptive Mean
@@ -59,6 +60,7 @@ for x in range(1,2,1):
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         # thresholded = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
         thresholded = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY,11,2)
+        print(thresholded)
         plt.imshow(thresholded, cmap="gray")
         plt.show()
         print("THRESHOLDED")
@@ -83,7 +85,9 @@ for x in range(1,2,1):
         # for mt in self.morph_transform:
         kernel = np.ones((3, 3), np.uint8)
         thresholded = cv.morphologyEx(np_mask.astype(np.uint8), cv.MORPH_CLOSE, kernel)
-        # thresholded = 255-thresholded
+        thresholded= thresholded*255
+        print(thresholded)
+        thresholded = 255-thresholded
         plt.imshow(thresholded, cmap="gray")
         plt.show()
         print("THRESHOLDED")
@@ -92,21 +96,9 @@ for x in range(1,2,1):
 
 
     blob_params = blobParamFunc(test_pipeline[1], test_pipeline[2])
-    detector = cv.SimpleBlobDetector_create()
+    detector = cv.SimpleBlobDetector_create(blob_params)
     keypoints = detector.detect(thresholded)
     print(str(len(keypoints)) + " blobs detected")
-
-    circles = cv.HoughCircles(thresholded, cv.HOUGH_GRADIENT,dp=1,minDist=2,maxRadius =1000)
-    print("circles")
-    print(circles)
-
-    contours, hierarchy = cv.findContours(thresholded, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    print('contours')
-    print(contours)
-    cv.drawContours(imageBlurred, contours, -1, (0,255,0), 10)
-    plt.imshow(imageBlurred, cmap="gray")
-    plt.show()
-
     blank = np.zeros((1, 1))
     blobs = cv.drawKeypoints(image, keypoints, blank, (255, 0, 0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     accuracy = []
@@ -122,8 +114,8 @@ for x in range(1,2,1):
     if accuracy < [5,5,5,5] and len(accuracy) == 4:
         print(accuracy)
         correct +=1
-    # plt.imshow(blobs, interpolation="nearest")
-    # plt.show()
+    plt.imshow(blobs, interpolation="nearest")
+    plt.show()
 print(correct)
 
 ## blob will be the same across the board
