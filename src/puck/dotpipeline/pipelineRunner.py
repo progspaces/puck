@@ -9,7 +9,7 @@ import json
 import math
 import pprint
 import pandas as pd
-from time import perf_counter
+from time import thread_time_ns
 import statistics
 from tqdm import tqdm
 
@@ -38,7 +38,7 @@ def pipelineTests(test_pipeline):
     times = []
     pipeline_img_dict = {}
     for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
-        start = perf_counter()
+        start = thread_time_ns()
     # for x in range(1,2,1):
         # img_path = "images/custom/davids/short/B/custom_davids_short_B_0.jpg"
         gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
@@ -89,7 +89,7 @@ def pipelineTests(test_pipeline):
             keypoints = keypoints1 + keypoints2
         else:
             keypoints = detector.detect(thresholded)
-        end = perf_counter()
+        end = thread_time_ns()
         # # print(str(len(keypoints)) + " blobs detected")
         blank = np.zeros((1, 1))
         blobs = cv.drawKeypoints(image, keypoints, blank, (255, 0, 0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -136,5 +136,11 @@ with ThreadPoolExecutor(10) as pool:
 	# call a function on each item in a list and handle results
     for name, result in tqdm(pool.map(pipelineTests, pipeline_list), total=len(pipeline_list)):
         pipeline_list_dict.update({name:result})
+
+# ensure that output directory exists
+output_dir = Path("src/puck/dotpipeline/big_picture/")        
+output_dir.mkdir(parents=True, exist_ok=True)
+
+# save the big picture results
 pd.DataFrame(pipeline_list_dict).T.to_csv("src/puck/dotpipeline/big_picture/"+str(pipelines[choice])[21:]+ "_results.csv")
 
