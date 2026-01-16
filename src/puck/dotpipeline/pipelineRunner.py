@@ -1,4 +1,5 @@
 import itertools
+from concurrent.futures import ThreadPoolExecutor
 from pipelineGenerator import generator
 from pathlib import Path
 import cv2 as cv
@@ -10,6 +11,7 @@ import pprint
 import pandas as pd
 from time import perf_counter
 import statistics
+from tqdm import tqdm
 
 def blobParamFunc(minArea, minCircularity):
     params = cv.SimpleBlobDetector_Params()
@@ -22,24 +24,20 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-
 with open('./src/puck/cli/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
-
-pipeline_list_dict = {}
 
 pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
 choice = int(input("Please enter 0-3 to choose binary(0) or adaptiveM(1) or adaptiveG(2) or otsu(3): "))
 pipeline_list = (generator(pipelines[choice]))[1]
-# test_pipeline = pipeline_list[0]
-# print(test_pipeline)
-
 p = Path('.')
-for test_pipeline in pipeline_list:
+
+def pipelineTests(test_pipeline):
+    # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0].jpg'))):
+    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
         start = perf_counter()
     # for x in range(1,2,1):
         # img_path = "images/custom/davids/short/B/custom_davids_short_B_0.jpg"
@@ -80,7 +78,7 @@ for test_pipeline in pipeline_list:
             kernel = np.ones((3, 3), np.uint8)
             thresholded = cv.morphologyEx(np_mask.astype(np.uint8), cv.MORPH_CLOSE, kernel)
             thresholded= thresholded*255
-            print(thresholded)
+            # # print(thresholded)
             thresholded = 255-thresholded
             
         blob_params = blobParamFunc(test_pipeline[1], test_pipeline[2])
@@ -92,7 +90,7 @@ for test_pipeline in pipeline_list:
         else:
             keypoints = detector.detect(thresholded)
         end = perf_counter()
-        print(str(len(keypoints)) + " blobs detected")
+        # # print(str(len(keypoints)) + " blobs detected")
         blank = np.zeros((1, 1))
         blobs = cv.drawKeypoints(image, keypoints, blank, (255, 0, 0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         
@@ -126,16 +124,17 @@ for test_pipeline in pipeline_list:
         timeToDetect = end - start
         times.append(timeToDetect)
         pipeline_img_dict.update({img_path: (count_of_blobs, only_4, only_4_close_enough, timeToDetect,distances)})
-        # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv(str(test_pipeline) + "_results.csv")
+        # # print("...")
+    pd.DataFrame(pipeline_img_dict).T.to_csv("src/puck/dotpipeline/pipeline_results/" +str(test_pipeline) + "_results.csv")
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
-    pipeline_list_dict.update({str(test_pipeline):(choice, accuracy, avgTimeToDetect, medianTimeToDetect)})
+    return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
 
-pd.DataFrame(pipeline_list_dict).T.to_csv(str(pipelines[choice])+ "_results.csv")
-    # plt.imshow(blobs, interpolation="nearest")
-    # plt.show()
-
-
+pipeline_list_dict = {}
+with ThreadPoolExecutor(10) as pool:
+	# call a function on each item in a list and handle results
+    for name, result in tqdm(pool.map(pipelineTests, pipeline_list), total=len(pipeline_list)):
+        pipeline_list_dict.update({name:result})
+pd.DataFrame(pipeline_list_dict).T.to_csv("src/puck/dotpipeline/big_picture/"+str(pipelines[choice])[21:]+ "_results.csv")
 
