@@ -32,6 +32,9 @@ choice = int(input("Please enter 0-3 to choose binary(0) or adaptiveM(1) or adap
 pipeline_list = (generator(pipelines[choice]))[1]
 p = Path('.')
 
+results_path = Path("src/puck/dotpipeline/pipeline_results/")
+results_path.mkdir(parents=True, exist_ok=True)
+
 def pipelineTests(test_pipeline):
     # print(test_pipeline)
     correct = 0 
@@ -125,11 +128,12 @@ def pipelineTests(test_pipeline):
         times.append(timeToDetect)
         pipeline_img_dict.update({img_path: (count_of_blobs, only_4, only_4_close_enough, timeToDetect,distances)})
         # # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv("src/puck/dotpipeline/pipeline_results/" +str(test_pipeline) + "_results.csv")
+    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / (str(test_pipeline) + "_results.csv"))
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
     return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
+
 
 pipeline_list_dict = {}
 with ThreadPoolExecutor(10) as pool:
@@ -142,5 +146,4 @@ output_dir = Path("src/puck/dotpipeline/big_picture/")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 # save the big picture results
-pd.DataFrame(pipeline_list_dict).T.to_csv("src/puck/dotpipeline/big_picture/"+str(pipelines[choice])[21:]+ "_results.csv")
-
+pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))

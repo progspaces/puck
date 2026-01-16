@@ -1,10 +1,10 @@
-{"blur_min":1,
- "blur_max":5,
- "blur_step":1,
- 
- "area_min": 300,
- "area_max": 400,
- "area_step":1,
- "circ_step": 0.1,
-
- "thresh": "otsu"}
+{
+    "blur_min": 1,
+    "blur_max": 13,
+    "blur_step": 2,
+    "area_min": 300,
+    "area_max": 400,
+    "area_step": 10,
+    "circ_step": 0.1,
+    "thresh": "otsu"
+}
