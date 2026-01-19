@@ -1,481 +1,481 @@
 ,0,1,2,3,4
-images/custom/davids/high/A/custom_davids_high_A_0.jpg,0,False,False,0.07665637499303557,[]
-images/custom/davids/high/A/custom_davids_high_A_1.jpg,1,False,False,0.08960579200356733,[1.0]
-images/custom/davids/high/A/custom_davids_high_A_2.jpg,0,False,False,0.06484604200522881,[]
-images/custom/davids/high/A/custom_davids_high_A_3.jpg,3,False,False,0.1263794590049656,"[1.0, 2.0, 2.23606797749979]"
-images/custom/davids/high/A/custom_davids_high_A_4.jpg,0,False,False,0.048423542000819,[]
-images/custom/davids/high/B/custom_davids_high_B_0.jpg,3,False,False,0.06152599999040831,"[1.0, 1.0, 2.23606797749979]"
-images/custom/davids/high/B/custom_davids_high_B_1.jpg,4,True,True,0.07378024999343324,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
-images/custom/davids/high/B/custom_davids_high_B_2.jpg,1,False,False,0.09739075000106823,[1.4142135623730951]
-images/custom/davids/high/B/custom_davids_high_B_3.jpg,1,False,False,0.09673274999659043,[1.4142135623730951]
-images/custom/davids/high/B/custom_davids_high_B_4.jpg,0,False,False,0.09782408300088719,[]
-images/custom/davids/high/C/custom_davids_high_C_0.jpg,3,False,False,0.13350545799767133,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
-images/custom/davids/high/C/custom_davids_high_C_1.jpg,1,False,False,0.0961317089968361,[1.0]
-images/custom/davids/high/C/custom_davids_high_C_2.jpg,1,False,False,0.09111691699945368,[1.0]
-images/custom/davids/high/C/custom_davids_high_C_3.jpg,0,False,False,0.09445554100966547,[]
-images/custom/davids/high/C/custom_davids_high_C_4.jpg,0,False,False,0.09544695900694933,[]
-images/custom/davids/high/D/custom_davids_high_D_0.jpg,0,False,False,0.09801833299570717,[]
-images/custom/davids/high/D/custom_davids_high_D_1.jpg,0,False,False,0.11631324999325443,[]
-images/custom/davids/high/D/custom_davids_high_D_2.jpg,2,False,False,0.13901404199714307,"[1.4142135623730951, 2.23606797749979]"
-images/custom/davids/high/D/custom_davids_high_D_3.jpg,1,False,False,0.09090024999750312,[1.0]
-images/custom/davids/high/D/custom_davids_high_D_4.jpg,0,False,False,0.06500833299651276,[]
-images/custom/davids/medium/A/custom_davids_medium_A_0.jpg,0,False,False,0.06233274999249261,[]
-images/custom/davids/medium/A/custom_davids_medium_A_1.jpg,0,False,False,0.06338729200069793,[]
-images/custom/davids/medium/A/custom_davids_medium_A_2.jpg,0,False,False,0.04220508299476933,[]
-images/custom/davids/medium/A/custom_davids_medium_A_3.jpg,1,False,False,0.09746945901133586,[1.0]
-images/custom/davids/medium/A/custom_davids_medium_A_4.jpg,0,False,False,0.07670858400524594,[]
-images/custom/davids/medium/B/custom_davids_medium_B_0.jpg,0,False,False,0.05329979199450463,[]
-images/custom/davids/medium/B/custom_davids_medium_B_1.jpg,0,False,False,0.07671866699820384,[]
-images/custom/davids/medium/B/custom_davids_medium_B_2.jpg,0,False,False,0.05016229199827649,[]
-images/custom/davids/medium/B/custom_davids_medium_B_3.jpg,0,False,False,0.10069750000548083,[]
-images/custom/davids/medium/B/custom_davids_medium_B_4.jpg,0,False,False,0.08796458299912047,[]
-images/custom/davids/medium/C/custom_davids_medium_C_0.jpg,0,False,False,0.06014233300811611,[]
-images/custom/davids/medium/C/custom_davids_medium_C_1.jpg,0,False,False,0.07114295799692627,[]
-images/custom/davids/medium/C/custom_davids_medium_C_2.jpg,0,False,False,0.0703522500116378,[]
-images/custom/davids/medium/C/custom_davids_medium_C_3.jpg,0,False,False,0.04041204099485185,[]
-images/custom/davids/medium/C/custom_davids_medium_C_4.jpg,0,False,False,0.06927637499757111,[]
-images/custom/davids/medium/D/custom_davids_medium_D_0.jpg,3,False,False,0.08613108300778549,"[1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
-images/custom/davids/medium/D/custom_davids_medium_D_1.jpg,0,False,False,0.07954800000879914,[]
-images/custom/davids/medium/D/custom_davids_medium_D_2.jpg,0,False,False,0.08650733300601132,[]
-images/custom/davids/medium/D/custom_davids_medium_D_3.jpg,0,False,False,0.08517299999948591,[]
-images/custom/davids/medium/D/custom_davids_medium_D_4.jpg,0,False,False,0.057178917006240226,[]
-images/custom/davids/short/A/custom_davids_short_A_0.jpg,0,False,False,0.12293895799666643,[]
-images/custom/davids/short/A/custom_davids_short_A_1.jpg,0,False,False,0.053234999999403954,[]
-images/custom/davids/short/A/custom_davids_short_A_2.jpg,0,False,False,0.03526187498937361,[]
-images/custom/davids/short/A/custom_davids_short_A_3.jpg,2,False,False,0.052053207997232676,"[1.0, 2.0]"
-images/custom/davids/short/A/custom_davids_short_A_4.jpg,0,False,False,0.0352246670081513,[]
-images/custom/davids/short/B/custom_davids_short_B_0.jpg,1,False,False,0.06374179098929744,[3.0]
-images/custom/davids/short/B/custom_davids_short_B_1.jpg,0,False,False,0.07640433400229085,[]
-images/custom/davids/short/B/custom_davids_short_B_2.jpg,0,False,False,0.04224770900327712,[]
-images/custom/davids/short/B/custom_davids_short_B_3.jpg,1,False,False,0.1015619579993654,[1.4142135623730951]
-images/custom/davids/short/B/custom_davids_short_B_4.jpg,0,False,False,0.08064529200783,[]
-images/custom/davids/short/C/custom_davids_short_C_0.jpg,2,False,False,0.09708595799747854,"[2.0, 2.0]"
-images/custom/davids/short/C/custom_davids_short_C_1.jpg,0,False,False,0.05116379199898802,[]
-images/custom/davids/short/C/custom_davids_short_C_2.jpg,1,False,False,0.08057595900027081,[1.0]
-images/custom/davids/short/C/custom_davids_short_C_3.jpg,0,False,False,0.08801158399728592,[]
-images/custom/davids/short/C/custom_davids_short_C_4.jpg,0,False,False,0.08691979201103095,[]
-images/custom/davids/short/D/custom_davids_short_D_0.jpg,0,False,False,0.06700766600260977,[]
-images/custom/davids/short/D/custom_davids_short_D_1.jpg,1,False,False,0.10766775000956841,[1.4142135623730951]
-images/custom/davids/short/D/custom_davids_short_D_2.jpg,1,False,False,0.0998957919946406,[1.0]
-images/custom/davids/short/D/custom_davids_short_D_3.jpg,0,False,False,0.09394575000624172,[]
-images/custom/davids/short/D/custom_davids_short_D_4.jpg,0,False,False,0.041734541999176145,[]
-images/custom/jack_cole/high/A/custom_jack_cole_high_A_0.jpg,0,False,False,0.0705672079930082,[]
-images/custom/jack_cole/high/A/custom_jack_cole_high_A_1.jpg,0,False,False,0.0846396669949172,[]
-images/custom/jack_cole/high/A/custom_jack_cole_high_A_2.jpg,0,False,False,0.08764841700030956,[]
-images/custom/jack_cole/high/A/custom_jack_cole_high_A_3.jpg,0,False,False,0.05613787499896716,[]
-images/custom/jack_cole/high/A/custom_jack_cole_high_A_4.jpg,0,False,False,0.04217679100111127,[]
-images/custom/jack_cole/high/B/custom_jack_cole_high_B_0.jpg,0,False,False,0.07085783399816137,[]
-images/custom/jack_cole/high/B/custom_jack_cole_high_B_1.jpg,0,False,False,0.09288475000357721,[]
-images/custom/jack_cole/high/B/custom_jack_cole_high_B_2.jpg,0,False,False,0.04082591598853469,[]
-images/custom/jack_cole/high/B/custom_jack_cole_high_B_3.jpg,0,False,False,0.09439549999660812,[]
-images/custom/jack_cole/high/B/custom_jack_cole_high_B_4.jpg,0,False,False,0.04134658299153671,[]
-images/custom/jack_cole/high/C/custom_jack_cole_high_C_0.jpg,0,False,False,0.030710582999745384,[]
-images/custom/jack_cole/high/C/custom_jack_cole_high_C_1.jpg,0,False,False,0.034465707998606376,[]
-images/custom/jack_cole/high/C/custom_jack_cole_high_C_2.jpg,0,False,False,0.10315824999997858,[]
-images/custom/jack_cole/high/C/custom_jack_cole_high_C_3.jpg,1,False,False,0.07549820801068563,[2.23606797749979]
-images/custom/jack_cole/high/C/custom_jack_cole_high_C_4.jpg,0,False,False,0.06788554199738428,[]
-images/custom/jack_cole/high/D/custom_jack_cole_high_D_0.jpg,0,False,False,0.09762687499460299,[]
-images/custom/jack_cole/high/D/custom_jack_cole_high_D_1.jpg,0,False,False,0.04772149999917019,[]
-images/custom/jack_cole/high/D/custom_jack_cole_high_D_2.jpg,1,False,False,0.09222891701210756,[1.4142135623730951]
-images/custom/jack_cole/high/D/custom_jack_cole_high_D_3.jpg,0,False,False,0.07135787500010338,[]
-images/custom/jack_cole/high/D/custom_jack_cole_high_D_4.jpg,0,False,False,0.06234454100194853,[]
-images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_0.jpg,0,False,False,0.056932584004243836,[]
-images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_1.jpg,0,False,False,0.051499458990292624,[]
-images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_2.jpg,0,False,False,0.05127612499927636,[]
-images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_3.jpg,0,False,False,0.08782237500417978,[]
-images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_4.jpg,0,False,False,0.07102945800579619,[]
-images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_0.jpg,0,False,False,0.08661041599407326,[]
-images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_1.jpg,0,False,False,0.059864750000997446,[]
-images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_2.jpg,0,False,False,0.10148675000527874,[]
-images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_3.jpg,0,False,False,0.042143833998125046,[]
-images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_4.jpg,0,False,False,0.04297287498775404,[]
-images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_0.jpg,0,False,False,0.06835141600458883,[]
-images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_1.jpg,0,False,False,0.04867699999886099,[]
-images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_2.jpg,0,False,False,0.08400091600196902,[]
-images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_3.jpg,0,False,False,0.06657912499213126,[]
-images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_4.jpg,0,False,False,0.05866170799708925,[]
-images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_0.jpg,0,False,False,0.07034129100793507,[]
-images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_1.jpg,0,False,False,0.07948374999978114,[]
-images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_2.jpg,0,False,False,0.06391375001112465,[]
-images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_3.jpg,0,False,False,0.058638375005102716,[]
-images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_4.jpg,0,False,False,0.04601766700216103,[]
-images/custom/jack_cole/short/A/custom_jack_cole_short_A_0.jpg,0,False,False,0.04738695798732806,[]
-images/custom/jack_cole/short/A/custom_jack_cole_short_A_1.jpg,0,False,False,0.05007737499545328,[]
-images/custom/jack_cole/short/A/custom_jack_cole_short_A_2.jpg,0,False,False,0.09807875000115018,[]
-images/custom/jack_cole/short/A/custom_jack_cole_short_A_3.jpg,0,False,False,0.053365624989965,[]
-images/custom/jack_cole/short/A/custom_jack_cole_short_A_4.jpg,0,False,False,0.04666233299940359,[]
-images/custom/jack_cole/short/B/custom_jack_cole_short_B_0.jpg,0,False,False,0.058194540994009,[]
-images/custom/jack_cole/short/B/custom_jack_cole_short_B_1.jpg,0,False,False,0.08429979199718218,[]
-images/custom/jack_cole/short/B/custom_jack_cole_short_B_2.jpg,0,False,False,0.040604209003504366,[]
-images/custom/jack_cole/short/B/custom_jack_cole_short_B_3.jpg,0,False,False,0.06386712500534486,[]
-images/custom/jack_cole/short/B/custom_jack_cole_short_B_4.jpg,0,False,False,0.06409499999426771,[]
-images/custom/jack_cole/short/C/custom_jack_cole_short_C_0.jpg,0,False,False,0.0634550419927109,[]
-images/custom/jack_cole/short/C/custom_jack_cole_short_C_1.jpg,0,False,False,0.054720957996323705,[]
-images/custom/jack_cole/short/C/custom_jack_cole_short_C_2.jpg,0,False,False,0.07313800000702031,[]
-images/custom/jack_cole/short/C/custom_jack_cole_short_C_3.jpg,0,False,False,0.11304495799413417,[]
-images/custom/jack_cole/short/C/custom_jack_cole_short_C_4.jpg,0,False,False,0.04185479199804831,[]
-images/custom/jack_cole/short/D/custom_jack_cole_short_D_0.jpg,0,False,False,0.057200833995011635,[]
-images/custom/jack_cole/short/D/custom_jack_cole_short_D_1.jpg,0,False,False,0.04907449999882374,[]
-images/custom/jack_cole/short/D/custom_jack_cole_short_D_2.jpg,0,False,False,0.08694391600147355,[]
-images/custom/jack_cole/short/D/custom_jack_cole_short_D_3.jpg,0,False,False,0.06318441600888036,[]
-images/custom/jack_cole/short/D/custom_jack_cole_short_D_4.jpg,0,False,False,0.03813487500883639,[]
-images/custom/john_honey/high/A/custom_john_honey_high_A_0.jpg,2,False,False,0.1323921660077758,"[1.0, 3.1622776601683795]"
-images/custom/john_honey/high/A/custom_john_honey_high_A_1.jpg,4,True,True,0.05536166600359138,"[1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
-images/custom/john_honey/high/A/custom_john_honey_high_A_2.jpg,4,True,True,0.09911866699985694,"[0.0, 1.0, 1.4142135623730951, 1.4142135623730951]"
-images/custom/john_honey/high/A/custom_john_honey_high_A_3.jpg,2,False,False,0.08276587500586174,"[1.0, 2.23606797749979]"
-images/custom/john_honey/high/A/custom_john_honey_high_A_4.jpg,3,False,False,0.10274541701073758,"[1.0, 1.4142135623730951, 1.4142135623730951]"
-images/custom/john_honey/high/B/custom_john_honey_high_B_0.jpg,3,False,False,0.06660112499957904,"[1.0, 2.0, 2.0]"
-images/custom/john_honey/high/B/custom_john_honey_high_B_1.jpg,3,False,False,0.09772670800157357,"[0.0, 1.4142135623730951, 2.0]"
-images/custom/john_honey/high/B/custom_john_honey_high_B_2.jpg,4,True,True,0.10671066700888332,"[1.0, 2.0, 2.0, 3.1622776601683795]"
-images/custom/john_honey/high/B/custom_john_honey_high_B_3.jpg,4,True,True,0.09149662499839906,"[0.0, 1.4142135623730951, 2.0, 3.0]"
-images/custom/john_honey/high/B/custom_john_honey_high_B_4.jpg,3,False,False,0.0758769589883741,"[0.0, 1.0, 1.0]"
-images/custom/john_honey/high/C/custom_john_honey_high_C_0.jpg,3,False,False,0.05641208399902098,"[1.0, 1.4142135623730951, 1.4142135623730951]"
-images/custom/john_honey/high/C/custom_john_honey_high_C_1.jpg,4,True,True,0.08002695799223147,"[1.0, 1.0, 1.0, 1.4142135623730951]"
-images/custom/john_honey/high/C/custom_john_honey_high_C_2.jpg,3,False,False,0.05175474999123253,"[0.0, 1.0, 2.0]"
-images/custom/john_honey/high/C/custom_john_honey_high_C_3.jpg,4,True,True,0.1301680829928955,"[0.0, 1.0, 1.0, 1.0]"
-images/custom/john_honey/high/C/custom_john_honey_high_C_4.jpg,3,False,False,0.045624333986779675,"[1.0, 1.4142135623730951, 2.23606797749979]"
-images/custom/john_honey/high/D/custom_john_honey_high_D_0.jpg,3,False,False,0.07553941701189615,"[0.0, 1.0, 1.0]"
-images/custom/john_honey/high/D/custom_john_honey_high_D_1.jpg,3,False,False,0.08318012500240002,"[1.0, 1.0, 1.0]"
-images/custom/john_honey/high/D/custom_john_honey_high_D_2.jpg,4,True,True,0.052335833010147326,"[0.0, 1.0, 2.0, 2.23606797749979]"
-images/custom/john_honey/high/D/custom_john_honey_high_D_3.jpg,3,False,False,0.09987762500531971,"[1.0, 1.4142135623730951, 2.23606797749979]"
-images/custom/john_honey/high/D/custom_john_honey_high_D_4.jpg,3,False,False,0.08946616698813159,"[1.0, 1.0, 2.23606797749979]"
-images/custom/john_honey/medium/A/custom_john_honey_medium_A_0.jpg,3,False,False,0.09387474998948164,"[0.0, 1.0, 1.0]"
-images/custom/john_honey/medium/A/custom_john_honey_medium_A_1.jpg,3,False,False,0.06956741701287683,"[0.0, 1.0, 1.4142135623730951]"
-images/custom/john_honey/medium/A/custom_john_honey_medium_A_2.jpg,2,False,False,0.07433795899851248,"[0.0, 1.4142135623730951]"
-images/custom/john_honey/medium/A/custom_john_honey_medium_A_3.jpg,3,False,False,0.057186416001059115,"[1.0, 1.0, 1.4142135623730951]"
-images/custom/john_honey/medium/A/custom_john_honey_medium_A_4.jpg,2,False,False,0.07699787500314415,"[1.0, 1.4142135623730951]"
-images/custom/john_honey/medium/B/custom_john_honey_medium_B_0.jpg,1,False,False,0.06377500000235159,[1.0]
-images/custom/john_honey/medium/B/custom_john_honey_medium_B_1.jpg,2,False,False,0.0755116249929415,"[1.0, 2.23606797749979]"
-images/custom/john_honey/medium/B/custom_john_honey_medium_B_2.jpg,1,False,False,0.056988290991284885,[2.23606797749979]
-images/custom/john_honey/medium/B/custom_john_honey_medium_B_3.jpg,3,False,False,0.08499679100350477,"[1.0, 2.0, 2.8284271247461903]"
-images/custom/john_honey/medium/B/custom_john_honey_medium_B_4.jpg,1,False,False,0.1175680000014836,[1.4142135623730951]
-images/custom/john_honey/medium/C/custom_john_honey_medium_C_0.jpg,3,False,False,0.0817578330024844,"[1.0, 1.4142135623730951, 2.23606797749979]"
-images/custom/john_honey/medium/C/custom_john_honey_medium_C_1.jpg,3,False,False,0.11173437499382999,"[1.0, 1.4142135623730951, 1.4142135623730951]"
-images/custom/john_honey/medium/C/custom_john_honey_medium_C_2.jpg,2,False,False,0.07169174999580719,"[1.0, 2.0]"
-images/custom/john_honey/medium/C/custom_john_honey_medium_C_3.jpg,3,False,False,0.09473912500834558,"[1.4142135623730951, 2.0, 2.23606797749979]"
-images/custom/john_honey/medium/C/custom_john_honey_medium_C_4.jpg,1,False,False,0.08968274999642745,[1.0]
-images/custom/john_honey/medium/D/custom_john_honey_medium_D_0.jpg,2,False,False,0.04864812501182314,"[1.0, 2.23606797749979]"
-images/custom/john_honey/medium/D/custom_john_honey_medium_D_1.jpg,2,False,False,0.1033397910068743,"[0.0, 1.4142135623730951]"
-images/custom/john_honey/medium/D/custom_john_honey_medium_D_2.jpg,2,False,False,0.07007070801046211,"[0.0, 1.4142135623730951]"
-images/custom/john_honey/medium/D/custom_john_honey_medium_D_3.jpg,2,False,False,0.06702304199279752,"[0.0, 1.0]"
-images/custom/john_honey/medium/D/custom_john_honey_medium_D_4.jpg,1,False,False,0.15412229200592265,[1.4142135623730951]
-images/custom/john_honey/short/A/custom_john_honey_short_A_0.jpg,1,False,False,0.04692833300214261,[1.4142135623730951]
-images/custom/john_honey/short/A/custom_john_honey_short_A_1.jpg,0,False,False,0.04827904199191835,[]
-images/custom/john_honey/short/A/custom_john_honey_short_A_2.jpg,1,False,False,0.04876508300367277,[1.4142135623730951]
-images/custom/john_honey/short/A/custom_john_honey_short_A_3.jpg,0,False,False,0.044264542011660524,[]
-images/custom/john_honey/short/A/custom_john_honey_short_A_4.jpg,1,False,False,0.07396491699910257,[2.23606797749979]
-images/custom/john_honey/short/B/custom_john_honey_short_B_0.jpg,2,False,False,0.08079983299830928,"[1.0, 2.23606797749979]"
-images/custom/john_honey/short/B/custom_john_honey_short_B_1.jpg,2,False,False,0.07054604100994766,"[1.0, 2.0]"
-images/custom/john_honey/short/B/custom_john_honey_short_B_2.jpg,0,False,False,0.12475083299796097,[]
-images/custom/john_honey/short/B/custom_john_honey_short_B_3.jpg,1,False,False,0.11719429200456943,[1.0]
-images/custom/john_honey/short/B/custom_john_honey_short_B_4.jpg,0,False,False,0.05535208299988881,[]
-images/custom/john_honey/short/C/custom_john_honey_short_C_0.jpg,1,False,False,0.07515645898820367,[2.0]
-images/custom/john_honey/short/C/custom_john_honey_short_C_1.jpg,0,False,False,0.06985945798805915,[]
-images/custom/john_honey/short/C/custom_john_honey_short_C_2.jpg,0,False,False,0.06096791601157747,[]
-images/custom/john_honey/short/C/custom_john_honey_short_C_3.jpg,0,False,False,0.23291062499629334,[]
-images/custom/john_honey/short/C/custom_john_honey_short_C_4.jpg,0,False,False,0.10592137499770615,[]
-images/custom/john_honey/short/D/custom_john_honey_short_D_0.jpg,0,False,False,0.05333091699867509,[]
-images/custom/john_honey/short/D/custom_john_honey_short_D_1.jpg,1,False,False,0.0993258750095265,[1.4142135623730951]
-images/custom/john_honey/short/D/custom_john_honey_short_D_2.jpg,1,False,False,0.05150562500057276,[1.4142135623730951]
-images/custom/john_honey/short/D/custom_john_honey_short_D_3.jpg,2,False,False,0.1367198750085663,"[1.4142135623730951, 2.0]"
-images/custom/john_honey/short/D/custom_john_honey_short_D_4.jpg,0,False,False,0.09418983300565742,[]
-images/custom/michaels/high/A/custom_michaels_high_A_0.jpg,4,True,True,0.051778041990473866,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
-images/custom/michaels/high/A/custom_michaels_high_A_1.jpg,4,True,True,0.08455779099313077,"[1.0, 1.0, 1.0, 1.4142135623730951]"
-images/custom/michaels/high/A/custom_michaels_high_A_2.jpg,3,False,False,0.07616508399951272,"[1.0, 1.0, 1.4142135623730951]"
-images/custom/michaels/high/A/custom_michaels_high_A_3.jpg,0,False,False,0.07108795800013468,[]
-images/custom/michaels/high/A/custom_michaels_high_A_4.jpg,0,False,False,0.07879520799906459,[]
-images/custom/michaels/high/B/custom_michaels_high_B_0.jpg,4,True,True,0.10532062499260064,"[0.0, 1.0, 1.4142135623730951, 2.8284271247461903]"
-images/custom/michaels/high/B/custom_michaels_high_B_1.jpg,3,False,False,0.10742524999659508,"[1.0, 1.4142135623730951, 2.0]"
-images/custom/michaels/high/B/custom_michaels_high_B_2.jpg,1,False,False,0.0965117079904303,[0.0]
-images/custom/michaels/high/B/custom_michaels_high_B_3.jpg,4,True,True,0.05872433401236776,"[0.0, 1.0, 1.0, 2.23606797749979]"
-images/custom/michaels/high/B/custom_michaels_high_B_4.jpg,2,False,False,0.09035929200763348,"[0.0, 1.0]"
-images/custom/michaels/high/C/custom_michaels_high_C_0.jpg,2,False,False,0.06852883299870882,"[2.23606797749979, 3.1622776601683795]"
-images/custom/michaels/high/C/custom_michaels_high_C_1.jpg,2,False,False,0.04290945900720544,"[1.4142135623730951, 2.23606797749979]"
-images/custom/michaels/high/C/custom_michaels_high_C_2.jpg,2,False,False,0.03920629200001713,"[0.0, 1.0]"
-images/custom/michaels/high/C/custom_michaels_high_C_3.jpg,2,False,False,0.15935349999926984,"[0.0, 1.4142135623730951]"
-images/custom/michaels/high/C/custom_michaels_high_C_4.jpg,0,False,False,0.07130283300648443,[]
-images/custom/michaels/high/D/custom_michaels_high_D_0.jpg,3,False,False,0.053693124995334074,"[0.0, 0.0, 1.4142135623730951]"
-images/custom/michaels/high/D/custom_michaels_high_D_1.jpg,1,False,False,0.06828520800627302,[1.0]
-images/custom/michaels/high/D/custom_michaels_high_D_2.jpg,1,False,False,0.08145195800170768,[1.4142135623730951]
-images/custom/michaels/high/D/custom_michaels_high_D_3.jpg,4,True,True,0.05640520800079685,"[1.0, 1.0, 1.0, 1.4142135623730951]"
-images/custom/michaels/high/D/custom_michaels_high_D_4.jpg,3,False,False,0.05736612499458715,"[0.0, 1.0, 1.4142135623730951]"
-images/custom/michaels/medium/A/custom_michaels_medium_A_0.jpg,0,False,False,0.07229170799837448,[]
-images/custom/michaels/medium/A/custom_michaels_medium_A_1.jpg,0,False,False,0.09565666600246914,[]
-images/custom/michaels/medium/A/custom_michaels_medium_A_2.jpg,2,False,False,0.09638220899796579,"[1.0, 1.4142135623730951]"
-images/custom/michaels/medium/A/custom_michaels_medium_A_3.jpg,0,False,False,0.10250924999127164,[]
-images/custom/michaels/medium/A/custom_michaels_medium_A_4.jpg,0,False,False,0.06459562499367166,[]
-images/custom/michaels/medium/B/custom_michaels_medium_B_0.jpg,0,False,False,0.08258179199765436,[]
-images/custom/michaels/medium/B/custom_michaels_medium_B_1.jpg,1,False,False,0.08616766700288281,[1.4142135623730951]
-images/custom/michaels/medium/B/custom_michaels_medium_B_2.jpg,0,False,False,0.05752395901072305,[]
-images/custom/michaels/medium/B/custom_michaels_medium_B_3.jpg,3,False,False,0.09649920799711253,"[0.0, 1.0, 2.23606797749979]"
-images/custom/michaels/medium/B/custom_michaels_medium_B_4.jpg,0,False,False,0.04864725000516046,[]
-images/custom/michaels/medium/C/custom_michaels_medium_C_0.jpg,0,False,False,0.06303904100786895,[]
-images/custom/michaels/medium/C/custom_michaels_medium_C_1.jpg,1,False,False,0.1527695419936208,[1.0]
-images/custom/michaels/medium/C/custom_michaels_medium_C_2.jpg,0,False,False,0.15026608399057295,[]
-images/custom/michaels/medium/C/custom_michaels_medium_C_3.jpg,0,False,False,0.06311266600096133,[]
-images/custom/michaels/medium/C/custom_michaels_medium_C_4.jpg,0,False,False,0.08914854199974798,[]
-images/custom/michaels/medium/D/custom_michaels_medium_D_0.jpg,0,False,False,0.07096733299840707,[]
-images/custom/michaels/medium/D/custom_michaels_medium_D_1.jpg,0,False,False,0.072569541996927,[]
-images/custom/michaels/medium/D/custom_michaels_medium_D_2.jpg,1,False,False,0.08612562500638887,[1.0]
-images/custom/michaels/medium/D/custom_michaels_medium_D_3.jpg,0,False,False,0.08854945799976122,[]
-images/custom/michaels/medium/D/custom_michaels_medium_D_4.jpg,0,False,False,0.054713250006898306,[]
-images/custom/michaels/short/A/custom_michaels_short_A_0.jpg,0,False,False,0.05139316699933261,[]
-images/custom/michaels/short/A/custom_michaels_short_A_1.jpg,0,False,False,0.0727872080024099,[]
-images/custom/michaels/short/A/custom_michaels_short_A_2.jpg,0,False,False,0.1102596669952618,[]
-images/custom/michaels/short/A/custom_michaels_short_A_3.jpg,0,False,False,0.04766370900324546,[]
-images/custom/michaels/short/A/custom_michaels_short_A_4.jpg,0,False,False,0.06386633300280664,[]
-images/custom/michaels/short/B/custom_michaels_short_B_0.jpg,0,False,False,0.08852662499703001,[]
-images/custom/michaels/short/B/custom_michaels_short_B_1.jpg,0,False,False,0.06829133299470413,[]
-images/custom/michaels/short/B/custom_michaels_short_B_2.jpg,0,False,False,0.11144262499874458,[]
-images/custom/michaels/short/B/custom_michaels_short_B_3.jpg,0,False,False,0.10887358299805783,[]
-images/custom/michaels/short/B/custom_michaels_short_B_4.jpg,0,False,False,0.04446562500379514,[]
-images/custom/michaels/short/C/custom_michaels_short_C_0.jpg,0,False,False,0.08340499999758322,[]
-images/custom/michaels/short/C/custom_michaels_short_C_1.jpg,0,False,False,0.0846946669917088,[]
-images/custom/michaels/short/C/custom_michaels_short_C_2.jpg,0,False,False,0.11664145799295511,[]
-images/custom/michaels/short/C/custom_michaels_short_C_3.jpg,0,False,False,0.03779524999845307,[]
-images/custom/michaels/short/C/custom_michaels_short_C_4.jpg,0,False,False,0.07911341699946206,[]
-images/custom/michaels/short/D/custom_michaels_short_D_0.jpg,0,False,False,0.06079370800580364,[]
-images/custom/michaels/short/D/custom_michaels_short_D_1.jpg,0,False,False,0.07541008399857674,[]
-images/custom/michaels/short/D/custom_michaels_short_D_2.jpg,0,False,False,0.07241183299629483,[]
-images/custom/michaels/short/D/custom_michaels_short_D_3.jpg,0,False,False,0.04380916700756643,[]
-images/custom/michaels/short/D/custom_michaels_short_D_4.jpg,0,False,False,0.04873708299419377,[]
-images/dark/davids/high/A/dark_davids_high_A_0.jpg,1,False,False,0.10950662499817554,[1.0]
-images/dark/davids/high/A/dark_davids_high_A_1.jpg,1,False,False,0.09923749999143183,[2.23606797749979]
-images/dark/davids/high/A/dark_davids_high_A_2.jpg,0,False,False,0.1330515409936197,[]
-images/dark/davids/high/A/dark_davids_high_A_3.jpg,1,False,False,0.09404670799267478,[1.0]
-images/dark/davids/high/A/dark_davids_high_A_4.jpg,0,False,False,0.08733708299405407,[]
-images/dark/davids/high/B/dark_davids_high_B_0.jpg,1,False,False,0.10410541700548492,[2.0]
-images/dark/davids/high/B/dark_davids_high_B_1.jpg,0,False,False,0.10380966600496322,[]
-images/dark/davids/high/B/dark_davids_high_B_2.jpg,0,False,False,0.1039680420071818,[]
-images/dark/davids/high/B/dark_davids_high_B_3.jpg,0,False,False,0.07702054099354427,[]
-images/dark/davids/high/B/dark_davids_high_B_4.jpg,0,False,False,0.2813033750135219,[]
-images/dark/davids/high/C/dark_davids_high_C_0.jpg,1,False,False,0.08963529199536424,[1.0]
-images/dark/davids/high/C/dark_davids_high_C_1.jpg,0,False,False,0.06534579199797008,[]
-images/dark/davids/high/C/dark_davids_high_C_2.jpg,1,False,False,0.12899974999891128,[1.0]
-images/dark/davids/high/C/dark_davids_high_C_3.jpg,0,False,False,0.20022704199072905,[]
-images/dark/davids/high/C/dark_davids_high_C_4.jpg,0,False,False,0.0695374999922933,[]
-images/dark/davids/high/D/dark_davids_high_D_0.jpg,0,False,False,0.09270524999010377,[]
-images/dark/davids/high/D/dark_davids_high_D_1.jpg,1,False,False,0.14294458299991675,[1.0]
-images/dark/davids/high/D/dark_davids_high_D_2.jpg,1,False,False,0.06588008299877401,[1.4142135623730951]
-images/dark/davids/high/D/dark_davids_high_D_3.jpg,0,False,False,0.11360245899413712,[]
-images/dark/davids/high/D/dark_davids_high_D_4.jpg,1,False,False,0.09182512501138262,[1.4142135623730951]
-images/dark/davids/medium/A/dark_davids_medium_A_0.jpg,0,False,False,0.044244499993510544,[]
-images/dark/davids/medium/A/dark_davids_medium_A_1.jpg,0,False,False,0.10813220900308806,[]
-images/dark/davids/medium/A/dark_davids_medium_A_2.jpg,0,False,False,0.08839108300162479,[]
-images/dark/davids/medium/A/dark_davids_medium_A_3.jpg,1,False,False,0.06959312499384396,[1.0]
-images/dark/davids/medium/A/dark_davids_medium_A_4.jpg,0,False,False,0.05523220798932016,[]
-images/dark/davids/medium/B/dark_davids_medium_B_0.jpg,0,False,False,0.09092262499325443,[]
-images/dark/davids/medium/B/dark_davids_medium_B_1.jpg,0,False,False,0.08418904100835789,[]
-images/dark/davids/medium/B/dark_davids_medium_B_2.jpg,0,False,False,0.05069141701096669,[]
-images/dark/davids/medium/B/dark_davids_medium_B_3.jpg,0,False,False,0.057307583003421314,[]
-images/dark/davids/medium/B/dark_davids_medium_B_4.jpg,0,False,False,0.08289725000213366,[]
-images/dark/davids/medium/C/dark_davids_medium_C_0.jpg,0,False,False,0.06588683399604633,[]
-images/dark/davids/medium/C/dark_davids_medium_C_1.jpg,0,False,False,0.08483033398806583,[]
-images/dark/davids/medium/C/dark_davids_medium_C_2.jpg,0,False,False,0.10210970899788663,[]
-images/dark/davids/medium/C/dark_davids_medium_C_3.jpg,0,False,False,0.047364665995701216,[]
-images/dark/davids/medium/C/dark_davids_medium_C_4.jpg,0,False,False,0.04504816699773073,[]
-images/dark/davids/medium/D/dark_davids_medium_D_0.jpg,0,False,False,0.08155341699603014,[]
-images/dark/davids/medium/D/dark_davids_medium_D_1.jpg,0,False,False,0.0966111669986276,[]
-images/dark/davids/medium/D/dark_davids_medium_D_2.jpg,0,False,False,0.07558762500411831,[]
-images/dark/davids/medium/D/dark_davids_medium_D_3.jpg,0,False,False,0.1006584999995539,[]
-images/dark/davids/medium/D/dark_davids_medium_D_4.jpg,0,False,False,0.04950020799878985,[]
-images/dark/davids/short/A/dark_davids_short_A_0.jpg,1,False,False,0.06679858300776687,[2.23606797749979]
-images/dark/davids/short/A/dark_davids_short_A_1.jpg,0,False,False,0.10333324999373872,[]
-images/dark/davids/short/A/dark_davids_short_A_2.jpg,0,False,False,0.08429112499288749,[]
-images/dark/davids/short/A/dark_davids_short_A_3.jpg,2,False,False,0.1073620000097435,"[1.4142135623730951, 2.23606797749979]"
-images/dark/davids/short/A/dark_davids_short_A_4.jpg,0,False,False,0.06514341699949,[]
-images/dark/davids/short/B/dark_davids_short_B_0.jpg,0,False,False,0.040253375002066605,[]
-images/dark/davids/short/B/dark_davids_short_B_1.jpg,0,False,False,0.09909824999340344,[]
-images/dark/davids/short/B/dark_davids_short_B_2.jpg,0,False,False,0.05339541599096265,[]
-images/dark/davids/short/B/dark_davids_short_B_3.jpg,0,False,False,0.034661124998820014,[]
-images/dark/davids/short/B/dark_davids_short_B_4.jpg,0,False,False,0.04231712500040885,[]
-images/dark/davids/short/C/dark_davids_short_C_0.jpg,0,False,False,0.06701887499366421,[]
-images/dark/davids/short/C/dark_davids_short_C_1.jpg,0,False,False,0.04170962500211317,[]
-images/dark/davids/short/C/dark_davids_short_C_2.jpg,0,False,False,0.04770087500219233,[]
-images/dark/davids/short/C/dark_davids_short_C_3.jpg,0,False,False,0.08703766700637061,[]
-images/dark/davids/short/C/dark_davids_short_C_4.jpg,0,False,False,0.09388445800868794,[]
-images/dark/davids/short/D/dark_davids_short_D_0.jpg,0,False,False,0.057361958999536,[]
-images/dark/davids/short/D/dark_davids_short_D_1.jpg,0,False,False,0.061270125006558374,[]
-images/dark/davids/short/D/dark_davids_short_D_2.jpg,0,False,False,0.07129462499869987,[]
-images/dark/davids/short/D/dark_davids_short_D_3.jpg,0,False,False,0.08060316699265968,[]
-images/dark/davids/short/D/dark_davids_short_D_4.jpg,0,False,False,0.0732703749963548,[]
-images/dark/jack_cole/high/A/dark_jack_cole_high_A_0.jpg,0,False,False,0.0770084579999093,[]
-images/dark/jack_cole/high/A/dark_jack_cole_high_A_1.jpg,0,False,False,0.028625000006286427,[]
-images/dark/jack_cole/high/A/dark_jack_cole_high_A_2.jpg,0,False,False,0.035358875000383705,[]
-images/dark/jack_cole/high/A/dark_jack_cole_high_A_3.jpg,0,False,False,0.06065945800219197,[]
-images/dark/jack_cole/high/A/dark_jack_cole_high_A_4.jpg,0,False,False,0.10377654100011569,[]
-images/dark/jack_cole/high/B/dark_jack_cole_high_B_0.jpg,0,False,False,0.05847737500153016,[]
-images/dark/jack_cole/high/B/dark_jack_cole_high_B_1.jpg,0,False,False,0.06381237501045689,[]
-images/dark/jack_cole/high/B/dark_jack_cole_high_B_2.jpg,0,False,False,0.09509600000455976,[]
-images/dark/jack_cole/high/B/dark_jack_cole_high_B_3.jpg,0,False,False,0.04666529200039804,[]
-images/dark/jack_cole/high/B/dark_jack_cole_high_B_4.jpg,0,False,False,0.07463679100328591,[]
-images/dark/jack_cole/high/C/dark_jack_cole_high_C_0.jpg,0,False,False,0.06784912500006612,[]
-images/dark/jack_cole/high/C/dark_jack_cole_high_C_1.jpg,0,False,False,0.06812741699104663,[]
-images/dark/jack_cole/high/C/dark_jack_cole_high_C_2.jpg,0,False,False,0.06083612499060109,[]
-images/dark/jack_cole/high/C/dark_jack_cole_high_C_3.jpg,0,False,False,0.047459458000957966,[]
-images/dark/jack_cole/high/C/dark_jack_cole_high_C_4.jpg,0,False,False,0.03267575000063516,[]
-images/dark/jack_cole/high/D/dark_jack_cole_high_D_0.jpg,0,False,False,0.03488654199463781,[]
-images/dark/jack_cole/high/D/dark_jack_cole_high_D_1.jpg,0,False,False,0.04384262498933822,[]
-images/dark/jack_cole/high/D/dark_jack_cole_high_D_2.jpg,0,False,False,0.05757129100675229,[]
-images/dark/jack_cole/high/D/dark_jack_cole_high_D_3.jpg,0,False,False,0.07225816701247822,[]
-images/dark/jack_cole/high/D/dark_jack_cole_high_D_4.jpg,0,False,False,0.037417291998281144,[]
-images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_0.jpg,0,False,False,0.038811124992207624,[]
-images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_1.jpg,0,False,False,0.06971820900798775,[]
-images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_2.jpg,0,False,False,0.046532541993656196,[]
-images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_3.jpg,0,False,False,0.0712573340133531,[]
-images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_4.jpg,0,False,False,0.05476008300320245,[]
-images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_0.jpg,0,False,False,0.07564058298885357,[]
-images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_1.jpg,0,False,False,0.07823050000297371,[]
-images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_2.jpg,0,False,False,0.051928166998550296,[]
-images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_3.jpg,0,False,False,0.09854095800255891,[]
-images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_4.jpg,0,False,False,0.05362383299507201,[]
-images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_0.jpg,0,False,False,0.06447050000133459,[]
-images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_1.jpg,0,False,False,0.0532354160095565,[]
-images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_2.jpg,0,False,False,0.04697750000923406,[]
-images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_3.jpg,0,False,False,0.08577216698904522,[]
-images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_4.jpg,0,False,False,0.054438916995422915,[]
-images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_0.jpg,0,False,False,0.06606483399809804,[]
-images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_1.jpg,0,False,False,0.04959937499370426,[]
-images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_2.jpg,0,False,False,0.0826599590072874,[]
-images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_3.jpg,0,False,False,0.05892116599716246,[]
-images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_4.jpg,0,False,False,0.08104049999383278,[]
-images/dark/jack_cole/short/A/dark_jack_cole_short_A_0.jpg,0,False,False,0.07867425000586081,[]
-images/dark/jack_cole/short/A/dark_jack_cole_short_A_1.jpg,0,False,False,0.07352491699566599,[]
-images/dark/jack_cole/short/A/dark_jack_cole_short_A_2.jpg,0,False,False,0.07670325000071898,[]
-images/dark/jack_cole/short/A/dark_jack_cole_short_A_3.jpg,0,False,False,0.04695499999797903,[]
-images/dark/jack_cole/short/A/dark_jack_cole_short_A_4.jpg,0,False,False,0.04437741699803155,[]
-images/dark/jack_cole/short/B/dark_jack_cole_short_B_0.jpg,0,False,False,0.0724015000014333,[]
-images/dark/jack_cole/short/B/dark_jack_cole_short_B_1.jpg,0,False,False,0.06957783400139306,[]
-images/dark/jack_cole/short/B/dark_jack_cole_short_B_2.jpg,0,False,False,0.07363625000289176,[]
-images/dark/jack_cole/short/B/dark_jack_cole_short_B_3.jpg,0,False,False,0.050619957997696474,[]
-images/dark/jack_cole/short/B/dark_jack_cole_short_B_4.jpg,0,False,False,0.10079004098952282,[]
-images/dark/jack_cole/short/C/dark_jack_cole_short_C_0.jpg,0,False,False,0.06057520899048541,[]
-images/dark/jack_cole/short/C/dark_jack_cole_short_C_1.jpg,0,False,False,0.07394029200077057,[]
-images/dark/jack_cole/short/C/dark_jack_cole_short_C_2.jpg,0,False,False,0.04625862500688527,[]
-images/dark/jack_cole/short/C/dark_jack_cole_short_C_3.jpg,0,False,False,0.05962975000147708,[]
-images/dark/jack_cole/short/C/dark_jack_cole_short_C_4.jpg,0,False,False,0.05861620799987577,[]
-images/dark/jack_cole/short/D/dark_jack_cole_short_D_0.jpg,0,False,False,0.03697979099524673,[]
-images/dark/jack_cole/short/D/dark_jack_cole_short_D_1.jpg,0,False,False,0.036920167010976,[]
-images/dark/jack_cole/short/D/dark_jack_cole_short_D_2.jpg,0,False,False,0.032444833996123634,[]
-images/dark/jack_cole/short/D/dark_jack_cole_short_D_3.jpg,0,False,False,0.045976499997777864,[]
-images/dark/jack_cole/short/D/dark_jack_cole_short_D_4.jpg,0,False,False,0.05183837500226218,[]
-images/dark/john_honey/high/A/dark_john_honey_high_A_0.jpg,4,True,True,0.09862695800256915,"[1.0, 1.0, 1.0, 2.23606797749979]"
-images/dark/john_honey/high/A/dark_john_honey_high_A_1.jpg,4,True,True,0.1698023750068387,"[1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/high/A/dark_john_honey_high_A_2.jpg,4,True,True,0.12603724999644328,"[0.0, 1.0, 2.0, 2.8284271247461903]"
-images/dark/john_honey/high/A/dark_john_honey_high_A_3.jpg,4,True,True,0.1046211249922635,"[1.0, 2.23606797749979, 2.23606797749979, 2.8284271247461903]"
-images/dark/john_honey/high/A/dark_john_honey_high_A_4.jpg,4,True,True,0.09767716699570883,"[0.0, 1.0, 1.0, 2.0]"
-images/dark/john_honey/high/B/dark_john_honey_high_B_0.jpg,4,True,True,0.11437175000901334,"[0.0, 1.0, 1.0, 1.0]"
-images/dark/john_honey/high/B/dark_john_honey_high_B_1.jpg,4,True,True,0.13883254199754447,"[0.0, 0.0, 2.23606797749979, 2.8284271247461903]"
-images/dark/john_honey/high/B/dark_john_honey_high_B_2.jpg,4,True,True,0.30700200000137556,"[1.4142135623730951, 2.0, 2.23606797749979, 2.23606797749979]"
-images/dark/john_honey/high/B/dark_john_honey_high_B_3.jpg,4,True,True,0.10423133299627807,"[1.0, 1.4142135623730951, 2.23606797749979, 3.1622776601683795]"
-images/dark/john_honey/high/B/dark_john_honey_high_B_4.jpg,4,True,True,0.09548625000752509,"[1.4142135623730951, 1.4142135623730951, 2.0, 3.1622776601683795]"
-images/dark/john_honey/high/C/dark_john_honey_high_C_0.jpg,4,True,True,0.187003500002902,"[0.0, 1.0, 1.0, 1.4142135623730951]"
-images/dark/john_honey/high/C/dark_john_honey_high_C_1.jpg,4,True,True,0.20625170900893863,"[0.0, 1.0, 1.4142135623730951, 2.0]"
-images/dark/john_honey/high/C/dark_john_honey_high_C_2.jpg,4,True,True,0.18577495799399912,"[1.0, 1.4142135623730951, 2.8284271247461903, 3.1622776601683795]"
-images/dark/john_honey/high/C/dark_john_honey_high_C_3.jpg,4,True,True,0.18719362499541603,"[1.0, 1.0, 2.23606797749979, 2.23606797749979]"
-images/dark/john_honey/high/C/dark_john_honey_high_C_4.jpg,4,True,True,0.1858524999988731,"[1.0, 1.0, 1.4142135623730951, 1.4142135623730951]"
-images/dark/john_honey/high/D/dark_john_honey_high_D_0.jpg,4,True,True,0.31395275000249967,"[0.0, 1.0, 1.4142135623730951, 2.0]"
-images/dark/john_honey/high/D/dark_john_honey_high_D_1.jpg,4,True,True,0.2842227079963777,"[0.0, 1.0, 2.23606797749979, 2.8284271247461903]"
-images/dark/john_honey/high/D/dark_john_honey_high_D_2.jpg,4,True,True,0.15329262499290053,"[0.0, 2.23606797749979, 2.23606797749979, 2.23606797749979]"
-images/dark/john_honey/high/D/dark_john_honey_high_D_3.jpg,3,False,False,0.1104856669990113,"[1.0, 2.23606797749979, 3.1622776601683795]"
-images/dark/john_honey/high/D/dark_john_honey_high_D_4.jpg,4,True,True,0.17566737499146257,"[1.0, 1.0, 1.0, 2.23606797749979]"
-images/dark/john_honey/medium/A/dark_john_honey_medium_A_0.jpg,3,False,False,0.09245450000162236,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
-images/dark/john_honey/medium/A/dark_john_honey_medium_A_1.jpg,3,False,False,0.0944133330049226,"[1.4142135623730951, 2.0, 2.0]"
-images/dark/john_honey/medium/A/dark_john_honey_medium_A_2.jpg,3,False,False,0.07310087500081863,"[0.0, 1.0, 2.23606797749979]"
-images/dark/john_honey/medium/A/dark_john_honey_medium_A_3.jpg,4,True,True,0.04241604199341964,"[1.0, 1.0, 1.4142135623730951, 3.0]"
-images/dark/john_honey/medium/A/dark_john_honey_medium_A_4.jpg,3,False,False,0.10958970899810083,"[1.0, 1.0, 1.4142135623730951]"
-images/dark/john_honey/medium/B/dark_john_honey_medium_B_0.jpg,2,False,False,0.07314337500429247,"[2.0, 2.23606797749979]"
-images/dark/john_honey/medium/B/dark_john_honey_medium_B_1.jpg,4,True,True,0.09524383299867623,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/medium/B/dark_john_honey_medium_B_2.jpg,4,True,True,0.08717258399701677,"[0.0, 1.4142135623730951, 1.4142135623730951, 2.0]"
-images/dark/john_honey/medium/B/dark_john_honey_medium_B_3.jpg,4,True,True,0.06847229199775029,"[1.0, 1.0, 2.0, 2.23606797749979]"
-images/dark/john_honey/medium/B/dark_john_honey_medium_B_4.jpg,4,True,True,0.1438092919997871,"[0.0, 0.0, 1.0, 2.23606797749979]"
-images/dark/john_honey/medium/C/dark_john_honey_medium_C_0.jpg,4,True,True,0.08764658399741165,"[1.0, 1.0, 1.0, 1.0]"
-images/dark/john_honey/medium/C/dark_john_honey_medium_C_1.jpg,3,False,False,0.07887933299934957,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
-images/dark/john_honey/medium/C/dark_john_honey_medium_C_2.jpg,3,False,False,0.07250604199361987,"[1.0, 2.0, 2.23606797749979]"
-images/dark/john_honey/medium/C/dark_john_honey_medium_C_3.jpg,4,True,True,0.04663487499055918,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/medium/C/dark_john_honey_medium_C_4.jpg,3,False,False,0.03638883300300222,"[0.0, 2.23606797749979, 2.23606797749979]"
-images/dark/john_honey/medium/D/dark_john_honey_medium_D_0.jpg,2,False,False,0.0339103750011418,"[1.0, 1.4142135623730951]"
-images/dark/john_honey/medium/D/dark_john_honey_medium_D_1.jpg,3,False,False,0.06096941599389538,"[1.0, 1.0, 1.4142135623730951]"
-images/dark/john_honey/medium/D/dark_john_honey_medium_D_2.jpg,4,True,True,0.07034820900298655,"[0.0, 1.0, 2.0, 2.23606797749979]"
-images/dark/john_honey/medium/D/dark_john_honey_medium_D_3.jpg,4,True,True,0.05691025000123773,"[1.4142135623730951, 2.0, 2.23606797749979, 3.1622776601683795]"
-images/dark/john_honey/medium/D/dark_john_honey_medium_D_4.jpg,2,False,False,0.10141508400556631,"[1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/short/A/dark_john_honey_short_A_0.jpg,3,False,False,0.05991041699599009,"[1.4142135623730951, 1.4142135623730951, 2.0]"
-images/dark/john_honey/short/A/dark_john_honey_short_A_1.jpg,4,True,True,0.10637995800061617,"[0.0, 1.0, 1.4142135623730951, 3.605551275463989]"
-images/dark/john_honey/short/A/dark_john_honey_short_A_2.jpg,1,False,False,0.06762183298997115,[1.0]
-images/dark/john_honey/short/A/dark_john_honey_short_A_3.jpg,1,False,False,0.09245704099885188,[2.23606797749979]
-images/dark/john_honey/short/A/dark_john_honey_short_A_4.jpg,2,False,False,0.09363841700542253,"[1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/short/B/dark_john_honey_short_B_0.jpg,2,False,False,0.05164433400204871,"[0.0, 1.4142135623730951]"
-images/dark/john_honey/short/B/dark_john_honey_short_B_1.jpg,2,False,False,0.07664433401077986,"[1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/short/B/dark_john_honey_short_B_2.jpg,0,False,False,0.12165279100008775,[]
-images/dark/john_honey/short/B/dark_john_honey_short_B_3.jpg,3,False,False,0.07616479200078174,"[1.0, 2.23606797749979, 3.0]"
-images/dark/john_honey/short/B/dark_john_honey_short_B_4.jpg,0,False,False,0.06169516600493807,[]
-images/dark/john_honey/short/C/dark_john_honey_short_C_0.jpg,0,False,False,0.10032070899615064,[]
-images/dark/john_honey/short/C/dark_john_honey_short_C_1.jpg,0,False,False,0.08540550000907388,[]
-images/dark/john_honey/short/C/dark_john_honey_short_C_2.jpg,1,False,False,0.1167865829920629,[2.23606797749979]
-images/dark/john_honey/short/C/dark_john_honey_short_C_3.jpg,1,False,False,0.08493116700265091,[2.8284271247461903]
-images/dark/john_honey/short/C/dark_john_honey_short_C_4.jpg,0,False,False,0.09828595801081974,[]
-images/dark/john_honey/short/D/dark_john_honey_short_D_0.jpg,0,False,False,0.05057995799870696,[]
-images/dark/john_honey/short/D/dark_john_honey_short_D_1.jpg,4,True,True,0.05038733300170861,"[0.0, 0.0, 1.4142135623730951, 2.23606797749979]"
-images/dark/john_honey/short/D/dark_john_honey_short_D_2.jpg,1,False,False,0.05038487499405164,[2.0]
-images/dark/john_honey/short/D/dark_john_honey_short_D_3.jpg,1,False,False,0.04522216599434614,[1.0]
-images/dark/john_honey/short/D/dark_john_honey_short_D_4.jpg,0,False,False,0.07630524999694899,[]
-images/dark/michaels/high/A/dark_michaels_high_A_0.jpg,0,False,False,0.10918912499619182,[]
-images/dark/michaels/high/A/dark_michaels_high_A_1.jpg,2,False,False,0.0741948329959996,"[2.23606797749979, 2.23606797749979]"
-images/dark/michaels/high/A/dark_michaels_high_A_2.jpg,0,False,False,0.09510458300064784,[]
-images/dark/michaels/high/A/dark_michaels_high_A_3.jpg,2,False,False,0.10650354200333823,"[1.0, 2.0]"
-images/dark/michaels/high/A/dark_michaels_high_A_4.jpg,0,False,False,0.08144616699428298,[]
-images/dark/michaels/high/B/dark_michaels_high_B_0.jpg,0,False,False,0.047054875001776963,[]
-images/dark/michaels/high/B/dark_michaels_high_B_1.jpg,0,False,False,0.10678737499983981,[]
-images/dark/michaels/high/B/dark_michaels_high_B_2.jpg,0,False,False,0.13609129200631287,[]
-images/dark/michaels/high/B/dark_michaels_high_B_3.jpg,1,False,False,0.07003387500299141,[2.23606797749979]
-images/dark/michaels/high/B/dark_michaels_high_B_4.jpg,0,False,False,0.08374258399999235,[]
-images/dark/michaels/high/C/dark_michaels_high_C_0.jpg,0,False,False,0.06443499999295454,[]
-images/dark/michaels/high/C/dark_michaels_high_C_1.jpg,0,False,False,0.07209975000296254,[]
-images/dark/michaels/high/C/dark_michaels_high_C_2.jpg,3,False,False,0.09951812500366941,"[1.0, 1.4142135623730951, 2.23606797749979]"
-images/dark/michaels/high/C/dark_michaels_high_C_3.jpg,1,False,False,0.0501993749930989,[1.4142135623730951]
-images/dark/michaels/high/C/dark_michaels_high_C_4.jpg,0,False,False,0.05934379200334661,[]
-images/dark/michaels/high/D/dark_michaels_high_D_0.jpg,1,False,False,0.10860354200121947,[1.0]
-images/dark/michaels/high/D/dark_michaels_high_D_1.jpg,2,False,False,0.09013562499603722,"[2.0, 2.23606797749979]"
-images/dark/michaels/high/D/dark_michaels_high_D_2.jpg,4,True,True,0.07832808299281169,"[0.0, 1.4142135623730951, 2.23606797749979, 3.0]"
-images/dark/michaels/high/D/dark_michaels_high_D_3.jpg,2,False,False,0.09887945800437592,"[2.0, 2.23606797749979]"
-images/dark/michaels/high/D/dark_michaels_high_D_4.jpg,0,False,False,0.07344775000819936,[]
-images/dark/michaels/medium/A/dark_michaels_medium_A_0.jpg,2,False,False,0.08984041700023226,"[0.0, 2.23606797749979]"
-images/dark/michaels/medium/A/dark_michaels_medium_A_1.jpg,3,False,False,0.08333941698947456,"[1.4142135623730951, 2.0, 2.23606797749979]"
-images/dark/michaels/medium/A/dark_michaels_medium_A_2.jpg,2,False,False,0.08034216599480715,"[2.0, 3.0]"
-images/dark/michaels/medium/A/dark_michaels_medium_A_3.jpg,1,False,False,0.08518754200486,[2.23606797749979]
-images/dark/michaels/medium/A/dark_michaels_medium_A_4.jpg,0,False,False,0.03694533300586045,[]
-images/dark/michaels/medium/B/dark_michaels_medium_B_0.jpg,2,False,False,0.11419754099915735,"[0.0, 1.4142135623730951]"
-images/dark/michaels/medium/B/dark_michaels_medium_B_1.jpg,4,True,True,0.06884104099299293,"[0.0, 1.0, 1.0, 2.0]"
-images/dark/michaels/medium/B/dark_michaels_medium_B_2.jpg,1,False,False,0.06759175000479445,[1.0]
-images/dark/michaels/medium/B/dark_michaels_medium_B_3.jpg,3,False,False,0.06520408300275449,"[1.0, 1.0, 2.23606797749979]"
-images/dark/michaels/medium/B/dark_michaels_medium_B_4.jpg,1,False,False,0.09903020900674164,[1.4142135623730951]
-images/dark/michaels/medium/C/dark_michaels_medium_C_0.jpg,1,False,False,0.08617445900745224,[1.0]
-images/dark/michaels/medium/C/dark_michaels_medium_C_1.jpg,0,False,False,0.08314154199615587,[]
-images/dark/michaels/medium/C/dark_michaels_medium_C_2.jpg,2,False,False,0.08098020899342373,"[1.0, 1.4142135623730951]"
-images/dark/michaels/medium/C/dark_michaels_medium_C_3.jpg,3,False,False,0.09615866700187325,"[1.0, 1.4142135623730951, 2.0]"
-images/dark/michaels/medium/C/dark_michaels_medium_C_4.jpg,1,False,False,0.08622399999876507,[2.0]
-images/dark/michaels/medium/D/dark_michaels_medium_D_0.jpg,4,True,True,0.08011345799604896,"[2.0, 2.23606797749979, 2.23606797749979, 2.8284271247461903]"
-images/dark/michaels/medium/D/dark_michaels_medium_D_1.jpg,0,False,False,0.07741637500294019,[]
-images/dark/michaels/medium/D/dark_michaels_medium_D_2.jpg,1,False,False,0.06418220800696872,[1.0]
-images/dark/michaels/medium/D/dark_michaels_medium_D_3.jpg,2,False,False,0.2020015829912154,"[1.0, 2.0]"
-images/dark/michaels/medium/D/dark_michaels_medium_D_4.jpg,0,False,False,0.05546029198740143,[]
-images/dark/michaels/short/A/dark_michaels_short_A_0.jpg,0,False,False,0.05565004199161194,[]
-images/dark/michaels/short/A/dark_michaels_short_A_1.jpg,0,False,False,0.08866529200167861,[]
-images/dark/michaels/short/A/dark_michaels_short_A_2.jpg,0,False,False,0.04936150000139605,[]
-images/dark/michaels/short/A/dark_michaels_short_A_3.jpg,0,False,False,0.06733545899624005,[]
-images/dark/michaels/short/A/dark_michaels_short_A_4.jpg,0,False,False,0.05797179198998492,[]
-images/dark/michaels/short/B/dark_michaels_short_B_0.jpg,1,False,False,0.055112750007538125,[3.1622776601683795]
-images/dark/michaels/short/B/dark_michaels_short_B_1.jpg,1,False,False,0.06412145799549762,[1.4142135623730951]
-images/dark/michaels/short/B/dark_michaels_short_B_2.jpg,1,False,False,0.0703410830028588,[1.4142135623730951]
-images/dark/michaels/short/B/dark_michaels_short_B_3.jpg,1,False,False,0.06952162500238046,[1.4142135623730951]
-images/dark/michaels/short/B/dark_michaels_short_B_4.jpg,0,False,False,0.07998004199180286,[]
-images/dark/michaels/short/C/dark_michaels_short_C_0.jpg,0,False,False,0.04665558401029557,[]
-images/dark/michaels/short/C/dark_michaels_short_C_1.jpg,0,False,False,0.04031554200628307,[]
-images/dark/michaels/short/C/dark_michaels_short_C_2.jpg,0,False,False,0.07481095800176263,[]
-images/dark/michaels/short/C/dark_michaels_short_C_3.jpg,0,False,False,0.06194445899745915,[]
-images/dark/michaels/short/C/dark_michaels_short_C_4.jpg,0,False,False,0.0566967500053579,[]
-images/dark/michaels/short/D/dark_michaels_short_D_0.jpg,0,False,False,0.06359499999962281,[]
-images/dark/michaels/short/D/dark_michaels_short_D_1.jpg,1,False,False,0.07364883300033398,[3.1622776601683795]
-images/dark/michaels/short/D/dark_michaels_short_D_2.jpg,1,False,False,0.07307908299844712,[1.4142135623730951]
-images/dark/michaels/short/D/dark_michaels_short_D_3.jpg,0,False,False,0.10511308399145491,[]
-images/dark/michaels/short/D/dark_michaels_short_D_4.jpg,0,False,False,0.051581666994025,[]
+images/custom/davids/high/A/custom_davids_high_A_0.jpg,0,False,False,18254035,[]
+images/custom/davids/high/A/custom_davids_high_A_1.jpg,1,False,False,26169437,[1.0]
+images/custom/davids/high/A/custom_davids_high_A_2.jpg,0,False,False,18555147,[]
+images/custom/davids/high/A/custom_davids_high_A_3.jpg,3,False,False,22011300,"[1.0, 2.0, 2.23606797749979]"
+images/custom/davids/high/A/custom_davids_high_A_4.jpg,0,False,False,17916112,[]
+images/custom/davids/high/B/custom_davids_high_B_0.jpg,3,False,False,26950305,"[1.0, 1.0, 2.23606797749979]"
+images/custom/davids/high/B/custom_davids_high_B_1.jpg,4,True,True,28160041,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
+images/custom/davids/high/B/custom_davids_high_B_2.jpg,1,False,False,27404662,[1.4142135623730951]
+images/custom/davids/high/B/custom_davids_high_B_3.jpg,1,False,False,29713496,[1.4142135623730951]
+images/custom/davids/high/B/custom_davids_high_B_4.jpg,0,False,False,19494168,[]
+images/custom/davids/high/C/custom_davids_high_C_0.jpg,3,False,False,29929499,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
+images/custom/davids/high/C/custom_davids_high_C_1.jpg,1,False,False,26151056,[1.0]
+images/custom/davids/high/C/custom_davids_high_C_2.jpg,1,False,False,29576970,[1.0]
+images/custom/davids/high/C/custom_davids_high_C_3.jpg,0,False,False,19781227,[]
+images/custom/davids/high/C/custom_davids_high_C_4.jpg,0,False,False,15928150,[]
+images/custom/davids/high/D/custom_davids_high_D_0.jpg,0,False,False,23751223,[]
+images/custom/davids/high/D/custom_davids_high_D_1.jpg,0,False,False,24993889,[]
+images/custom/davids/high/D/custom_davids_high_D_2.jpg,2,False,False,28711833,"[1.4142135623730951, 2.23606797749979]"
+images/custom/davids/high/D/custom_davids_high_D_3.jpg,1,False,False,25837207,[1.0]
+images/custom/davids/high/D/custom_davids_high_D_4.jpg,0,False,False,14830855,[]
+images/custom/davids/medium/A/custom_davids_medium_A_0.jpg,0,False,False,13710742,[]
+images/custom/davids/medium/A/custom_davids_medium_A_1.jpg,0,False,False,15636636,[]
+images/custom/davids/medium/A/custom_davids_medium_A_2.jpg,0,False,False,18097318,[]
+images/custom/davids/medium/A/custom_davids_medium_A_3.jpg,1,False,False,24382976,[1.0]
+images/custom/davids/medium/A/custom_davids_medium_A_4.jpg,0,False,False,15758891,[]
+images/custom/davids/medium/B/custom_davids_medium_B_0.jpg,0,False,False,14444891,[]
+images/custom/davids/medium/B/custom_davids_medium_B_1.jpg,0,False,False,16271607,[]
+images/custom/davids/medium/B/custom_davids_medium_B_2.jpg,0,False,False,16860429,[]
+images/custom/davids/medium/B/custom_davids_medium_B_3.jpg,0,False,False,18402832,[]
+images/custom/davids/medium/B/custom_davids_medium_B_4.jpg,0,False,False,15201169,[]
+images/custom/davids/medium/C/custom_davids_medium_C_0.jpg,0,False,False,15674464,[]
+images/custom/davids/medium/C/custom_davids_medium_C_1.jpg,0,False,False,15512494,[]
+images/custom/davids/medium/C/custom_davids_medium_C_2.jpg,0,False,False,15226374,[]
+images/custom/davids/medium/C/custom_davids_medium_C_3.jpg,0,False,False,17505186,[]
+images/custom/davids/medium/C/custom_davids_medium_C_4.jpg,0,False,False,14904652,[]
+images/custom/davids/medium/D/custom_davids_medium_D_0.jpg,3,False,False,23138061,"[1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
+images/custom/davids/medium/D/custom_davids_medium_D_1.jpg,0,False,False,25087208,[]
+images/custom/davids/medium/D/custom_davids_medium_D_2.jpg,0,False,False,15501020,[]
+images/custom/davids/medium/D/custom_davids_medium_D_3.jpg,0,False,False,16654052,[]
+images/custom/davids/medium/D/custom_davids_medium_D_4.jpg,0,False,False,15387390,[]
+images/custom/davids/short/A/custom_davids_short_A_0.jpg,0,False,False,13966531,[]
+images/custom/davids/short/A/custom_davids_short_A_1.jpg,0,False,False,15019807,[]
+images/custom/davids/short/A/custom_davids_short_A_2.jpg,0,False,False,15058002,[]
+images/custom/davids/short/A/custom_davids_short_A_3.jpg,2,False,False,20835854,"[1.0, 2.0]"
+images/custom/davids/short/A/custom_davids_short_A_4.jpg,0,False,False,13555601,[]
+images/custom/davids/short/B/custom_davids_short_B_0.jpg,1,False,False,22635435,[3.0]
+images/custom/davids/short/B/custom_davids_short_B_1.jpg,0,False,False,23700037,[]
+images/custom/davids/short/B/custom_davids_short_B_2.jpg,0,False,False,15629544,[]
+images/custom/davids/short/B/custom_davids_short_B_3.jpg,1,False,False,20321459,[1.4142135623730951]
+images/custom/davids/short/B/custom_davids_short_B_4.jpg,0,False,False,14573303,[]
+images/custom/davids/short/C/custom_davids_short_C_0.jpg,2,False,False,23988187,"[2.0, 2.0]"
+images/custom/davids/short/C/custom_davids_short_C_1.jpg,0,False,False,18865058,[]
+images/custom/davids/short/C/custom_davids_short_C_2.jpg,1,False,False,26084006,[1.0]
+images/custom/davids/short/C/custom_davids_short_C_3.jpg,0,False,False,16532464,[]
+images/custom/davids/short/C/custom_davids_short_C_4.jpg,0,False,False,15543750,[]
+images/custom/davids/short/D/custom_davids_short_D_0.jpg,0,False,False,19499188,[]
+images/custom/davids/short/D/custom_davids_short_D_1.jpg,1,False,False,21293125,[1.4142135623730951]
+images/custom/davids/short/D/custom_davids_short_D_2.jpg,1,False,False,23784144,[1.0]
+images/custom/davids/short/D/custom_davids_short_D_3.jpg,0,False,False,15234079,[]
+images/custom/davids/short/D/custom_davids_short_D_4.jpg,0,False,False,15690816,[]
+images/custom/jack_cole/high/A/custom_jack_cole_high_A_0.jpg,0,False,False,16492931,[]
+images/custom/jack_cole/high/A/custom_jack_cole_high_A_1.jpg,0,False,False,14309802,[]
+images/custom/jack_cole/high/A/custom_jack_cole_high_A_2.jpg,0,False,False,13948859,[]
+images/custom/jack_cole/high/A/custom_jack_cole_high_A_3.jpg,0,False,False,15487675,[]
+images/custom/jack_cole/high/A/custom_jack_cole_high_A_4.jpg,0,False,False,14989150,[]
+images/custom/jack_cole/high/B/custom_jack_cole_high_B_0.jpg,0,False,False,13511609,[]
+images/custom/jack_cole/high/B/custom_jack_cole_high_B_1.jpg,0,False,False,18518759,[]
+images/custom/jack_cole/high/B/custom_jack_cole_high_B_2.jpg,0,False,False,14959515,[]
+images/custom/jack_cole/high/B/custom_jack_cole_high_B_3.jpg,0,False,False,17114026,[]
+images/custom/jack_cole/high/B/custom_jack_cole_high_B_4.jpg,0,False,False,17555108,[]
+images/custom/jack_cole/high/C/custom_jack_cole_high_C_0.jpg,0,False,False,15302667,[]
+images/custom/jack_cole/high/C/custom_jack_cole_high_C_1.jpg,0,False,False,15089338,[]
+images/custom/jack_cole/high/C/custom_jack_cole_high_C_2.jpg,0,False,False,19639089,[]
+images/custom/jack_cole/high/C/custom_jack_cole_high_C_3.jpg,1,False,False,17127270,[2.23606797749979]
+images/custom/jack_cole/high/C/custom_jack_cole_high_C_4.jpg,0,False,False,15553850,[]
+images/custom/jack_cole/high/D/custom_jack_cole_high_D_0.jpg,0,False,False,14381630,[]
+images/custom/jack_cole/high/D/custom_jack_cole_high_D_1.jpg,0,False,False,12727466,[]
+images/custom/jack_cole/high/D/custom_jack_cole_high_D_2.jpg,1,False,False,20008061,[1.4142135623730951]
+images/custom/jack_cole/high/D/custom_jack_cole_high_D_3.jpg,0,False,False,17326604,[]
+images/custom/jack_cole/high/D/custom_jack_cole_high_D_4.jpg,0,False,False,13241393,[]
+images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_0.jpg,0,False,False,13275485,[]
+images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_1.jpg,0,False,False,13082728,[]
+images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_2.jpg,0,False,False,15617749,[]
+images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_3.jpg,0,False,False,15472626,[]
+images/custom/jack_cole/medium/A/custom_jack_cole_medium_A_4.jpg,0,False,False,13445616,[]
+images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_0.jpg,0,False,False,17026791,[]
+images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_1.jpg,0,False,False,16100826,[]
+images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_2.jpg,0,False,False,16276475,[]
+images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_3.jpg,0,False,False,14146142,[]
+images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_4.jpg,0,False,False,14005325,[]
+images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_0.jpg,0,False,False,16191765,[]
+images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_1.jpg,0,False,False,12984238,[]
+images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_2.jpg,0,False,False,16893202,[]
+images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_3.jpg,0,False,False,15269145,[]
+images/custom/jack_cole/medium/C/custom_jack_cole_medium_C_4.jpg,0,False,False,14997386,[]
+images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_0.jpg,0,False,False,14692734,[]
+images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_1.jpg,0,False,False,18269291,[]
+images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_2.jpg,0,False,False,13870964,[]
+images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_3.jpg,0,False,False,16849428,[]
+images/custom/jack_cole/medium/D/custom_jack_cole_medium_D_4.jpg,0,False,False,14762254,[]
+images/custom/jack_cole/short/A/custom_jack_cole_short_A_0.jpg,0,False,False,15574958,[]
+images/custom/jack_cole/short/A/custom_jack_cole_short_A_1.jpg,0,False,False,15023471,[]
+images/custom/jack_cole/short/A/custom_jack_cole_short_A_2.jpg,0,False,False,15441368,[]
+images/custom/jack_cole/short/A/custom_jack_cole_short_A_3.jpg,0,False,False,17548670,[]
+images/custom/jack_cole/short/A/custom_jack_cole_short_A_4.jpg,0,False,False,14617394,[]
+images/custom/jack_cole/short/B/custom_jack_cole_short_B_0.jpg,0,False,False,14423119,[]
+images/custom/jack_cole/short/B/custom_jack_cole_short_B_1.jpg,0,False,False,16588663,[]
+images/custom/jack_cole/short/B/custom_jack_cole_short_B_2.jpg,0,False,False,15682948,[]
+images/custom/jack_cole/short/B/custom_jack_cole_short_B_3.jpg,0,False,False,13990907,[]
+images/custom/jack_cole/short/B/custom_jack_cole_short_B_4.jpg,0,False,False,16291486,[]
+images/custom/jack_cole/short/C/custom_jack_cole_short_C_0.jpg,0,False,False,13511591,[]
+images/custom/jack_cole/short/C/custom_jack_cole_short_C_1.jpg,0,False,False,16373496,[]
+images/custom/jack_cole/short/C/custom_jack_cole_short_C_2.jpg,0,False,False,14812233,[]
+images/custom/jack_cole/short/C/custom_jack_cole_short_C_3.jpg,0,False,False,15430116,[]
+images/custom/jack_cole/short/C/custom_jack_cole_short_C_4.jpg,0,False,False,13111697,[]
+images/custom/jack_cole/short/D/custom_jack_cole_short_D_0.jpg,0,False,False,13307595,[]
+images/custom/jack_cole/short/D/custom_jack_cole_short_D_1.jpg,0,False,False,16304957,[]
+images/custom/jack_cole/short/D/custom_jack_cole_short_D_2.jpg,0,False,False,14788325,[]
+images/custom/jack_cole/short/D/custom_jack_cole_short_D_3.jpg,0,False,False,15875102,[]
+images/custom/jack_cole/short/D/custom_jack_cole_short_D_4.jpg,0,False,False,15108755,[]
+images/custom/john_honey/high/A/custom_john_honey_high_A_0.jpg,2,False,False,18877532,"[1.0, 3.1622776601683795]"
+images/custom/john_honey/high/A/custom_john_honey_high_A_1.jpg,4,True,True,20767591,"[1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
+images/custom/john_honey/high/A/custom_john_honey_high_A_2.jpg,4,True,True,17697434,"[0.0, 1.0, 1.4142135623730951, 1.4142135623730951]"
+images/custom/john_honey/high/A/custom_john_honey_high_A_3.jpg,2,False,False,17719370,"[1.0, 2.23606797749979]"
+images/custom/john_honey/high/A/custom_john_honey_high_A_4.jpg,3,False,False,21266683,"[1.0, 1.4142135623730951, 1.4142135623730951]"
+images/custom/john_honey/high/B/custom_john_honey_high_B_0.jpg,3,False,False,19137219,"[1.0, 2.0, 2.0]"
+images/custom/john_honey/high/B/custom_john_honey_high_B_1.jpg,3,False,False,19985066,"[0.0, 1.4142135623730951, 2.0]"
+images/custom/john_honey/high/B/custom_john_honey_high_B_2.jpg,4,True,True,18431859,"[1.0, 2.0, 2.0, 3.1622776601683795]"
+images/custom/john_honey/high/B/custom_john_honey_high_B_3.jpg,4,True,True,18132786,"[0.0, 1.4142135623730951, 2.0, 3.0]"
+images/custom/john_honey/high/B/custom_john_honey_high_B_4.jpg,3,False,False,16412739,"[0.0, 1.0, 1.0]"
+images/custom/john_honey/high/C/custom_john_honey_high_C_0.jpg,3,False,False,17368500,"[1.0, 1.4142135623730951, 1.4142135623730951]"
+images/custom/john_honey/high/C/custom_john_honey_high_C_1.jpg,4,True,True,19590488,"[1.0, 1.0, 1.0, 1.4142135623730951]"
+images/custom/john_honey/high/C/custom_john_honey_high_C_2.jpg,3,False,False,19045789,"[0.0, 1.0, 2.0]"
+images/custom/john_honey/high/C/custom_john_honey_high_C_3.jpg,4,True,True,19733598,"[0.0, 1.0, 1.0, 1.0]"
+images/custom/john_honey/high/C/custom_john_honey_high_C_4.jpg,3,False,False,17820720,"[1.0, 1.4142135623730951, 2.23606797749979]"
+images/custom/john_honey/high/D/custom_john_honey_high_D_0.jpg,3,False,False,18181997,"[0.0, 1.0, 1.0]"
+images/custom/john_honey/high/D/custom_john_honey_high_D_1.jpg,3,False,False,19523252,"[1.0, 1.0, 1.0]"
+images/custom/john_honey/high/D/custom_john_honey_high_D_2.jpg,4,True,True,21363207,"[0.0, 1.0, 2.0, 2.23606797749979]"
+images/custom/john_honey/high/D/custom_john_honey_high_D_3.jpg,3,False,False,18403741,"[1.0, 1.4142135623730951, 2.23606797749979]"
+images/custom/john_honey/high/D/custom_john_honey_high_D_4.jpg,3,False,False,21895251,"[1.0, 1.0, 2.23606797749979]"
+images/custom/john_honey/medium/A/custom_john_honey_medium_A_0.jpg,3,False,False,17071276,"[0.0, 1.0, 1.0]"
+images/custom/john_honey/medium/A/custom_john_honey_medium_A_1.jpg,3,False,False,21461197,"[0.0, 1.0, 1.4142135623730951]"
+images/custom/john_honey/medium/A/custom_john_honey_medium_A_2.jpg,2,False,False,18145452,"[0.0, 1.4142135623730951]"
+images/custom/john_honey/medium/A/custom_john_honey_medium_A_3.jpg,3,False,False,18588270,"[1.0, 1.0, 1.4142135623730951]"
+images/custom/john_honey/medium/A/custom_john_honey_medium_A_4.jpg,2,False,False,17773993,"[1.0, 1.4142135623730951]"
+images/custom/john_honey/medium/B/custom_john_honey_medium_B_0.jpg,1,False,False,17247475,[1.0]
+images/custom/john_honey/medium/B/custom_john_honey_medium_B_1.jpg,2,False,False,18827998,"[1.0, 2.23606797749979]"
+images/custom/john_honey/medium/B/custom_john_honey_medium_B_2.jpg,1,False,False,18387993,[2.23606797749979]
+images/custom/john_honey/medium/B/custom_john_honey_medium_B_3.jpg,3,False,False,19024368,"[1.0, 2.0, 2.8284271247461903]"
+images/custom/john_honey/medium/B/custom_john_honey_medium_B_4.jpg,1,False,False,18970609,[1.4142135623730951]
+images/custom/john_honey/medium/C/custom_john_honey_medium_C_0.jpg,3,False,False,16706252,"[1.0, 1.4142135623730951, 2.23606797749979]"
+images/custom/john_honey/medium/C/custom_john_honey_medium_C_1.jpg,3,False,False,16553534,"[1.0, 1.4142135623730951, 1.4142135623730951]"
+images/custom/john_honey/medium/C/custom_john_honey_medium_C_2.jpg,2,False,False,17918984,"[1.0, 2.0]"
+images/custom/john_honey/medium/C/custom_john_honey_medium_C_3.jpg,3,False,False,22394128,"[1.4142135623730951, 2.0, 2.23606797749979]"
+images/custom/john_honey/medium/C/custom_john_honey_medium_C_4.jpg,1,False,False,19202643,[1.0]
+images/custom/john_honey/medium/D/custom_john_honey_medium_D_0.jpg,2,False,False,15224855,"[1.0, 2.23606797749979]"
+images/custom/john_honey/medium/D/custom_john_honey_medium_D_1.jpg,2,False,False,22361455,"[0.0, 1.4142135623730951]"
+images/custom/john_honey/medium/D/custom_john_honey_medium_D_2.jpg,2,False,False,17942018,"[0.0, 1.4142135623730951]"
+images/custom/john_honey/medium/D/custom_john_honey_medium_D_3.jpg,2,False,False,18011548,"[0.0, 1.0]"
+images/custom/john_honey/medium/D/custom_john_honey_medium_D_4.jpg,1,False,False,19733638,[1.4142135623730951]
+images/custom/john_honey/short/A/custom_john_honey_short_A_0.jpg,1,False,False,17750576,[1.4142135623730951]
+images/custom/john_honey/short/A/custom_john_honey_short_A_1.jpg,0,False,False,17591050,[]
+images/custom/john_honey/short/A/custom_john_honey_short_A_2.jpg,1,False,False,20733892,[1.4142135623730951]
+images/custom/john_honey/short/A/custom_john_honey_short_A_3.jpg,0,False,False,18257978,[]
+images/custom/john_honey/short/A/custom_john_honey_short_A_4.jpg,1,False,False,19166087,[2.23606797749979]
+images/custom/john_honey/short/B/custom_john_honey_short_B_0.jpg,2,False,False,20849990,"[1.0, 2.23606797749979]"
+images/custom/john_honey/short/B/custom_john_honey_short_B_1.jpg,2,False,False,21644040,"[1.0, 2.0]"
+images/custom/john_honey/short/B/custom_john_honey_short_B_2.jpg,0,False,False,24024923,[]
+images/custom/john_honey/short/B/custom_john_honey_short_B_3.jpg,1,False,False,22023592,[1.0]
+images/custom/john_honey/short/B/custom_john_honey_short_B_4.jpg,0,False,False,17148406,[]
+images/custom/john_honey/short/C/custom_john_honey_short_C_0.jpg,1,False,False,17890641,[2.0]
+images/custom/john_honey/short/C/custom_john_honey_short_C_1.jpg,0,False,False,19707468,[]
+images/custom/john_honey/short/C/custom_john_honey_short_C_2.jpg,0,False,False,16229067,[]
+images/custom/john_honey/short/C/custom_john_honey_short_C_3.jpg,0,False,False,17452841,[]
+images/custom/john_honey/short/C/custom_john_honey_short_C_4.jpg,0,False,False,19633791,[]
+images/custom/john_honey/short/D/custom_john_honey_short_D_0.jpg,0,False,False,18875208,[]
+images/custom/john_honey/short/D/custom_john_honey_short_D_1.jpg,1,False,False,21660160,[1.4142135623730951]
+images/custom/john_honey/short/D/custom_john_honey_short_D_2.jpg,1,False,False,18655997,[1.4142135623730951]
+images/custom/john_honey/short/D/custom_john_honey_short_D_3.jpg,2,False,False,22257087,"[1.4142135623730951, 2.0]"
+images/custom/john_honey/short/D/custom_john_honey_short_D_4.jpg,0,False,False,25184750,[]
+images/custom/michaels/high/A/custom_michaels_high_A_0.jpg,4,True,True,17297560,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
+images/custom/michaels/high/A/custom_michaels_high_A_1.jpg,4,True,True,18581930,"[1.0, 1.0, 1.0, 1.4142135623730951]"
+images/custom/michaels/high/A/custom_michaels_high_A_2.jpg,3,False,False,20639537,"[1.0, 1.0, 1.4142135623730951]"
+images/custom/michaels/high/A/custom_michaels_high_A_3.jpg,0,False,False,19585589,[]
+images/custom/michaels/high/A/custom_michaels_high_A_4.jpg,0,False,False,17607431,[]
+images/custom/michaels/high/B/custom_michaels_high_B_0.jpg,4,True,True,21029791,"[0.0, 1.0, 1.4142135623730951, 2.8284271247461903]"
+images/custom/michaels/high/B/custom_michaels_high_B_1.jpg,3,False,False,18781092,"[1.0, 1.4142135623730951, 2.0]"
+images/custom/michaels/high/B/custom_michaels_high_B_2.jpg,1,False,False,17560353,[0.0]
+images/custom/michaels/high/B/custom_michaels_high_B_3.jpg,4,True,True,16624893,"[0.0, 1.0, 1.0, 2.23606797749979]"
+images/custom/michaels/high/B/custom_michaels_high_B_4.jpg,2,False,False,17620704,"[0.0, 1.0]"
+images/custom/michaels/high/C/custom_michaels_high_C_0.jpg,2,False,False,16990814,"[2.23606797749979, 3.1622776601683795]"
+images/custom/michaels/high/C/custom_michaels_high_C_1.jpg,2,False,False,19261034,"[1.4142135623730951, 2.23606797749979]"
+images/custom/michaels/high/C/custom_michaels_high_C_2.jpg,2,False,False,16446864,"[0.0, 1.0]"
+images/custom/michaels/high/C/custom_michaels_high_C_3.jpg,2,False,False,19669036,"[0.0, 1.4142135623730951]"
+images/custom/michaels/high/C/custom_michaels_high_C_4.jpg,0,False,False,20987758,[]
+images/custom/michaels/high/D/custom_michaels_high_D_0.jpg,3,False,False,19136388,"[0.0, 0.0, 1.4142135623730951]"
+images/custom/michaels/high/D/custom_michaels_high_D_1.jpg,1,False,False,16472446,[1.0]
+images/custom/michaels/high/D/custom_michaels_high_D_2.jpg,1,False,False,21166473,[1.4142135623730951]
+images/custom/michaels/high/D/custom_michaels_high_D_3.jpg,4,True,True,17958633,"[1.0, 1.0, 1.0, 1.4142135623730951]"
+images/custom/michaels/high/D/custom_michaels_high_D_4.jpg,3,False,False,17732049,"[0.0, 1.0, 1.4142135623730951]"
+images/custom/michaels/medium/A/custom_michaels_medium_A_0.jpg,0,False,False,16698790,[]
+images/custom/michaels/medium/A/custom_michaels_medium_A_1.jpg,0,False,False,18283197,[]
+images/custom/michaels/medium/A/custom_michaels_medium_A_2.jpg,2,False,False,18768097,"[1.0, 1.4142135623730951]"
+images/custom/michaels/medium/A/custom_michaels_medium_A_3.jpg,0,False,False,17583806,[]
+images/custom/michaels/medium/A/custom_michaels_medium_A_4.jpg,0,False,False,16798314,[]
+images/custom/michaels/medium/B/custom_michaels_medium_B_0.jpg,0,False,False,13891993,[]
+images/custom/michaels/medium/B/custom_michaels_medium_B_1.jpg,1,False,False,23338005,[1.4142135623730951]
+images/custom/michaels/medium/B/custom_michaels_medium_B_2.jpg,0,False,False,15642638,[]
+images/custom/michaels/medium/B/custom_michaels_medium_B_3.jpg,3,False,False,23984340,"[0.0, 1.0, 2.23606797749979]"
+images/custom/michaels/medium/B/custom_michaels_medium_B_4.jpg,0,False,False,14884845,[]
+images/custom/michaels/medium/C/custom_michaels_medium_C_0.jpg,0,False,False,16140367,[]
+images/custom/michaels/medium/C/custom_michaels_medium_C_1.jpg,1,False,False,26015618,[1.0]
+images/custom/michaels/medium/C/custom_michaels_medium_C_2.jpg,0,False,False,15998883,[]
+images/custom/michaels/medium/C/custom_michaels_medium_C_3.jpg,0,False,False,15827446,[]
+images/custom/michaels/medium/C/custom_michaels_medium_C_4.jpg,0,False,False,16919140,[]
+images/custom/michaels/medium/D/custom_michaels_medium_D_0.jpg,0,False,False,14205430,[]
+images/custom/michaels/medium/D/custom_michaels_medium_D_1.jpg,0,False,False,14925090,[]
+images/custom/michaels/medium/D/custom_michaels_medium_D_2.jpg,1,False,False,20822017,[1.0]
+images/custom/michaels/medium/D/custom_michaels_medium_D_3.jpg,0,False,False,18743760,[]
+images/custom/michaels/medium/D/custom_michaels_medium_D_4.jpg,0,False,False,18094726,[]
+images/custom/michaels/short/A/custom_michaels_short_A_0.jpg,0,False,False,14955257,[]
+images/custom/michaels/short/A/custom_michaels_short_A_1.jpg,0,False,False,20399245,[]
+images/custom/michaels/short/A/custom_michaels_short_A_2.jpg,0,False,False,15501562,[]
+images/custom/michaels/short/A/custom_michaels_short_A_3.jpg,0,False,False,17185128,[]
+images/custom/michaels/short/A/custom_michaels_short_A_4.jpg,0,False,False,13623899,[]
+images/custom/michaels/short/B/custom_michaels_short_B_0.jpg,0,False,False,15919806,[]
+images/custom/michaels/short/B/custom_michaels_short_B_1.jpg,0,False,False,16799005,[]
+images/custom/michaels/short/B/custom_michaels_short_B_2.jpg,0,False,False,18759614,[]
+images/custom/michaels/short/B/custom_michaels_short_B_3.jpg,0,False,False,16569613,[]
+images/custom/michaels/short/B/custom_michaels_short_B_4.jpg,0,False,False,13044833,[]
+images/custom/michaels/short/C/custom_michaels_short_C_0.jpg,0,False,False,16972008,[]
+images/custom/michaels/short/C/custom_michaels_short_C_1.jpg,0,False,False,19621568,[]
+images/custom/michaels/short/C/custom_michaels_short_C_2.jpg,0,False,False,15124204,[]
+images/custom/michaels/short/C/custom_michaels_short_C_3.jpg,0,False,False,17789308,[]
+images/custom/michaels/short/C/custom_michaels_short_C_4.jpg,0,False,False,15729959,[]
+images/custom/michaels/short/D/custom_michaels_short_D_0.jpg,0,False,False,17127698,[]
+images/custom/michaels/short/D/custom_michaels_short_D_1.jpg,0,False,False,17758883,[]
+images/custom/michaels/short/D/custom_michaels_short_D_2.jpg,0,False,False,15056030,[]
+images/custom/michaels/short/D/custom_michaels_short_D_3.jpg,0,False,False,17748937,[]
+images/custom/michaels/short/D/custom_michaels_short_D_4.jpg,0,False,False,13918573,[]
+images/dark/davids/high/A/dark_davids_high_A_0.jpg,1,False,False,23315374,[1.0]
+images/dark/davids/high/A/dark_davids_high_A_1.jpg,1,False,False,23642268,[2.23606797749979]
+images/dark/davids/high/A/dark_davids_high_A_2.jpg,0,False,False,22449100,[]
+images/dark/davids/high/A/dark_davids_high_A_3.jpg,1,False,False,21934678,[1.0]
+images/dark/davids/high/A/dark_davids_high_A_4.jpg,0,False,False,18533606,[]
+images/dark/davids/high/B/dark_davids_high_B_0.jpg,1,False,False,24564125,[2.0]
+images/dark/davids/high/B/dark_davids_high_B_1.jpg,0,False,False,24385181,[]
+images/dark/davids/high/B/dark_davids_high_B_2.jpg,0,False,False,21621218,[]
+images/dark/davids/high/B/dark_davids_high_B_3.jpg,0,False,False,22720451,[]
+images/dark/davids/high/B/dark_davids_high_B_4.jpg,0,False,False,23653458,[]
+images/dark/davids/high/C/dark_davids_high_C_0.jpg,1,False,False,22817317,[1.0]
+images/dark/davids/high/C/dark_davids_high_C_1.jpg,0,False,False,23021356,[]
+images/dark/davids/high/C/dark_davids_high_C_2.jpg,1,False,False,19243651,[1.0]
+images/dark/davids/high/C/dark_davids_high_C_3.jpg,0,False,False,22004176,[]
+images/dark/davids/high/C/dark_davids_high_C_4.jpg,0,False,False,19909691,[]
+images/dark/davids/high/D/dark_davids_high_D_0.jpg,0,False,False,19853532,[]
+images/dark/davids/high/D/dark_davids_high_D_1.jpg,1,False,False,25911436,[1.0]
+images/dark/davids/high/D/dark_davids_high_D_2.jpg,1,False,False,21785388,[1.4142135623730951]
+images/dark/davids/high/D/dark_davids_high_D_3.jpg,0,False,False,23453261,[]
+images/dark/davids/high/D/dark_davids_high_D_4.jpg,1,False,False,21819540,[1.4142135623730951]
+images/dark/davids/medium/A/dark_davids_medium_A_0.jpg,0,False,False,14522409,[]
+images/dark/davids/medium/A/dark_davids_medium_A_1.jpg,0,False,False,25621560,[]
+images/dark/davids/medium/A/dark_davids_medium_A_2.jpg,0,False,False,18245949,[]
+images/dark/davids/medium/A/dark_davids_medium_A_3.jpg,1,False,False,24591837,[1.0]
+images/dark/davids/medium/A/dark_davids_medium_A_4.jpg,0,False,False,15110126,[]
+images/dark/davids/medium/B/dark_davids_medium_B_0.jpg,0,False,False,15297459,[]
+images/dark/davids/medium/B/dark_davids_medium_B_1.jpg,0,False,False,20708747,[]
+images/dark/davids/medium/B/dark_davids_medium_B_2.jpg,0,False,False,13898138,[]
+images/dark/davids/medium/B/dark_davids_medium_B_3.jpg,0,False,False,21076487,[]
+images/dark/davids/medium/B/dark_davids_medium_B_4.jpg,0,False,False,15429508,[]
+images/dark/davids/medium/C/dark_davids_medium_C_0.jpg,0,False,False,18884045,[]
+images/dark/davids/medium/C/dark_davids_medium_C_1.jpg,0,False,False,21214416,[]
+images/dark/davids/medium/C/dark_davids_medium_C_2.jpg,0,False,False,16131221,[]
+images/dark/davids/medium/C/dark_davids_medium_C_3.jpg,0,False,False,14756443,[]
+images/dark/davids/medium/C/dark_davids_medium_C_4.jpg,0,False,False,15113944,[]
+images/dark/davids/medium/D/dark_davids_medium_D_0.jpg,0,False,False,15776115,[]
+images/dark/davids/medium/D/dark_davids_medium_D_1.jpg,0,False,False,18548705,[]
+images/dark/davids/medium/D/dark_davids_medium_D_2.jpg,0,False,False,18395492,[]
+images/dark/davids/medium/D/dark_davids_medium_D_3.jpg,0,False,False,17937187,[]
+images/dark/davids/medium/D/dark_davids_medium_D_4.jpg,0,False,False,17866215,[]
+images/dark/davids/short/A/dark_davids_short_A_0.jpg,1,False,False,22424140,[2.23606797749979]
+images/dark/davids/short/A/dark_davids_short_A_1.jpg,0,False,False,17582824,[]
+images/dark/davids/short/A/dark_davids_short_A_2.jpg,0,False,False,20279567,[]
+images/dark/davids/short/A/dark_davids_short_A_3.jpg,2,False,False,33053052,"[1.4142135623730951, 2.23606797749979]"
+images/dark/davids/short/A/dark_davids_short_A_4.jpg,0,False,False,15124583,[]
+images/dark/davids/short/B/dark_davids_short_B_0.jpg,0,False,False,19099599,[]
+images/dark/davids/short/B/dark_davids_short_B_1.jpg,0,False,False,17579940,[]
+images/dark/davids/short/B/dark_davids_short_B_2.jpg,0,False,False,15070603,[]
+images/dark/davids/short/B/dark_davids_short_B_3.jpg,0,False,False,16423350,[]
+images/dark/davids/short/B/dark_davids_short_B_4.jpg,0,False,False,16412128,[]
+images/dark/davids/short/C/dark_davids_short_C_0.jpg,0,False,False,14966558,[]
+images/dark/davids/short/C/dark_davids_short_C_1.jpg,0,False,False,17430900,[]
+images/dark/davids/short/C/dark_davids_short_C_2.jpg,0,False,False,15278564,[]
+images/dark/davids/short/C/dark_davids_short_C_3.jpg,0,False,False,15829176,[]
+images/dark/davids/short/C/dark_davids_short_C_4.jpg,0,False,False,20890957,[]
+images/dark/davids/short/D/dark_davids_short_D_0.jpg,0,False,False,14455218,[]
+images/dark/davids/short/D/dark_davids_short_D_1.jpg,0,False,False,17337072,[]
+images/dark/davids/short/D/dark_davids_short_D_2.jpg,0,False,False,16302553,[]
+images/dark/davids/short/D/dark_davids_short_D_3.jpg,0,False,False,19635947,[]
+images/dark/davids/short/D/dark_davids_short_D_4.jpg,0,False,False,15737304,[]
+images/dark/jack_cole/high/A/dark_jack_cole_high_A_0.jpg,0,False,False,17778350,[]
+images/dark/jack_cole/high/A/dark_jack_cole_high_A_1.jpg,0,False,False,14757643,[]
+images/dark/jack_cole/high/A/dark_jack_cole_high_A_2.jpg,0,False,False,15087815,[]
+images/dark/jack_cole/high/A/dark_jack_cole_high_A_3.jpg,0,False,False,15016207,[]
+images/dark/jack_cole/high/A/dark_jack_cole_high_A_4.jpg,0,False,False,15753704,[]
+images/dark/jack_cole/high/B/dark_jack_cole_high_B_0.jpg,0,False,False,15217999,[]
+images/dark/jack_cole/high/B/dark_jack_cole_high_B_1.jpg,0,False,False,17758997,[]
+images/dark/jack_cole/high/B/dark_jack_cole_high_B_2.jpg,0,False,False,16340485,[]
+images/dark/jack_cole/high/B/dark_jack_cole_high_B_3.jpg,0,False,False,14793050,[]
+images/dark/jack_cole/high/B/dark_jack_cole_high_B_4.jpg,0,False,False,16211148,[]
+images/dark/jack_cole/high/C/dark_jack_cole_high_C_0.jpg,0,False,False,16497742,[]
+images/dark/jack_cole/high/C/dark_jack_cole_high_C_1.jpg,0,False,False,14781927,[]
+images/dark/jack_cole/high/C/dark_jack_cole_high_C_2.jpg,0,False,False,13758328,[]
+images/dark/jack_cole/high/C/dark_jack_cole_high_C_3.jpg,0,False,False,16361292,[]
+images/dark/jack_cole/high/C/dark_jack_cole_high_C_4.jpg,0,False,False,14275071,[]
+images/dark/jack_cole/high/D/dark_jack_cole_high_D_0.jpg,0,False,False,16214286,[]
+images/dark/jack_cole/high/D/dark_jack_cole_high_D_1.jpg,0,False,False,15479192,[]
+images/dark/jack_cole/high/D/dark_jack_cole_high_D_2.jpg,0,False,False,14872802,[]
+images/dark/jack_cole/high/D/dark_jack_cole_high_D_3.jpg,0,False,False,13994023,[]
+images/dark/jack_cole/high/D/dark_jack_cole_high_D_4.jpg,0,False,False,13048097,[]
+images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_0.jpg,0,False,False,14000405,[]
+images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_1.jpg,0,False,False,16299187,[]
+images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_2.jpg,0,False,False,14360780,[]
+images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_3.jpg,0,False,False,15241522,[]
+images/dark/jack_cole/medium/A/dark_jack_cole_medium_A_4.jpg,0,False,False,14167732,[]
+images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_0.jpg,0,False,False,14046251,[]
+images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_1.jpg,0,False,False,16024381,[]
+images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_2.jpg,0,False,False,15912362,[]
+images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_3.jpg,0,False,False,17132586,[]
+images/dark/jack_cole/medium/B/dark_jack_cole_medium_B_4.jpg,0,False,False,14904451,[]
+images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_0.jpg,0,False,False,15286698,[]
+images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_1.jpg,0,False,False,14645525,[]
+images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_2.jpg,0,False,False,15533752,[]
+images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_3.jpg,0,False,False,14353027,[]
+images/dark/jack_cole/medium/C/dark_jack_cole_medium_C_4.jpg,0,False,False,12697802,[]
+images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_0.jpg,0,False,False,14889783,[]
+images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_1.jpg,0,False,False,13572598,[]
+images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_2.jpg,0,False,False,14082089,[]
+images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_3.jpg,0,False,False,13947938,[]
+images/dark/jack_cole/medium/D/dark_jack_cole_medium_D_4.jpg,0,False,False,14078052,[]
+images/dark/jack_cole/short/A/dark_jack_cole_short_A_0.jpg,0,False,False,12908848,[]
+images/dark/jack_cole/short/A/dark_jack_cole_short_A_1.jpg,0,False,False,16110324,[]
+images/dark/jack_cole/short/A/dark_jack_cole_short_A_2.jpg,0,False,False,13573675,[]
+images/dark/jack_cole/short/A/dark_jack_cole_short_A_3.jpg,0,False,False,15933342,[]
+images/dark/jack_cole/short/A/dark_jack_cole_short_A_4.jpg,0,False,False,13503273,[]
+images/dark/jack_cole/short/B/dark_jack_cole_short_B_0.jpg,0,False,False,15241648,[]
+images/dark/jack_cole/short/B/dark_jack_cole_short_B_1.jpg,0,False,False,13784681,[]
+images/dark/jack_cole/short/B/dark_jack_cole_short_B_2.jpg,0,False,False,14429199,[]
+images/dark/jack_cole/short/B/dark_jack_cole_short_B_3.jpg,0,False,False,15970112,[]
+images/dark/jack_cole/short/B/dark_jack_cole_short_B_4.jpg,0,False,False,14549758,[]
+images/dark/jack_cole/short/C/dark_jack_cole_short_C_0.jpg,0,False,False,15661740,[]
+images/dark/jack_cole/short/C/dark_jack_cole_short_C_1.jpg,0,False,False,15993422,[]
+images/dark/jack_cole/short/C/dark_jack_cole_short_C_2.jpg,0,False,False,12841693,[]
+images/dark/jack_cole/short/C/dark_jack_cole_short_C_3.jpg,0,False,False,13850107,[]
+images/dark/jack_cole/short/C/dark_jack_cole_short_C_4.jpg,0,False,False,14436427,[]
+images/dark/jack_cole/short/D/dark_jack_cole_short_D_0.jpg,0,False,False,14068009,[]
+images/dark/jack_cole/short/D/dark_jack_cole_short_D_1.jpg,0,False,False,14325295,[]
+images/dark/jack_cole/short/D/dark_jack_cole_short_D_2.jpg,0,False,False,13263119,[]
+images/dark/jack_cole/short/D/dark_jack_cole_short_D_3.jpg,0,False,False,16154366,[]
+images/dark/jack_cole/short/D/dark_jack_cole_short_D_4.jpg,0,False,False,13870995,[]
+images/dark/john_honey/high/A/dark_john_honey_high_A_0.jpg,4,True,True,26672653,"[1.0, 1.0, 1.0, 2.23606797749979]"
+images/dark/john_honey/high/A/dark_john_honey_high_A_1.jpg,4,True,True,25538254,"[1.4142135623730951, 1.4142135623730951, 1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/high/A/dark_john_honey_high_A_2.jpg,4,True,True,26319401,"[0.0, 1.0, 2.0, 2.8284271247461903]"
+images/dark/john_honey/high/A/dark_john_honey_high_A_3.jpg,4,True,True,25205447,"[1.0, 2.23606797749979, 2.23606797749979, 2.8284271247461903]"
+images/dark/john_honey/high/A/dark_john_honey_high_A_4.jpg,4,True,True,24419073,"[0.0, 1.0, 1.0, 2.0]"
+images/dark/john_honey/high/B/dark_john_honey_high_B_0.jpg,4,True,True,27430671,"[0.0, 1.0, 1.0, 1.0]"
+images/dark/john_honey/high/B/dark_john_honey_high_B_1.jpg,4,True,True,29255942,"[0.0, 0.0, 2.23606797749979, 2.8284271247461903]"
+images/dark/john_honey/high/B/dark_john_honey_high_B_2.jpg,4,True,True,37376255,"[1.4142135623730951, 2.0, 2.23606797749979, 2.23606797749979]"
+images/dark/john_honey/high/B/dark_john_honey_high_B_3.jpg,4,True,True,29549498,"[1.0, 1.4142135623730951, 2.23606797749979, 3.1622776601683795]"
+images/dark/john_honey/high/B/dark_john_honey_high_B_4.jpg,4,True,True,37006740,"[1.4142135623730951, 1.4142135623730951, 2.0, 3.1622776601683795]"
+images/dark/john_honey/high/C/dark_john_honey_high_C_0.jpg,4,True,True,46962889,"[0.0, 1.0, 1.0, 1.4142135623730951]"
+images/dark/john_honey/high/C/dark_john_honey_high_C_1.jpg,4,True,True,44804874,"[0.0, 1.0, 1.4142135623730951, 2.0]"
+images/dark/john_honey/high/C/dark_john_honey_high_C_2.jpg,4,True,True,49430700,"[1.0, 1.4142135623730951, 2.8284271247461903, 3.1622776601683795]"
+images/dark/john_honey/high/C/dark_john_honey_high_C_3.jpg,4,True,True,48705651,"[1.0, 1.0, 2.23606797749979, 2.23606797749979]"
+images/dark/john_honey/high/C/dark_john_honey_high_C_4.jpg,4,True,True,46438257,"[1.0, 1.0, 1.4142135623730951, 1.4142135623730951]"
+images/dark/john_honey/high/D/dark_john_honey_high_D_0.jpg,4,True,True,40953374,"[0.0, 1.0, 1.4142135623730951, 2.0]"
+images/dark/john_honey/high/D/dark_john_honey_high_D_1.jpg,4,True,True,45003529,"[0.0, 1.0, 2.23606797749979, 2.8284271247461903]"
+images/dark/john_honey/high/D/dark_john_honey_high_D_2.jpg,4,True,True,43949828,"[0.0, 2.23606797749979, 2.23606797749979, 2.23606797749979]"
+images/dark/john_honey/high/D/dark_john_honey_high_D_3.jpg,3,False,False,27261904,"[1.0, 2.23606797749979, 3.1622776601683795]"
+images/dark/john_honey/high/D/dark_john_honey_high_D_4.jpg,4,True,True,40331778,"[1.0, 1.0, 1.0, 2.23606797749979]"
+images/dark/john_honey/medium/A/dark_john_honey_medium_A_0.jpg,3,False,False,19277011,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
+images/dark/john_honey/medium/A/dark_john_honey_medium_A_1.jpg,3,False,False,20479288,"[1.4142135623730951, 2.0, 2.0]"
+images/dark/john_honey/medium/A/dark_john_honey_medium_A_2.jpg,3,False,False,19286908,"[0.0, 1.0, 2.23606797749979]"
+images/dark/john_honey/medium/A/dark_john_honey_medium_A_3.jpg,4,True,True,18998969,"[1.0, 1.0, 1.4142135623730951, 3.0]"
+images/dark/john_honey/medium/A/dark_john_honey_medium_A_4.jpg,3,False,False,19825760,"[1.0, 1.0, 1.4142135623730951]"
+images/dark/john_honey/medium/B/dark_john_honey_medium_B_0.jpg,2,False,False,20265204,"[2.0, 2.23606797749979]"
+images/dark/john_honey/medium/B/dark_john_honey_medium_B_1.jpg,4,True,True,23107805,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/medium/B/dark_john_honey_medium_B_2.jpg,4,True,True,19447573,"[0.0, 1.4142135623730951, 1.4142135623730951, 2.0]"
+images/dark/john_honey/medium/B/dark_john_honey_medium_B_3.jpg,4,True,True,21474877,"[1.0, 1.0, 2.0, 2.23606797749979]"
+images/dark/john_honey/medium/B/dark_john_honey_medium_B_4.jpg,4,True,True,19348287,"[0.0, 0.0, 1.0, 2.23606797749979]"
+images/dark/john_honey/medium/C/dark_john_honey_medium_C_0.jpg,4,True,True,20905022,"[1.0, 1.0, 1.0, 1.0]"
+images/dark/john_honey/medium/C/dark_john_honey_medium_C_1.jpg,3,False,False,20374879,"[1.4142135623730951, 1.4142135623730951, 2.8284271247461903]"
+images/dark/john_honey/medium/C/dark_john_honey_medium_C_2.jpg,3,False,False,19321654,"[1.0, 2.0, 2.23606797749979]"
+images/dark/john_honey/medium/C/dark_john_honey_medium_C_3.jpg,4,True,True,18395689,"[0.0, 1.0, 1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/medium/C/dark_john_honey_medium_C_4.jpg,3,False,False,19406516,"[0.0, 2.23606797749979, 2.23606797749979]"
+images/dark/john_honey/medium/D/dark_john_honey_medium_D_0.jpg,2,False,False,20788496,"[1.0, 1.4142135623730951]"
+images/dark/john_honey/medium/D/dark_john_honey_medium_D_1.jpg,3,False,False,20138404,"[1.0, 1.0, 1.4142135623730951]"
+images/dark/john_honey/medium/D/dark_john_honey_medium_D_2.jpg,4,True,True,18307913,"[0.0, 1.0, 2.0, 2.23606797749979]"
+images/dark/john_honey/medium/D/dark_john_honey_medium_D_3.jpg,4,True,True,20312263,"[1.4142135623730951, 2.0, 2.23606797749979, 3.1622776601683795]"
+images/dark/john_honey/medium/D/dark_john_honey_medium_D_4.jpg,2,False,False,22115075,"[1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/short/A/dark_john_honey_short_A_0.jpg,3,False,False,18962701,"[1.4142135623730951, 1.4142135623730951, 2.0]"
+images/dark/john_honey/short/A/dark_john_honey_short_A_1.jpg,4,True,True,21658977,"[0.0, 1.0, 1.4142135623730951, 3.605551275463989]"
+images/dark/john_honey/short/A/dark_john_honey_short_A_2.jpg,1,False,False,20059820,[1.0]
+images/dark/john_honey/short/A/dark_john_honey_short_A_3.jpg,1,False,False,18204270,[2.23606797749979]
+images/dark/john_honey/short/A/dark_john_honey_short_A_4.jpg,2,False,False,21239572,"[1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/short/B/dark_john_honey_short_B_0.jpg,2,False,False,20730315,"[0.0, 1.4142135623730951]"
+images/dark/john_honey/short/B/dark_john_honey_short_B_1.jpg,2,False,False,19302819,"[1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/short/B/dark_john_honey_short_B_2.jpg,0,False,False,23825548,[]
+images/dark/john_honey/short/B/dark_john_honey_short_B_3.jpg,3,False,False,17556445,"[1.0, 2.23606797749979, 3.0]"
+images/dark/john_honey/short/B/dark_john_honey_short_B_4.jpg,0,False,False,14432900,[]
+images/dark/john_honey/short/C/dark_john_honey_short_C_0.jpg,0,False,False,21838722,[]
+images/dark/john_honey/short/C/dark_john_honey_short_C_1.jpg,0,False,False,19774744,[]
+images/dark/john_honey/short/C/dark_john_honey_short_C_2.jpg,1,False,False,16641811,[2.23606797749979]
+images/dark/john_honey/short/C/dark_john_honey_short_C_3.jpg,1,False,False,24385350,[2.8284271247461903]
+images/dark/john_honey/short/C/dark_john_honey_short_C_4.jpg,0,False,False,25166866,[]
+images/dark/john_honey/short/D/dark_john_honey_short_D_0.jpg,0,False,False,24173184,[]
+images/dark/john_honey/short/D/dark_john_honey_short_D_1.jpg,4,True,True,23534307,"[0.0, 0.0, 1.4142135623730951, 2.23606797749979]"
+images/dark/john_honey/short/D/dark_john_honey_short_D_2.jpg,1,False,False,18944369,[2.0]
+images/dark/john_honey/short/D/dark_john_honey_short_D_3.jpg,1,False,False,21046168,[1.0]
+images/dark/john_honey/short/D/dark_john_honey_short_D_4.jpg,0,False,False,24803807,[]
+images/dark/michaels/high/A/dark_michaels_high_A_0.jpg,0,False,False,18067935,[]
+images/dark/michaels/high/A/dark_michaels_high_A_1.jpg,2,False,False,18132163,"[2.23606797749979, 2.23606797749979]"
+images/dark/michaels/high/A/dark_michaels_high_A_2.jpg,0,False,False,17597096,[]
+images/dark/michaels/high/A/dark_michaels_high_A_3.jpg,2,False,False,20669502,"[1.0, 2.0]"
+images/dark/michaels/high/A/dark_michaels_high_A_4.jpg,0,False,False,17188784,[]
+images/dark/michaels/high/B/dark_michaels_high_B_0.jpg,0,False,False,20833951,[]
+images/dark/michaels/high/B/dark_michaels_high_B_1.jpg,0,False,False,17897839,[]
+images/dark/michaels/high/B/dark_michaels_high_B_2.jpg,0,False,False,20780149,[]
+images/dark/michaels/high/B/dark_michaels_high_B_3.jpg,1,False,False,19397489,[2.23606797749979]
+images/dark/michaels/high/B/dark_michaels_high_B_4.jpg,0,False,False,19523651,[]
+images/dark/michaels/high/C/dark_michaels_high_C_0.jpg,0,False,False,18672328,[]
+images/dark/michaels/high/C/dark_michaels_high_C_1.jpg,0,False,False,16667510,[]
+images/dark/michaels/high/C/dark_michaels_high_C_2.jpg,3,False,False,19292097,"[1.0, 1.4142135623730951, 2.23606797749979]"
+images/dark/michaels/high/C/dark_michaels_high_C_3.jpg,1,False,False,17124631,[1.4142135623730951]
+images/dark/michaels/high/C/dark_michaels_high_C_4.jpg,0,False,False,17025851,[]
+images/dark/michaels/high/D/dark_michaels_high_D_0.jpg,1,False,False,21107515,[1.0]
+images/dark/michaels/high/D/dark_michaels_high_D_1.jpg,2,False,False,23847249,"[2.0, 2.23606797749979]"
+images/dark/michaels/high/D/dark_michaels_high_D_2.jpg,4,True,True,22990358,"[0.0, 1.4142135623730951, 2.23606797749979, 3.0]"
+images/dark/michaels/high/D/dark_michaels_high_D_3.jpg,2,False,False,18837180,"[2.0, 2.23606797749979]"
+images/dark/michaels/high/D/dark_michaels_high_D_4.jpg,0,False,False,16150395,[]
+images/dark/michaels/medium/A/dark_michaels_medium_A_0.jpg,2,False,False,25859736,"[0.0, 2.23606797749979]"
+images/dark/michaels/medium/A/dark_michaels_medium_A_1.jpg,3,False,False,26012430,"[1.4142135623730951, 2.0, 2.23606797749979]"
+images/dark/michaels/medium/A/dark_michaels_medium_A_2.jpg,2,False,False,26225072,"[2.0, 3.0]"
+images/dark/michaels/medium/A/dark_michaels_medium_A_3.jpg,1,False,False,21216467,[2.23606797749979]
+images/dark/michaels/medium/A/dark_michaels_medium_A_4.jpg,0,False,False,17338122,[]
+images/dark/michaels/medium/B/dark_michaels_medium_B_0.jpg,2,False,False,16843501,"[0.0, 1.4142135623730951]"
+images/dark/michaels/medium/B/dark_michaels_medium_B_1.jpg,4,True,True,18808924,"[0.0, 1.0, 1.0, 2.0]"
+images/dark/michaels/medium/B/dark_michaels_medium_B_2.jpg,1,False,False,19655011,[1.0]
+images/dark/michaels/medium/B/dark_michaels_medium_B_3.jpg,3,False,False,24284540,"[1.0, 1.0, 2.23606797749979]"
+images/dark/michaels/medium/B/dark_michaels_medium_B_4.jpg,1,False,False,17717302,[1.4142135623730951]
+images/dark/michaels/medium/C/dark_michaels_medium_C_0.jpg,1,False,False,19259106,[1.0]
+images/dark/michaels/medium/C/dark_michaels_medium_C_1.jpg,0,False,False,20331619,[]
+images/dark/michaels/medium/C/dark_michaels_medium_C_2.jpg,2,False,False,22305168,"[1.0, 1.4142135623730951]"
+images/dark/michaels/medium/C/dark_michaels_medium_C_3.jpg,3,False,False,25310091,"[1.0, 1.4142135623730951, 2.0]"
+images/dark/michaels/medium/C/dark_michaels_medium_C_4.jpg,1,False,False,19114173,[2.0]
+images/dark/michaels/medium/D/dark_michaels_medium_D_0.jpg,4,True,True,20759418,"[2.0, 2.23606797749979, 2.23606797749979, 2.8284271247461903]"
+images/dark/michaels/medium/D/dark_michaels_medium_D_1.jpg,0,False,False,15814980,[]
+images/dark/michaels/medium/D/dark_michaels_medium_D_2.jpg,1,False,False,19132447,[1.0]
+images/dark/michaels/medium/D/dark_michaels_medium_D_3.jpg,2,False,False,20646741,"[1.0, 2.0]"
+images/dark/michaels/medium/D/dark_michaels_medium_D_4.jpg,0,False,False,16720076,[]
+images/dark/michaels/short/A/dark_michaels_short_A_0.jpg,0,False,False,23199787,[]
+images/dark/michaels/short/A/dark_michaels_short_A_1.jpg,0,False,False,17546757,[]
+images/dark/michaels/short/A/dark_michaels_short_A_2.jpg,0,False,False,16810686,[]
+images/dark/michaels/short/A/dark_michaels_short_A_3.jpg,0,False,False,15544821,[]
+images/dark/michaels/short/A/dark_michaels_short_A_4.jpg,0,False,False,17957566,[]
+images/dark/michaels/short/B/dark_michaels_short_B_0.jpg,1,False,False,19867388,[3.1622776601683795]
+images/dark/michaels/short/B/dark_michaels_short_B_1.jpg,1,False,False,19084649,[1.4142135623730951]
+images/dark/michaels/short/B/dark_michaels_short_B_2.jpg,1,False,False,22340978,[1.4142135623730951]
+images/dark/michaels/short/B/dark_michaels_short_B_3.jpg,1,False,False,22016891,[1.4142135623730951]
+images/dark/michaels/short/B/dark_michaels_short_B_4.jpg,0,False,False,16840072,[]
+images/dark/michaels/short/C/dark_michaels_short_C_0.jpg,0,False,False,19130056,[]
+images/dark/michaels/short/C/dark_michaels_short_C_1.jpg,0,False,False,15949312,[]
+images/dark/michaels/short/C/dark_michaels_short_C_2.jpg,0,False,False,15757376,[]
+images/dark/michaels/short/C/dark_michaels_short_C_3.jpg,0,False,False,21511343,[]
+images/dark/michaels/short/C/dark_michaels_short_C_4.jpg,0,False,False,14631499,[]
+images/dark/michaels/short/D/dark_michaels_short_D_0.jpg,0,False,False,14637158,[]
+images/dark/michaels/short/D/dark_michaels_short_D_1.jpg,1,False,False,20209710,[3.1622776601683795]
+images/dark/michaels/short/D/dark_michaels_short_D_2.jpg,1,False,False,22894557,[1.4142135623730951]
+images/dark/michaels/short/D/dark_michaels_short_D_3.jpg,0,False,False,22918265,[]
+images/dark/michaels/short/D/dark_michaels_short_D_4.jpg,0,False,False,14726196,[]
