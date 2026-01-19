@@ -16,7 +16,8 @@ def cleaner(path):
     for p in df.points:
         arrP = p.strip("]").strip("[").split(",")
         compareArrP =  (arrP[0:4]) if len(arrP)>= 4 else arrP
-        if len(compareArrP)>0:
+        print(compareArrP)
+        if len(compareArrP)>0 and compareArrP[0] != "" :
             closeEnoughCol.append((all([float(d)<5.0 for d in compareArrP])))
         else:
             closeEnoughCol.append(False)
