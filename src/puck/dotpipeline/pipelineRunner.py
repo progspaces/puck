@@ -118,9 +118,9 @@ def pipelineTests(test_pipeline, choice):
             correct += 1
         timeToDetect = end - start
         times.append(timeToDetect)
-        pipeline_img_dict.update({img_path: (count_of_blobs, only_4, only_4_close_enough, timeToDetect,distances)})
+        pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
         # # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / (str(test_pipeline) + "_results.csv"))
+    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / str(choice) / str(test_pipeline) + "_results.csv")
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
@@ -140,7 +140,6 @@ pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM
 
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
 choices = [(0,0),(3,0)]
-pipeline_list=[]
 p = Path('.')
 
 
@@ -149,7 +148,7 @@ for choice, choice_time in choices:
     pipeline_list_dict = {}
     with ThreadPoolExecutor(10) as pool:
         # call a function on each item in a list and handle results
-        for name, result in tqdm(pool.map(pipelineTests, (generator(pipelines[choice]))[1]), total=len((generator(pipelines[choice]))[1])):
+        for name, result in tqdm(pool.map(pipelineTests, ((generator(pipelines[choice]))[1]),choice), total=len((generator(pipelines[choice]))[1])):
             pipeline_list_dict.update({name:result})
 
     # ensure that output directory exists for the big picture
