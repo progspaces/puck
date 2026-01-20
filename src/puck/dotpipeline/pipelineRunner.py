@@ -10,6 +10,7 @@ import math
 import pprint
 import pandas as pd
 from time import thread_time_ns
+from datetime import datetime
 import statistics
 from tqdm import tqdm
 
@@ -24,18 +25,9 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
-
-pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
-choice = int(input("Please enter 0-3 to choose binary(0) or adaptiveM(1) or adaptiveG(2) or otsu(3): "))
-pipeline_list = (generator(pipelines[choice]))[1]
-p = Path('.')
-
-results_path = Path("src/puck/dotpipeline/pipeline_results/")
-results_path.mkdir(parents=True, exist_ok=True)
-
-def pipelineTests(test_pipeline):
+def pipelineTests(test_pipeline, choice):
+    results_path = Path("src/puck/dotpipeline/pipeline_results/" + choice)
+    results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
@@ -135,15 +127,48 @@ def pipelineTests(test_pipeline):
     return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
 
 
-pipeline_list_dict = {}
-with ThreadPoolExecutor(10) as pool:
-	# call a function on each item in a list and handle results
-    for name, result in tqdm(pool.map(pipelineTests, pipeline_list), total=len(pipeline_list)):
-        pipeline_list_dict.update({name:result})
 
-# ensure that output directory exists
-output_dir = Path("src/puck/dotpipeline/big_picture/")        
-output_dir.mkdir(parents=True, exist_ok=True)
 
-# save the big picture results
-pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
+overall_start = thread_time_ns()
+
+# Open the ground truth annotations
+with open('./src/puck/cli/annotations.json' , "r") as json_file:
+    file_data = dict(json.loads(json_file.read()))
+
+# Get the pipeline configuration options
+pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
+
+# Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
+choices = [(0,0),(3,0)]
+pipeline_list=[]
+p = Path('.')
+
+
+for choice, choice_time in choices:
+    choice_start = thread_time_ns()
+    pipeline_list_dict = {}
+    with ThreadPoolExecutor(10) as pool:
+        # call a function on each item in a list and handle results
+        for name, result in tqdm(pool.map(pipelineTests, (generator(pipelines[choice]))[1]), total=len((generator(pipelines[choice]))[1])):
+            pipeline_list_dict.update({name:result})
+
+    # ensure that output directory exists for the big picture
+    output_dir = Path("src/puck/dotpipeline/big_picture/")        
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # save the big picture results
+    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
+    choice_time = thread_time_ns() - choice_start
+    
+
+overall_end = thread_time_ns()
+overall_time = overall_end - overall_start
+
+txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
+for option, option_time in choices:
+    txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
+
+with open('./src/puck/dotpipline/timingResults_' + datetime.now() + '.txt', "w") as txt_file:
+    txt_file.write(txtStr)
+    
+   
