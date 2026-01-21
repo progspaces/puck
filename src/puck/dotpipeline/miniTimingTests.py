@@ -1,3 +1,7 @@
+from time import thread_time_ns
+import numpy as np
+from pathlib import Path
+import random
 import itertools
 from concurrent.futures import ThreadPoolExecutor
 from pipelineGenerator import generator
@@ -14,6 +18,10 @@ from datetime import datetime
 import statistics
 from tqdm import tqdm
 
+with open('./src/puck/cli/annotations.json' , "r") as json_file:
+    file_data = dict(json.loads(json_file.read()))
+    # print(file_data)
+
 def blobParamFunc(minArea, minCircularity):
     params = cv.SimpleBlobDetector_Params()
     params.filterByCircularity = True
@@ -25,33 +33,27 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-def pipelineTests(test_pipeline, choice):
-    results_path = Path("src/puck/dotpipeline/pipeline_results/" + choice)
-    results_path.mkdir(parents=True, exist_ok=True)
-    # print(test_pipeline)
-    correct = 0 
+
+def runShortPipeline(shortenedImageList, choice, timesDict):
     times = []
-    pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
+    all_start = thread_time_ns()
+    correct = 0
+    for path in shortenedImageList:
         start = thread_time_ns()
-    # for x in range(1,2,1):
-        # img_path = "images/custom/davids/short/B/custom_davids_short_B_0.jpg"
-        gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
-        image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
-        imageBlurred = cv.medianBlur(image, test_pipeline[0])
-        thresholded1 = False
-        thresholded2 = False
+        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[14:])))
+        image = cv.imread(path, cv.IMREAD_COLOR_RGB)
+        imageBlurred = cv.medianBlur(image, 3)
         if choice == 0 : # binary
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            _, thresholded = cv.threshold(gray, test_pipeline[3], 255, cv.THRESH_BINARY)
+            _, thresholded = cv.threshold(gray, 3, 255, cv.THRESH_BINARY)
         elif choice == 1: ## Adaptive Mean
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
+            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2)
+            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,5,2)
         elif choice == 2: ## Adaptive Gaussian
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
+            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2)
+            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,5,2)
         else: 
             # convert the image into the hsv colour space
             image_hsv = cv.cvtColor(imageBlurred, cv.COLOR_RGB2HSV)
@@ -75,7 +77,7 @@ def pipelineTests(test_pipeline, choice):
             # # print(thresholded)
             thresholded = 255-thresholded
             
-        blob_params = blobParamFunc(test_pipeline[1], test_pipeline[2])
+        blob_params = blobParamFunc(300, .75)
         detector = cv.SimpleBlobDetector_create(blob_params)
         if choice == 1 or choice == 2:
             keypoints1 = detector.detect(thresholded1)
@@ -107,66 +109,40 @@ def pipelineTests(test_pipeline, choice):
             distances.append(closest[0])
         distances.sort()
         first_four = distances[:4] if len(distances) >= 4 else distances
-        # variable list
-        
         count_of_blobs = len(point_list)
         only_4 = len(point_list) == 4
         close_enough = True if all([(dist < 5) for dist in first_four]) else False
         only_4_close_enough = only_4 and close_enough
         if only_4_close_enough:
             correct += 1
-        timeToDetect = end - start
+        timeToDetect = (end - start)/1000000
         times.append(timeToDetect)
-        pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
-        # # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / str(choice) / str(test_pipeline) + "_results.csv")
-    accuracy = (correct/480)
+    all_time = (thread_time_ns() - all_start)/1000000
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
-    return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
+    timesDict.update({f"{choice}_all_time": all_time, f"{choice}_times": times, f"{choice}_avg": avgTimeToDetect, f"{choice}_median": medianTimeToDetect, f"{choice}_correct": correct})
 
-
-
-
-overall_start = thread_time_ns()
-
-# Open the ground truth annotations
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
-
-# Get the pipeline configuration options
-pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
-
-# Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [(0,0),(3,0)]
+random.seed(2026)
 p = Path('.')
 
+# imageList = [path for path in sorted(list(p.glob('images_miniset/*/*/*/*/*.jpg')))]
+# shortenedImageList = [imageList[ind] for ind in random.sample(range(0,95),k=10)]
 
-for choice, choice_time in choices:
-    choice_start = thread_time_ns()
-    pipeline_list_dict = {}
-    with ThreadPoolExecutor(10) as pool:
-        # call a function on each item in a list and handle results
-        for name, result in tqdm(pool.map(pipelineTests, ((generator(pipelines[choice]))[1]),choice), total=len((generator(pipelines[choice]))[1])):
-            pipeline_list_dict.update({name:result})
+# timesDict ={}
+# for choice in tqdm(range(0,4,1)):
+#     runShortPipeline(shortenedImageList, choice, timesDict)
+#     print(timesDict)
 
-    # ensure that output directory exists for the big picture
-    output_dir = Path("src/puck/dotpipeline/big_picture/")        
-    output_dir.mkdir(parents=True, exist_ok=True)
+# with open('timingDict.json', 'w') as f:
+#     json.dump(timesDict, f)
 
-    # save the big picture results
-    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
-    choice_time = thread_time_ns() - choice_start
-    
 
-overall_end = thread_time_ns()
-overall_time = overall_end - overall_start
+with open('./src/puck/dotpipeline/timingDict.json' , "r") as json_file:
+    file_data = dict(json.loads(json_file.read()))
 
-txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-for option, option_time in choices:
-    txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
+pprint.pprint(file_data)
 
-with open('./src/puck/dotpipline/timingResults_' + datetime.now() + '.txt', "w") as txt_file:
-    txt_file.write(txtStr)
-    
-   
+
+
+
+
