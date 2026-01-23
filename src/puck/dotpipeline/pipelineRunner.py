@@ -25,8 +25,9 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-def pipelineTests(test_pipeline, choice):
-    results_path = Path("src/puck/dotpipeline/pipeline_results/" + choice)
+def pipelineTests(args):
+    test_pipeline, choice = args
+    results_path = Path("src/puck/dotpipeline/pipeline_results/" + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
@@ -144,7 +145,10 @@ for choice, choice_time in choices:
     pipeline_list_dict = {}
     with ThreadPoolExecutor(10) as pool:
         # call a function on each item in a list and handle results
-        for name, result in tqdm(pool.map(pipelineTests, ((generator(pipelines[choice]))[1]),choice), total=len((generator(pipelines[choice]))[1])):
+        generatored_pipelines = generator(pipelines[choice])[1]
+        list_of_choices = [choice] * len(generatored_pipelines)
+
+        for name, result in tqdm(pool.map(pipelineTests, zip(generatored_pipelines, list_of_choices)), total=len(generatored_pipelines)):
             pipeline_list_dict.update({name:result})
 
     # ensure that output directory exists for the big picture
