@@ -201,6 +201,7 @@ dark_df_encoded = pd.get_dummies(dark_df, dtype=int)
 print(dark_df_encoded)
 
 X_dark = dark_df_encoded[["loc_davids" , "loc_jack_cole" , "loc_john_honey" , "loc_michaels"  ,"height_high" , "height_medium"  ,"height_short" , "set_A" , "set_B"  ,"set_C" , "set_D" ]]
+X_dark = dark_df_encoded[["set_A" , "set_B"  ,"set_C" , "set_D" ]]
 # X_custom = custom_df[["set","loc", "height" ]]
 y_dark= dark_df_encoded.count4
 # y_custom =custom_df.count4
@@ -210,23 +211,22 @@ y_dark= dark_df_encoded.count4
 
 X_train_dark, X_test_dark, y_train_dark, y_test_dark = train_test_split(X_dark , y_dark, test_size=0.33, random_state=2026)
 
-logreg = LogisticRegression(random_state=16)
+logreg = LogisticRegression(random_state=2026)
 
 # # fit the model with data
-# logreg.fit(X_train_dark, y_train_dark)
+logreg.fit(X_train_dark, y_train_dark)
 
-# y_pred_dark = logreg.predict(X_test_dark)
+y_pred_dark = logreg.predict(X_test_dark)
 
 
 # clf_dark = CategoricalNB()
 # clf_dark.fit(X_train_dark, y_train_dark)
 # y_pred_dark = clf_dark.predict(X_test_dark)
-# cnf_matrix_dark = metrics.confusion_matrix(y_test_dark,y_pred_dark)
-# print(cnf_matrix_dark)
+cnf_matrix_dark = metrics.confusion_matrix(y_test_dark,y_pred_dark)
+print(cnf_matrix_dark)
 
 
-import numpy as np
-np.identity(n=14) @ np.identity(n=14) # no warning
+
 # X_train_custom, X_test_custom, y_train_custom, y_test_custom= train_test_split(X_encoded_custom , y_custom, test_size=0.33, random_state=2026)
 # clf_custom= CategoricalNB()
 # clf_custom.fit(X_train_custom, y_train_custom)
@@ -234,17 +234,17 @@ np.identity(n=14) @ np.identity(n=14) # no warning
 # cnf_matrix_custom = metrics.confusion_matrix(y_test_custom,y_pred_custom)
 # print(cnf_matrix_custom)
 
-# fig, ax = plt.subplots()
-# # create heatmap
-# sns.heatmap(pd.DataFrame(cnf_matrix_custom), annot=True, cmap="YlGnBu" ,fmt='g')
-# ax.xaxis.set_label_position("top")
-# plt.tight_layout()
-# plt.title('Confusion matrix dark')
-# plt.ylabel('Actual label')
-# plt.xlabel('Predicted label')
-# plt.show()
+fig, ax = plt.subplots()
+# create heatmap
+sns.heatmap(pd.DataFrame(cnf_matrix_dark), annot=True, cmap="YlGnBu" ,fmt='g')
+ax.xaxis.set_label_position("top")
+plt.tight_layout()
+plt.title('Confusion matrix dark')
+plt.ylabel('Actual label')
+plt.xlabel('Predicted label')
+plt.show()
 
-# target_names = ['0', '1']
-# print(classification_report(y_test_custom, y_pred_custom, target_names=target_names))
+target_names = ['0', '1']
+print(classification_report(y_test_dark, y_pred_dark, target_names=target_names))
 
 

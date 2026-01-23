@@ -58,19 +58,16 @@ def pipelineTests(test_pipeline, choice):
             image_hsv = imageBlurred
     
             # use Otsu's method to find the thresholds for hue and saturation
-            _, thresh_h = cv.threshold(image_hsv[:, :, 0],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-            _, thresh_s = cv.threshold(image_hsv[:, :, 1],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+            _, thresh_v = cv.threshold(image_hsv[:, :, 2],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
     
             # mask the image to get determine which pixels with hue and saturation above their thresholds
-            mask_h = image_hsv[:, :, 1] > thresh_h
-            mask_s = image_hsv[:, :, 1] > thresh_s
+            mask_v= image_hsv[:, :, 1] > thresh_v
     
             # combine the masks with an OR so any pixel above either threshold counts as foreground
-            np_mask = np.logical_or(mask_h, mask_s)
     
             # apply morphological transforms
             kernel = np.ones((3, 3), np.uint8)
-            thresholded = cv.morphologyEx(np_mask.astype(np.uint8), cv.MORPH_CLOSE, kernel)
+            thresholded = cv.morphologyEx(mask_v.astype(np.uint8), cv.MORPH_CLOSE, kernel)
             thresholded= thresholded*255
             # # print(thresholded)
             thresholded = 255-thresholded
