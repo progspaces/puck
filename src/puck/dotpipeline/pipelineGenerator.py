@@ -20,7 +20,8 @@ def generator(json_path):
 
     blur = list(range(blur_min,blur_max,blur_step))
     blob_area= list(range(area_min,area_max + area_step,area_step))
-    blob_circ= list(np.arange(0.1,1,circ_step))
+    blob_circ= list(np.arange(0.7,.85,circ_step))
+    blob_circ = np.round(blob_circ, 2)
 
     thresh = parameters.get("thresh")
     if thresh == "binary":
@@ -42,6 +43,6 @@ def generator(json_path):
         p = list(product(blur,blob_area,blob_circ))
     return (thresh,p)
 
-# pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
+# pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu1.json"]
 # choice = int(input("Please enter 0-3 to choose binary(0) or adaptiveM(1) or adaptiveG(2) or otsu(3): "))
-# print(generator(pipelines[choice])[1][9])
+# print(generator(pipelines[choice])[1])

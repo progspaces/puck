@@ -136,10 +136,10 @@ with open('./src/puck/cli/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration options
-pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
+pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu1.json"]
 
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [(0,0),(3,0)]
+choices = [(3,0)]
 p = Path('.')
 
 
@@ -160,7 +160,8 @@ for choice, choice_time in choices:
 
     # save the big picture results
     pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
-    choice_time = thread_time_ns() - choice_start
+    choice_end =thread_time_ns()
+    choice_time = choice_end - choice_start
     
 
 overall_end = thread_time_ns()
