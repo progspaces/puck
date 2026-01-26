@@ -117,7 +117,10 @@ def pipelineTests(args):
         times.append(timeToDetect)
         pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
         # # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / str(choice) / str(test_pipeline) + "_results.csv")
+    # Create subdirectory for choice results
+    choice_results_path = results_path / str(choice)
+    choice_results_path.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / (str(test_pipeline) + "_results.csv"))
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
@@ -167,7 +170,13 @@ txtStr = f"This pipeline runner took {overall_time} time in total. \n"
 for option, option_time in choices:
     txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
-with open('./src/puck/dotpipline/timingResults_' + datetime.now() + '.txt', "w") as txt_file:
+# Ensure timing results directory exists
+timing_dir = Path('./src/puck/dotpipeline/')
+timing_dir.mkdir(parents=True, exist_ok=True)
+
+# Create timing results file with properly formatted datetime
+timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+with open(timing_filename, "w") as txt_file:
     txt_file.write(txtStr)
     
    
