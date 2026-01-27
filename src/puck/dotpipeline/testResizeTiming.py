@@ -1,6 +1,5 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from pipelineGenerator import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -25,7 +24,8 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-def detection(thresholds,blob_params, gray):
+
+def detection(thresholds,blob_params,gray):
     detector = cv.SimpleBlobDetector_create(blob_params)
     centers= []
     for thresh in thresholds:
@@ -45,30 +45,48 @@ def detection(thresholds,blob_params, gray):
         centers = centers + new_centers
     return centers
 
+# Open the ground truth annotations
+with open('./src/puck/cli/annotations.json' , "r") as json_file:
+    file_data = dict(json.loads(json_file.read()))
 
-def pipelineTests():
-    results_path = Path("src/puck/dotpipeline/pipeline_results/ppMultiTest")
-    results_path.mkdir(parents=True, exist_ok=True)
-    # print(test_pipeline)
-    correct = 0 
-    times = []
-    pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
-        print(str(img_path)[:-4])
-        start = thread_time_ns()
-        gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
+# Get the pipeline configuration options
+
+p = Path('.')
+
+# test on 96 images, 20% of the images possible
+# one binary
+# two binary
+# three binary
+# four binary
+# five binary
+# 10 binary
+# 15 binary
+thresh_dict = {
+    0: [170],#1
+    1: [170,180], #2
+    2: [160,170,180], #3
+    3: np.arange(150,190,10), #4
+    4: np.arange(160,185,5), #5
+    5: np.arange(150,200,5), #10
+    6: np.arange(120,195,5),
+}
+results = {}
+for img_path in sorted(list(p.glob('images_miniset/*/*/*/*/*[0-4].jpg'))):
+    truthPath = ("images" + str(img_path)[14:])
+    gtkp = groundTruthKeyPoints(file_data.get(str(truthPath)))
+    print(truthPath)
+    for x in range(0,7,1):
+        start= thread_time_ns()
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 9)
+#     # imageBlurred_resize = cv.resize(imageBlurred, None, fx = factor, fy = factor,interpolation= cv.INTER_LINEAR)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-        scaledSize = cv.Size(imageBlurred.cols / 4, imageBlurred.rows / 4)
-        scaledImage = cv.Mat(scaledSize, image.type())
-        cv.resize(image, scaledImage, scaledSize, 0, 0, cv.INTER_LINEAR)
-        thresholds = np.arange(160,190,10)
-        blob_params = blobParamFunc(400, .8)
+        thresholds = thresh_dict.get(x)
+        print(thresholds)
+        blob_params = blobParamFunc(500, .8)
         point_list = detection(thresholds=thresholds, blob_params= blob_params, gray=gray)
         end = thread_time_ns()
         distances = []
-
         points_to_purge= []
         for a, b in itertools.combinations(point_list, 2):
             dist = (math.dist(a, b))
@@ -91,52 +109,8 @@ def pipelineTests():
         only_4 = len(point_list) == 4
         close_enough = True if all([(dist < 5) for dist in first_four]) else False
         only_4_close_enough = only_4 and close_enough
-        if only_4_close_enough:
-            correct += 1
-        timeToDetect = end - start
-        times.append(timeToDetect)
-        pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
-        # # print("...")
-    # Create subdirectory for choice results
-    choice_results_path = results_path / str(3)
-    choice_results_path.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / "paperPrograms_results.csv")
-    accuracy = (correct/480)
-    avgTimeToDetect = statistics.mean(times)
-    medianTimeToDetect = statistics.median(times)
-    return str("test_pipeline"), (3, accuracy, avgTimeToDetect, medianTimeToDetect)
+        timeToDetect = (end - start)/1000000000
+        results.update({str(img_path)+ "."+str(x):(timeToDetect,count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
+pd.DataFrame(results).T.to_csv("timing_per_binary_thresh.csv")
 
 
-
-
-overall_start = thread_time_ns()
-
-# Open the ground truth annotations
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
-
-# Get the pipeline configuration options
-
-p = Path('.')
-
-blur = 9
-minArea = 400
-circularity = .8
-
-pipelineTests()
-
-overall_end = thread_time_ns()
-overall_time = overall_end - overall_start
-
-txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-
-# Ensure timing results directory exists
-timing_dir = Path('./src/puck/dotpipeline/')
-timing_dir.mkdir(parents=True, exist_ok=True)
-
-# Create timing results file with properly formatted datetime
-timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-with open(timing_filename, "w") as txt_file:
-    txt_file.write(txtStr)
-    
-   
