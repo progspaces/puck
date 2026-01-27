@@ -55,28 +55,30 @@ def pipelineTests(args):
             thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
             thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
         else: 
+            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
+            _, thresholded = cv.threshold(gray, gray.max()/2, 255, cv.THRESH_BINARY)
             # convert the image into the hsv colour space
-            image_hsv = cv.cvtColor(imageBlurred, cv.COLOR_RGB2HSV)
-            image_hsv = imageBlurred
+            # image_hsv = cv.cvtColor(imageBlurred, cv.COLOR_RGB2HSV)
+            # image_hsv = imageBlurred
     
-            # use Otsu's method to find the thresholds for hue and saturation
-            _, thresh_h = cv.threshold(image_hsv[:, :, 0],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-            _, thresh_v = cv.threshold(image_hsv[:, :, 2],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+            # # use Otsu's method to find the thresholds for hue and saturation
+            # _, thresh_h = cv.threshold(image_hsv[:, :, 0],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+            # _, thresh_v = cv.threshold(image_hsv[:, :, 2],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
     
-            # mask the image to get determine which pixels with hue and saturation above their thresholds
-            mask_v= image_hsv[:, :, 1] > thresh_v
-            mask_h= image_hsv[:, :, 1] > thresh_h
+            # # mask the image to get determine which pixels with hue and saturation above their thresholds
+            # mask_v= image_hsv[:, :, 2] > thresh_v
+            # mask_h= image_hsv[:, :, 1] > thresh_h
 
 
-            # combine the masks with an OR so any pixel above either threshold counts as foreground
-            np_mask = np.logical_or(mask_h, mask_v)
+            # # combine the masks with an OR so any pixel above either threshold counts as foreground
+            # np_mask = np.logical_or(mask_h, mask_v)
 
-            # apply morphological transforms
-            kernel = np.ones((3, 3), np.uint8)
-            thresholded = cv.morphologyEx(np_mask.astype(np.uint8), cv.MORPH_CLOSE, kernel)
-            thresholded= thresholded*255
-            # # print(thresholded)
-            thresholded = 255-thresholded
+            # # apply morphological transforms
+            # kernel = np.ones((3, 3), np.uint8)
+            # thresholded = cv.morphologyEx(np_mask.astype(np.uint8), cv.MORPH_CLOSE, kernel)
+            # thresholded= thresholded*255
+            # # # print(thresholded)
+            # thresholded = 255-thresholded
             cv.imwrite( "src/puck/dotpipeline/saved_"+str(img_path)[:-4] + "_thresholded.jpg", thresholded)
 
             
