@@ -21,74 +21,49 @@ def blobParamFunc(minArea, minCircularity):
     params.minArea=minArea
     params.blobColor = 0
     return params
+def detection(thresholds,blob_params,gray):
+    detector = cv.SimpleBlobDetector_create(blob_params)
+    centers= []
+    for thresh in thresholds:
+        _, thresholded = cv.threshold(gray, thresh, 255, cv.THRESH_BINARY)
+        keypoints = detector.detect(thresholded)
+        current_centers = [(round(kp.pt[0]), round(kp.pt[1])) for kp in keypoints]
+        new_centers = []
+        for curr_center in current_centers:
+            isNew = True
+            for c in centers:
+                    distance = math.dist(curr_center, c)
+                    isNew = distance >= 10
+                    if not isNew:
+                        break
+            if isNew:
+                new_centers.append(curr_center)
+        centers = centers + new_centers
+    return centers
+
 
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
 def pipelineTests(args):
-    test_pipeline, choice = args
+    test_pipeline = args
     results_path = Path("src/puck/dotpipeline/pipeline_results/" + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
-    # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
     for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
-        start = thread_time_ns()
-    # for x in range(1,2,1):
-        # img_path = "images/custom/davids/short/B/custom_davids_short_B_0.jpg"
+        # print(str(img_path))
         gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
+        start= thread_time_ns()
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
-        imageBlurred = cv.medianBlur(image, test_pipeline[0])
-        thresholded1 = False
-        thresholded2 = False
-        if choice == 0 : # binary
-            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            _, thresholded = cv.threshold(gray, test_pipeline[3], 255, cv.THRESH_BINARY)
-        elif choice == 1: ## Adaptive Mean
-            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
-        elif choice == 2: ## Adaptive Gaussian
-            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
-        else: 
-            # convert the image into the hsv colour space
-            image_hsv = cv.cvtColor(imageBlurred, cv.COLOR_RGB2HSV)
-            image_hsv = imageBlurred
-    
-            # use Otsu's method to find the thresholds for hue and saturation
-            _, thresh_v = cv.threshold(image_hsv[:, :, 2],0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-    
-            # mask the image to get determine which pixels with hue and saturation above their thresholds
-            mask_v= image_hsv[:, :, 1] > thresh_v
-    
-            # combine the masks with an OR so any pixel above either threshold counts as foreground
-    
-            # apply morphological transforms
-            kernel = np.ones((3, 3), np.uint8)
-            thresholded = cv.morphologyEx(mask_v.astype(np.uint8), cv.MORPH_CLOSE, kernel)
-            thresholded= thresholded*255
-            # # print(thresholded)
-            thresholded = 255-thresholded
-            
-        blob_params = blobParamFunc(test_pipeline[1], test_pipeline[2])
-        detector = cv.SimpleBlobDetector_create(blob_params)
-        if choice == 1 or choice == 2:
-            keypoints1 = detector.detect(thresholded1)
-            keypoints2 = detector.detect(thresholded2)
-            keypoints = keypoints1 + keypoints2
-        else:
-            keypoints = detector.detect(thresholded)
+        imageBlurred = cv.medianBlur(image, 9)
+        gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
+        thresholds = [160,170,180]
+        blob_params = blobParamFunc(500, .8)
+        point_list = detection(thresholds=thresholds, blob_params= blob_params, gray=gray)
         end = thread_time_ns()
-        # # print(str(len(keypoints)) + " blobs detected")
-        blank = np.zeros((1, 1))
-        blobs = cv.drawKeypoints(image, keypoints, blank, (255, 0, 0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        
         distances = []
-
-        point_list = [(round(kp.pt[0]), round(kp.pt[1])) for kp in keypoints]
         points_to_purge= []
         for a, b in itertools.combinations(point_list, 2):
             dist = (math.dist(a, b))
@@ -136,10 +111,9 @@ with open('./src/puck/cli/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration options
-pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu1.json"]
 
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [(3,0)]
+choices = [("paperPrograms",0)]
 p = Path('.')
 
 
@@ -148,10 +122,8 @@ for choice, choice_time in choices:
     pipeline_list_dict = {}
     with ThreadPoolExecutor(10) as pool:
         # call a function on each item in a list and handle results
-        generatored_pipelines = generator(pipelines[choice])[1]
-        list_of_choices = [choice] * len(generatored_pipelines)
-
-        for name, result in tqdm(pool.map(pipelineTests, zip(generatored_pipelines, list_of_choices)), total=len(generatored_pipelines)):
+        generatored_pipelines = generator("/Users/jdreiling/Desktop/puck/puck/src/puck/dotpipeline/binary1.json")[1]
+        for name, result in tqdm(pool.map(pipelineTests, generatored_pipelines), total=len(generatored_pipelines)):
             pipeline_list_dict.update({name:result})
 
     # ensure that output directory exists for the big picture
@@ -159,7 +131,7 @@ for choice, choice_time in choices:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # save the big picture results
-    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
+    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / "paperProgramsThresholding_results.csv")
     choice_end =thread_time_ns()
     choice_time = choice_end - choice_start
     
