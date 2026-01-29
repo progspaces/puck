@@ -9,6 +9,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "ipykernel>=6.31.0",
     "ipython>=8.18.1",
+    "krippendorff>=0.8.1",
     "matplotlib>=3.9.4",
     "matplotlib-inline>=0.2.1",
     "numpy>=2.0.2",
