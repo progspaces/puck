@@ -1,6 +1,5 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from pipelineGenerator import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -14,40 +13,14 @@ from datetime import datetime
 import statistics
 from tqdm import tqdm
 
-def blobParamFunc(minArea, minCircularity):
-    params = cv.SimpleBlobDetector_Params()
-    params.filterByCircularity = True
-    params.minCircularity = minCircularity
-    params.minArea=minArea
-    params.blobColor = 0
-    return params
 
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
-def detection(thresholds,blob_params, gray):
-    detector = cv.SimpleBlobDetector_create(blob_params)
-    centers= []
-    for thresh in thresholds:
-        _, thresholded = cv.threshold(gray, thresh, 255, cv.THRESH_BINARY)
-        keypoints = detector.detect(thresholded)
-        current_centers = [(round(kp.pt[0]), round(kp.pt[1])) for kp in keypoints]
-        new_centers = []
-        for curr_center in current_centers:
-            isNew = True
-            for c in centers:
-                    distance = math.dist(curr_center, c)
-                    isNew = distance >= 10
-                    if not isNew:
-                        break
-            if isNew:
-                new_centers.append(curr_center)
-        centers = centers + new_centers
-    return centers
 
 
 def pipelineTests():
-    results_path = Path("src/puck/dotpipeline/pipeline_results/ppMultiTest")
+    results_path = Path("src/puck/dotpipeline/pipeline_results/houghMultiTest")
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
@@ -62,16 +35,11 @@ def pipelineTests():
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                               param1=100, param2=30,
-                               minRadius=1, maxRadius=30)
-        
-        
-        scaledSize = cv.Size(imageBlurred.cols / 4, imageBlurred.rows / 4)
-        scaledImage = cv.Mat(scaledSize, image.type())
-        cv.resize(image, scaledImage, scaledSize, 0, 0, cv.INTER_LINEAR)
-        thresholds = np.arange(160,190,10)
-        blob_params = blobParamFunc(400, .8)
-        point_list = detection(thresholds=thresholds, blob_params= blob_params, gray=gray)
+                        param1=100, param2=30,
+                        minRadius=10, maxRadius=30)[:,:,0:2][0]
+        point_list = [(float(c[0]),float(c[1])) for c in circles]
+        point_list.sort(key= lambda p: math.dist(p, (0,0)))
+        gtkp.sort(key= lambda p: math.dist(p, (0,0)))
         end = thread_time_ns()
         distances = []
 
@@ -106,7 +74,7 @@ def pipelineTests():
     # Create subdirectory for choice results
     choice_results_path = results_path / str(3)
     choice_results_path.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / "paperPrograms_results.csv")
+    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / "hough_results.csv")
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
@@ -125,9 +93,6 @@ with open('./src/puck/cli/annotations.json' , "r") as json_file:
 
 p = Path('.')
 
-blur = 9
-minArea = 400
-circularity = .8
 
 pipelineTests()
 
@@ -145,4 +110,5 @@ timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_
 with open(timing_filename, "w") as txt_file:
     txt_file.write(txtStr)
     
-   
+
+
