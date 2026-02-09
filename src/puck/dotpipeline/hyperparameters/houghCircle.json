@@ -1,0 +1,18 @@
+{
+    "method": "circle",
+    "dp_min": 1,
+    "dp_step": 0.5,
+    "dp_max": 2,
+    "minDist_min": 100,
+    "minDist_step": 10,
+    "minDist_max": 300,
+    "param1_min": 100,
+    "param1_step": 10,
+    "param1_max": 300,
+    "param2_min": 30,
+    "param2_step": 5,
+    "param2_max": 50,
+    "minRadius_min": 5,
+    "minRadius_step": 5,
+    "minRadius_max":20
+}

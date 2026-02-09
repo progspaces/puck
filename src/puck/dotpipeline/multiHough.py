@@ -20,7 +20,7 @@ def groundTruthKeyPoints(entry):
 
 
 def pipelineTests():
-    results_path = Path("src/puck/dotpipeline/pipeline_results/houghMultiTest")
+    results_path = Path("./results/houghMultiTest")
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
@@ -34,13 +34,15 @@ def pipelineTests():
         imageBlurred = cv.medianBlur(image, 9)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         rows = gray.shape[0]
+        print(rows)
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
                         param1=100, param2=30,
                         minRadius=10, maxRadius=30)[:,:,0:2][0]
+        end = thread_time_ns()
         point_list = [(float(c[0]),float(c[1])) for c in circles]
         point_list.sort(key= lambda p: math.dist(p, (0,0)))
         gtkp.sort(key= lambda p: math.dist(p, (0,0)))
-        end = thread_time_ns()
+ 
         distances = []
 
         points_to_purge= []
@@ -86,7 +88,7 @@ def pipelineTests():
 overall_start = thread_time_ns()
 
 # Open the ground truth annotations
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
+with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration options
@@ -94,21 +96,14 @@ with open('./src/puck/cli/annotations.json' , "r") as json_file:
 p = Path('.')
 
 
+image = cv.imread("/Users/jdreiling/Desktop/puck/puck/images/custom/jack_cole/medium/B/custom_jack_cole_medium_B_0.jpg", cv.IMREAD_COLOR_RGB)
+imageBlurred = cv.medianBlur(image, 9)
+gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
+rows = gray.shape[0]
+print(rows)
+
 pipelineTests()
 
-overall_end = thread_time_ns()
-overall_time = overall_end - overall_start
-
-txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-
-# Ensure timing results directory exists
-timing_dir = Path('./src/puck/dotpipeline/')
-timing_dir.mkdir(parents=True, exist_ok=True)
-
-# Create timing results file with properly formatted datetime
-timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-with open(timing_filename, "w") as txt_file:
-    txt_file.write(txtStr)
     
 
 
