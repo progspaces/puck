@@ -44,19 +44,27 @@ def pipelineTests(args):
         imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         if choice == "houghCircle":
-            circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, test_pipeline[0], test_pipeline[1],
+            rows = gray.shape[0]
+            # circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
+            #            param1=100, param2=30,
+            #            minRadius=10, maxRadius=30)[:,:,0:2][0]
+            circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT,
+                                     int(test_pipeline[0]), test_pipeline[1],
                             param1=test_pipeline[2], param2=test_pipeline[3],
-                            minRadius=test_pipeline[4])[:,:,0:2][0]
+                            minRadius=test_pipeline[4], maxRadius=30)
+            circles = circles[:,:,0:2][0] if circles is not None else []
+
         elif choice == "houghCircleAlt":
             circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT_ALT, test_pipeline[0], test_pipeline[1],
                             param1=test_pipeline[2], param2=test_pipeline[3],
-                            minRadius=test_pipeline[4])[:,:,0:2][0]
+                            minRadius=test_pipeline[4], maxRadius=30)
+            circles = circles[:,:,0:2][0] if circles is not None else []
         elif choice == "houghEllipse":
             edges = canny(gray, sigma=test_pipeline[0], low_threshold=test_pipeline[1], high_threshold=test_pipeline[2])
             result = hough_ellipse(edges, accuracy=test_pipeline[3], threshold=test_pipeline[4], min_size=test_pipeline[5], max_size=120)
             circles = result.sort(order='accumulator')
         end = thread_time_ns()
-        print(test_pipeline, str(img_path)[:-4] , str((end-start)/1_000_000_000))
+        # print(test_pipeline, str(img_path)[:-4] , str((end-start)/1_000_000_000))
         point_list = [(float(c[0]),float(c[1])) for c in circles]
  
         distances = []
@@ -98,7 +106,8 @@ def pipelineTests(args):
     return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
 
 
-
+# print("is this optimized")
+# print(cv.useOptimized())
 
 overall_start = thread_time_ns()
 
@@ -109,7 +118,7 @@ with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
 # Get the pipeline configuration optionsß
 
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [("houghCircle",0)]
+choices = [("houghCircle",0), ("houghCircleAlt",0)]
 p = Path('.')
 
 
@@ -122,8 +131,8 @@ for choice, choice_time in choices:
         list_of_choices = [choice] * len(generated_pipelines)
         for name, result in tqdm(pool.map(pipelineTests, zip(generated_pipelines,list_of_choices)), total=len(generated_pipelines)):
             pipeline_list_dict.update({name:result})   
-            print(name)
-            print(result)
+            # print(name)
+            # print(result)
     # ensure that output directory exists for the big picture
     output_dir = Path("results/")        
     output_dir.mkdir(parents=True, exist_ok=True)
