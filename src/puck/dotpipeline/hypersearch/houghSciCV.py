@@ -38,11 +38,10 @@ def pipelineTests(args):
     times = []
     pipeline_img_dict = {}
     for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
-        # print(str(img_path)[:-4])
         start = thread_time_ns()
         gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
-        imageBlurred = cv.medianBlur(image, 9)
+        imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         if choice == "houghCircle":
             circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, test_pipeline[0], test_pipeline[1],
@@ -57,6 +56,7 @@ def pipelineTests(args):
             result = hough_ellipse(edges, accuracy=test_pipeline[3], threshold=test_pipeline[4], min_size=test_pipeline[5], max_size=120)
             circles = result.sort(order='accumulator')
         end = thread_time_ns()
+        print(test_pipeline, str(img_path)[:-4] , str((end-start)/1_000_000_000))
         point_list = [(float(c[0]),float(c[1])) for c in circles]
  
         distances = []
