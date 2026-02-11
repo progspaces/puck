@@ -30,7 +30,6 @@ variants = product(PALETTES,ROOMS,DISTS,PERMS,COUNTS)
 
 
 
-@click.command()
 def webcamCapture():
     i = 0
     vc = cv2.VideoCapture(0) # input index is 0, so first video input I assume 
@@ -72,6 +71,7 @@ def webcamCapture():
     ### wraps it up as a click.command object and then assigns it to the name webcamCaputre
     ### ways of enriching the function with more funcitonality in a way that is orthogonal to the function definition.
 
+webcamCapture()
 
 # @click.command()
 # @click.option(
