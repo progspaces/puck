@@ -1,0 +1,14 @@
+{"blur_min":1,
+ "blur_max":15,
+ "blur_step":2,
+ 
+ "area_min": 400,
+ "area_max": 600,
+ "area_step":10,
+
+ "circ_min": 0.7,
+ "circ_max": 0.9,
+ "circ_step": 0.05,
+
+ "thresh": "paperPrograms"
+}
