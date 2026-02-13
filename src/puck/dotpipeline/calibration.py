@@ -7,6 +7,9 @@ import click
 from itertools import product
 import os
 
+
+
+
 PALETTES = ["custom", "dark"]
 DISTS = ["high", "medium", "short"]
 ROOMS = ["john_honey","jack_cole","davids", "michaels", ]
@@ -42,4 +45,8 @@ def webcamCapture():
     cv2.destroyWindow("preview")
     vc.release()    
 
-webcamCapture()
+# webcamCapture()
+
+
+## grab one image and get the color of the dots.
+cal_path = "/Users/jdreiling/Desktop/puck/puck/images_calibration/high/custom/davids/high_custom_davids_calibration.jpg"
