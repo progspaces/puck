@@ -1,11 +1,16 @@
 import cv2 as cv
 import numpy as np
-rgb1 = np.array([251, 230, 38],dtype=np.uint8) # yellow
+rgb1 = np.array([255, 255, 255],dtype=np.uint8) # yellow
 rgb2 = np.array([170, 13, 254],dtype=np.uint8) # amathyst
 rgb1 = rgb1.reshape((1,1,3))
 rgb2 = rgb2.reshape((1,1,3))
 luv1 = cv.cvtColor(rgb1,cv.COLOR_RGB2Luv)
 luv2 = cv.cvtColor(rgb2,cv.COLOR_RGB2Luv)
+luv3 = np.array([255, 96 ,120], dtype=np.uint8)
+luv3 = luv3.reshape((1,1,3))
+rgb3 = cv.cvtColor(luv3,cv.COLOR_Luv2RGB)
+print("RGB")
+print(rgb3)
 print(luv1)
 print(luv2)
 luv1 = luv1.astype(np.float32)
