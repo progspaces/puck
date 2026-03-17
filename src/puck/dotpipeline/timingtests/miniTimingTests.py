@@ -4,7 +4,7 @@ from pathlib import Path
 import random
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from pipelineGenerator import generator
+# from hypersearch.pipelineGenerator import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -17,8 +17,7 @@ from time import thread_time_ns
 from datetime import datetime
 import statistics
 from tqdm import tqdm
-
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
+with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
     # print(file_data)
 
@@ -31,21 +30,26 @@ def blobParamFunc(minArea, minCircularity):
     return params
 
 def groundTruthKeyPoints(entry):
+    # print(entry)  
     return [tuple(point[1:3]) for point in entry]
 
 
 def runShortPipeline(shortenedImageList, choice, timesDict):
     times = []
+    blobcounts=[]
     all_start = thread_time_ns()
     correct = 0
+    close_enough_count =0
     for path in shortenedImageList:
         start = thread_time_ns()
+        # print(path)
+        # print("images"+(str(path)[14:]))
         gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[14:])))
         image = cv.imread(path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         if choice == 0 : # binary
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            _, thresholded = cv.threshold(gray, 3, 255, cv.THRESH_BINARY)
+            _, thresholded = cv.threshold(gray, 170, 255, cv.THRESH_BINARY)
         elif choice == 1: ## Adaptive Mean
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
             thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,5,2)
@@ -113,35 +117,40 @@ def runShortPipeline(shortenedImageList, choice, timesDict):
         only_4 = len(point_list) == 4
         close_enough = True if all([(dist < 5) for dist in first_four]) else False
         only_4_close_enough = only_4 and close_enough
+        if close_enough:
+            close_enough_count +=1
         if only_4_close_enough:
             correct += 1
-        timeToDetect = (end - start)/1000000
+        timeToDetect = (end - start)
         times.append(timeToDetect)
-    all_time = (thread_time_ns() - all_start)/1000000
+        blobcounts.append(count_of_blobs)
+    all_time = (thread_time_ns() - all_start)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
-    timesDict.update({f"{choice}_all_time": all_time, f"{choice}_times": times, f"{choice}_avg": avgTimeToDetect, f"{choice}_median": medianTimeToDetect, f"{choice}_correct": correct})
+    choice_human = choice_dict.get(str(choice))
+    timesDict.update({f"{choice_human}_all_time": all_time, f"{choice_human}_blobcounts": blobcounts, f"{choice_human}_times": times, f"{choice_human}_avg": avgTimeToDetect, f"{choice_human}_median": medianTimeToDetect, f"{choice_human}_correct": correct, f"{choice_human}_close4": close_enough_count})
 
 random.seed(2026)
 p = Path('.')
 
-# imageList = [path for path in sorted(list(p.glob('images_miniset/*/*/*/*/*.jpg')))]
-# shortenedImageList = [imageList[ind] for ind in random.sample(range(0,95),k=10)]
+imageList = [path for path in sorted(list(p.glob('images_miniset/*/*/*/*/*[0-4].jpg')))]
 
-# timesDict ={}
-# for choice in tqdm(range(0,4,1)):
-#     runShortPipeline(shortenedImageList, choice, timesDict)
-#     print(timesDict)
-
-# with open('timingDict.json', 'w') as f:
-#     json.dump(timesDict, f)
+choice_dict = {"0": "binary", "1": "adaptive_mean", "2": "adaptive_gaussian", "3":"otsu"}
 
 
-with open('./src/puck/dotpipeline/timingDict.json' , "r") as json_file:
+timesDict ={}
+for choice in tqdm(range(0,4,1)):
+    runShortPipeline(imageList, choice, timesDict)
+    print(timesDict)
+
+with open('./src/puck/dotpipeline/timing_dict_rerun_mar17.json', 'w') as f:
+    json.dump(timesDict, f)
+
+
+with open('./src/puck/dotpipeline/timing_dict_rerun_mar17.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 pprint.pprint(file_data)
-
 
 
 
