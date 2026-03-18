@@ -79,7 +79,7 @@ def pipeline(imgList, choice, times_dict, times_dict_sum):
                         minRadius=10, maxRadius=30)[:,:,0:2][0]
             point_list = [(float(c[0]),float(c[1])) for c in circles]
         end = thread_time_ns()
-        print(str(path) , str((end-start)/1_000_000_000))
+        # print(str(path) , str((end-start)/1_000_000_000))
 
 
         distances = []
