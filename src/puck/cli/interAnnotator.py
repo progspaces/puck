@@ -23,18 +23,25 @@ print(julia_dict.get(test))
 print(david_dict.get(test))
 print(michael_dict.get(test))
 
-annotations = {}
+#grab the dot, the id of the image, chose x or y, get the value for that.
+
+a_list = []
+b_list = []
+c_list = []
 
 for img in list(julia_dict.keys()):
         a = julia_dict.get(img)
         b = david_dict.get(img)
         c = michael_dict.get(img)
-        annotations.update({img: (a,b,c)})
+        for num in range(0,4,1):
+                ## letter [num] gets you back the whole entry
+                a_entry = a[num]
+                b_entry = b[num]
+                c_entry = c[num]
+                for ind in range(1,3):
+                        # grabs the x and the y as 1 and 2
+                        a_list.append(a_entry[ind])
+                        b_list.append(b_entry[ind])
+                        c_list.append(c_entry[ind])
 
-print(annotations)
-# krippendorff.alpha(
-#         reliablity_data = ,
-#         value_counts = ,
-#         value_domain = ,
-#         level_of_measurment = 
-# )
+full = [a_list, b_list, c_list]

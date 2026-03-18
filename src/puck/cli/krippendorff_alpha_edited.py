@@ -9,17 +9,17 @@ Python version >= 2.4 required
 '''
 import math
 import numpy as np
-
+import json
 
 def nominal_metric(a, b):
-    print(a)
-    print(b)
+    # print(a)
+    # print(b)
     return a != b
 
 def dist1_metric(a,b):
     # use when you're comparing just every single point individually
-    print(a)
-    print(b)
+    # print(a)
+    # print(b)
     return math.dist(a,b)
 
 def dist2_metric(a,b):
@@ -30,13 +30,7 @@ def dist2_metric(a,b):
 
 
 def interval_metric(a, b):
-    print("metric")
-    print('a')
-    print(a)
-    print("b")
-    print(b)
-    print("a-b")
-    print(a-b)
+    # print("metric")
     return (a-b)**2
 
 
@@ -80,13 +74,13 @@ def krippendorff_alpha(data, metric=interval_metric, force_vecmath=False, conver
         try:
             # try if d behaves as a dict
             diter = d.items()
-            print("AHHH")
-            print(diter)
+            # print("AHHH")
+            # print(diter)
         except AttributeError:
             # sequence assumed for d
-            print(d)
+            # print(d)
             diter = enumerate(d)
-            print(diter)
+            # print(diter)
             
         for it, g in diter:
             # it is the Index
@@ -101,8 +95,8 @@ def krippendorff_alpha(data, metric=interval_metric, force_vecmath=False, conver
 
 
     units = dict((it, d) for it, d in units.items() if len(d) > 1)  # units with pairable values
-    print("UNITS")
-    print(units)
+    # print("UNITS")
+    # print(units)
     # units = data
     n = sum(len(pv) for pv in units.values())  # number of pairable values
     
@@ -115,8 +109,8 @@ def krippendorff_alpha(data, metric=interval_metric, force_vecmath=False, conver
     for grades in units.values():
         if np_metric:
             gr = np.asarray(grades)
-            print("grades")
-            print(gr)
+            # print("grades")
+            # print(gr)
             Du = sum(np.sum(metric(gr, gri)) for gri in gr)
         else:
             Du = sum(metric(gi, gj) for gi in grades for gj in grades)
@@ -152,9 +146,42 @@ print(array)
 print("interval metric: %.3f" % krippendorff_alpha(array, interval_metric, missing_items=missing))
 
 
-# test_data = [[(788, 192)], [(787, 191)],[(788, 191)] ]
-# test_data = {0: [(788, 192), (787, 191),(788, 191)]}
+test_data = [[1,2,3,4,5],[1,2,2,4,5],[1,2,3,4,5]]
 
 
+julias_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_julia.json"
+davids_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_david.json"
+michaels_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_michael.json"
 
-print("test: %.3f" % krippendorff_alpha(test_data, dist1_metric))
+
+with open(julias_path , "r") as json_file_julia:
+        julia_dict = dict(json.loads(json_file_julia.read()))
+
+with open(davids_path , "r") as json_file_davids:
+        david_dict = dict(json.loads(json_file_davids.read()))
+
+with open(michaels_path , "r") as json_file_michael:
+        michael_dict = dict(json.loads(json_file_michael.read()))
+
+a_list = []
+b_list = []
+c_list = []
+
+for img in list(julia_dict.keys()):
+        a = julia_dict.get(img)
+        b = david_dict.get(img)
+        c = michael_dict.get(img)
+        for num in range(0,4,1):
+                ## letter [num] gets you back the whole entry
+                a_entry = a[num]
+                b_entry = b[num]
+                c_entry = c[num]
+                for ind in range(1,3):
+                        # grabs the x and the y as 1 and 2
+                        a_list.append(a_entry[ind])
+                        b_list.append(b_entry[ind])
+                        c_list.append(c_entry[ind])
+
+full = [a_list, b_list, c_list]
+
+print("interval metric: %.3f" % krippendorff_alpha(full, interval_metric))
