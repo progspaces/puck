@@ -1,6 +1,0 @@
-Computation time:
-This program was tested on the 17 March 2026 on a computer with a arm processor with a maximum clock frequency of 4 MHz with 10 physical cores, 10 logical cores and 24.00GB of RAM using the Operating System Darwin Darwin Kernel Version 25.3.0: Wed Jan 28 20:54:55 PST 2026; root:xnu-12377.91.3~2/RELEASE_ARM64_T8132. With this hardware and software combination the response time (time taken from start to end of process)for this program took 41158699416 nanoseconds to complete. 
-
-This text was generated using the open source code and text template in:
-D Harris-Birtill and R Harris-Birtill, "Understanding computation time: A critical discussion of time as a computational performance metric", Time in Variance (The Study of Time XVII), Brill. 
-
