@@ -13,10 +13,20 @@ def angle_to(p, q):
 
     angle = math.atan(dy/dx)
 
+
+    if dx == 0:
+        if dy > 0:
+            angle = math.pi /2
+        else:
+            angle = -math.pi / 2
+    else:
+        angle = math.atan(dy/dx)
+
     if dx < 0:
         angle += math.pi
 
     return angle
+
 
 
 def clockwise_pt(points, black):
@@ -42,28 +52,28 @@ def clockwise_pt(points, black):
     return clockwise_pt
 
 
-if __name__ == "__main__":
-    # example set of points arranged in a square
-    corner_pts = [
-        (2, 0),
-        (22, 2),
-        (0, 20), 
-        (20, 22),
-    ]
+# if __name__ == "__main__":
+#     # example set of points arranged in a square
+#     corner_pts = [
+#         (2, 0),
+#         (22, 2),
+#         (0, 20), 
+#         (20, 22),
+#     ]
 
-    # calculate what point is clockwise of each other point
-    for black in corner_pts:
-        print(f"clockwise from {black} is {clockwise_pt(corner_pts, black)}")
+#     # calculate what point is clockwise of each other point
+#     for black in corner_pts:
+#         print(f"clockwise from {black} is {clockwise_pt(corner_pts, black)}")
 
-    # full set of 9 points
-    pts = [
-        (2, 0),
-        (12, 1),
-        (22, 2),
-        (1, 10),
-        (11, 11),
-        (21, 12),
-        (0, 20),
-        (10, 21),
-        (20, 22),
-    ]
+#     # full set of 9 points
+#     pts = [
+#         (2, 0),
+#         (12, 1),
+#         (22, 2),
+#         (1, 10),
+#         (11, 11),
+#         (21, 12),
+#         (0, 20),
+#         (10, 21),
+#         (20, 22),
+#     ]
