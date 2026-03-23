@@ -1,13 +1,9 @@
 import json
-from code_modules.dot_finding.dot_finder import find_centers_hough
-from code_modules.image_annotation.krippendorff_alpha import krippendorff_alpha, interval_metric
-# julias_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_julia.json"
-julias_path = "/puck/data/annotations/annotations_julia.json"
-# davids_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_david.json"
-davids_path = "puck/data/annotations/annotations_david.json"
-# michaels_path = "/Users/jdreiling/Desktop/puck/puck/src/puck/cli/annotations_michael.json"
-michaels_path = "puck/data/annotations/annotations_michael.json"
+from image_annotation.krippendorff_alpha import krippendorff_alpha, interval_metric
 
+julias_path = "/puck/data/annotations/annotations_julia.json"
+davids_path = "puck/data/annotations/annotations_david.json"
+michaels_path = "puck/data/annotations/annotations_michael.json"
 
 with open(julias_path , "r") as json_file_julia:
         julia_dict = dict(json.loads(json_file_julia.read()))
@@ -39,4 +35,4 @@ for img in list(julia_dict.keys()):
 
 full = [a_list, b_list, c_list]
 
-print("interval metric: %.3f" % krippendorff_alpha(full, interval_metric))
+print("Using the krippendoff interval metric, the inter-annotator reliability is: %.3f" % krippendorff_alpha(full, interval_metric))

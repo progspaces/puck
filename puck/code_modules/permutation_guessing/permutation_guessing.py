@@ -1,5 +1,5 @@
 import colorsys
-import colour_conversion.colour_conversion
+import code_modules.colour_conversion.colour_conversion as conv
 from math import sqrt
 
 
@@ -28,8 +28,8 @@ def get_color_perm(ordered_rectangle, true_colors,printing:bool = False, colorsp
                     print(f"The summed difference between {k_hsv}, and {col_hsv} is "+str(hsv_summed_diff) +"\n") 
                 new_diff = hsv_summed_diff
             elif colorspace == "CMYK":
-                k_cmyk = rgb_to_cmyk(k)
-                col_cmyk = rgb_to_cmyk(col)
+                k_cmyk = conv.rgb_to_cmyk(k)
+                col_cmyk = conv.rgb_to_cmyk(col)
                 cmyk_summed_diff= sum([abs((k_cmyk[0])-(col_cmyk[0])) ,  abs((k_cmyk[1])-(col_cmyk[1]))  , abs((k_cmyk[2])-(col_cmyk[2]))])
                 if printing:
                     print(f"K in CMYK is {k_cmyk}")
@@ -37,8 +37,8 @@ def get_color_perm(ordered_rectangle, true_colors,printing:bool = False, colorsp
                     print(f"The summed difference between {k_cmyk}, and {col_cmyk} is "+str(cmyk_summed_diff) +"\n") 
                 new_diff = cmyk_summed_diff
             elif colorspace == "LUV":
-                k_luv = rgb_to_luv(k)
-                col_luv = rgb_to_luv(col)
+                k_luv = conv.rgb_to_luv(k)
+                col_luv = conv.rgb_to_luv(col)
                 a =(int(k_luv[0])-int(col_luv[0]))**2
                 b= (int(k_luv[1])-int(col_luv[1]))**2
                 c =(int(k_luv[2])-int(col_luv[2]))**2

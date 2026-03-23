@@ -156,7 +156,3 @@ with open('./src/puck/dotpipeline/acc_dict_rerun_mar17.json' , "r") as json_file
     file_data = dict(json.loads(json_file.read()))
 
 pprint.pprint(file_data)
-
-
-
-

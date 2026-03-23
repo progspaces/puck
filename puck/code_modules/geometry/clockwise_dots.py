@@ -68,28 +68,28 @@ def order_rectangle(color_point_list, reference):
     print(ordered)
     return sorted(colored_coords, key = lambda x: ordered.index(x[0]))
 
-# if __name__ == "__main__":
-#     # example set of points arranged in a square
-#     corner_pts = [
-#         (2, 0),
-#         (22, 2),
-#         (0, 20), 
-#         (20, 22),
-#     ]
+if __name__ == "__main__":
+    # example set of points arranged in a square
+    corner_pts = [
+        (2, 0),
+        (22, 2),
+        (0, 20), 
+        (20, 22),
+    ]
 
-#     # calculate what point is clockwise of each other point
-#     for black in corner_pts:
-#         print(f"clockwise from {black} is {clockwise_pt(corner_pts, black)}")
+    # calculate what point is clockwise of each other point
+    for black in corner_pts:
+        print(f"clockwise from {black} is {clockwise_pt(corner_pts, black)}")
 
-#     # full set of 9 points
-#     pts = [
-#         (2, 0),
-#         (12, 1),
-#         (22, 2),
-#         (1, 10),
-#         (11, 11),
-#         (21, 12),
-#         (0, 20),
-#         (10, 21),
-#         (20, 22),
-#     ]
+    # full set of 9 points
+    pts = [
+        (2, 0),
+        (12, 1),
+        (22, 2),
+        (1, 10),
+        (11, 11),
+        (21, 12),
+        (0, 20),
+        (10, 21),
+        (20, 22),
+    ]
