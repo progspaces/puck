@@ -12,7 +12,7 @@ from time import thread_time_ns
 from datetime import datetime
 import statistics
 from tqdm import tqdm
-from pipelineGenerator import houghGenerator
+from puck.experiments.best_thresholding.cartesian_product import houghGenerator
 from skimage.feature import canny
 from skimage.transform import hough_ellipse
 from skimage.draw import ellipse_perimeter

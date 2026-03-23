@@ -1,6 +1,6 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from pipelineGenerator import generator
+from puck.experiments.best_thresholding.cartesian_product import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
