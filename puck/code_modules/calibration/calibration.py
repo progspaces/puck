@@ -1,6 +1,4 @@
-from geometry.rectangles import convertRectToList
-from geometry.squares import get_key_squares
-from math import dist
+import geometry
 
 def small_big(rect_list, keypoint):
     square_list = get_key_squares(rect_list, keypoint)
