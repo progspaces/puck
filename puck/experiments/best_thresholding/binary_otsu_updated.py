@@ -157,7 +157,7 @@ for option, option_time in updated:
 print(updated)
 
    # Ensure timing results directory exists
-timing_dir = Path('output/experimental_results')
+timing_dir = Path('output/timing_results')
 timing_dir.mkdir(parents=True, exist_ok=True)
 
 # Create timing results file with properly formatted datetime

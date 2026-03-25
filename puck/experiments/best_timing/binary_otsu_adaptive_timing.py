@@ -17,7 +17,7 @@ from time import thread_time_ns
 from datetime import datetime
 import statistics
 from tqdm import tqdm
-with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
     # print(file_data)
 
@@ -44,7 +44,7 @@ def runShortPipeline(shortenedImageList, choice, timesDict):
         start = thread_time_ns()
         # print(path)
         # print("images"+(str(path)[14:]))
-        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[14:])))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[19:])))
         image = cv.imread(path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         if choice == 0 : # binary
@@ -133,7 +133,7 @@ def runShortPipeline(shortenedImageList, choice, timesDict):
 random.seed(2026)
 p = Path('.')
 
-imageList = [path for path in sorted(list(p.glob('images_miniset/*/*/*/*/*[0-4].jpg')))]
+imageList = [path for path in sorted(list(p.glob('data/images_miniset/*/*/*/*/*[0-4].jpg')))]
 
 choice_dict = {"0": "binary", "1": "adaptive_mean", "2": "adaptive_gaussian", "3":"otsu"}
 
@@ -143,11 +143,11 @@ for choice in tqdm(range(0,4,1)):
     runShortPipeline(imageList, choice, timesDict)
     print(timesDict)
 
-with open('./src/puck/dotpipeline/timing_dict_rerun_mar17.json', 'w') as f:
+with open('./output/timing_results/binary_otsu_adaptive_timing_dict.json', 'w') as f:
     json.dump(timesDict, f)
 
 
-with open('./src/puck/dotpipeline/timing_dict_rerun_mar17.json' , "r") as json_file:
+with open('./output/timing_results/binary_otsu_adaptive_timing_dict.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 pprint.pprint(file_data)

@@ -31,29 +31,25 @@ def groundTruthKeyPoints(entry):
 
 def pipelineTests(args):
     test_pipeline , choice = args
-    results_path = Path("./results/houghSciCV")
+    results_path = Path("./output/experimental_results/hough_options")
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
+    for img_path in sorted(list(p.glob('data/images_copy/*/*/*/*/*[0].jpg'))):
         start = thread_time_ns()
-        gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+ str(img_path)[16:]))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         if choice == "houghCircle":
             rows = gray.shape[0]
-            # circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-            #            param1=100, param2=30,
-            #            minRadius=10, maxRadius=30)[:,:,0:2][0]
             circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT,
                                      int(test_pipeline[0]), test_pipeline[1],
                             param1=test_pipeline[2], param2=test_pipeline[3],
                             minRadius=test_pipeline[4], maxRadius=30)
             circles = circles[:,:,0:2][0] if circles is not None else []
-
         elif choice == "houghCircleAlt":
             circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT_ALT, test_pipeline[0], test_pipeline[1],
                             param1=test_pipeline[2], param2=test_pipeline[3],
@@ -97,6 +93,7 @@ def pipelineTests(args):
         pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
         # # print("...")
     # Create subdirectory for choice results
+
     choice_results_path = results_path / choice
     choice_results_path.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / "hough_results.csv")
@@ -112,7 +109,7 @@ def pipelineTests(args):
 overall_start = thread_time_ns()
 
 # Open the ground truth annotations
-with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration optionsß
@@ -120,21 +117,21 @@ with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
 choices = [("houghCircle",0), ("houghCircleAlt",0)]
 p = Path('.')
-
+updated = []
 
 for choice, choice_time in choices:
     choice_start = thread_time_ns()
     pipeline_list_dict = {}
     with ThreadPoolExecutor(10) as pool:
         # call a function on each item in a list and handle results
-        generated_pipelines = houghGenerator("src/puck/dotpipeline/hyperparameters/"+ choice + ".json")[1]
+        generated_pipelines = houghGenerator("experiments/best_thresholding/hyperparameters/"+ choice + ".json")[1]
         list_of_choices = [choice] * len(generated_pipelines)
         for name, result in tqdm(pool.map(pipelineTests, zip(generated_pipelines,list_of_choices)), total=len(generated_pipelines)):
             pipeline_list_dict.update({name:result})   
             # print(name)
             # print(result)
     # ensure that output directory exists for the big picture
-    output_dir = Path("results/")        
+    output_dir = Path("output/experimental_results/hough_options_big_picture")        
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # save the big picture results
@@ -142,21 +139,22 @@ for choice, choice_time in choices:
     pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / choice_results)
     choice_end =thread_time_ns()
     choice_time = choice_end - choice_start 
+    updated.append([choice,choice_time])
 
 overall_end = thread_time_ns()
 overall_time = overall_end - overall_start
 
 txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-for option, option_time in choices:
+for option, option_time in updated:
     txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
-# Ensure timing results directory exists
-timing_dir = Path('./results')
+   # Ensure timing results directory exists
+timing_dir = Path('output/timing_results')
 timing_dir.mkdir(parents=True, exist_ok=True)
 
 # Create timing results file with properly formatted datetime
 timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+
 with open(timing_filename, "w") as txt_file:
     txt_file.write(txtStr)
-    
-   
+

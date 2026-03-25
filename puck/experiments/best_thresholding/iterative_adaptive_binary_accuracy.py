@@ -17,7 +17,7 @@ from time import thread_time_ns
 from datetime import datetime
 import statistics
 from tqdm import tqdm
-with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
     # print(file_data)
 
@@ -59,9 +59,7 @@ def runShortPipeline(shortenedImageList, choice, results_dict):
     correct = 0
     close_enough_count =0
     for path in shortenedImageList:
-        # print(path)
-        # print("images"+(str(path)[14:]))
-        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[14:])))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[19:])))
         image = cv.imread(path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         blob_params = blobParamFunc(400, .8)
@@ -137,7 +135,7 @@ def runShortPipeline(shortenedImageList, choice, results_dict):
 random.seed(2026)
 p = Path('.')
 
-imageList = [path for path in sorted(list(p.glob('images_miniset/*/*/*/*/*0.jpg')))]
+imageList = [path for path in sorted(list(p.glob('data/images_miniset/*/*/*/*/*0.jpg')))]
 count_of_images = len(imageList)
 print(count_of_images)
 choice_dict = {"0": "binary", "1": "adaptive_global-50", "2": "adaptive_global-20", "3": "adaptive_global-80",  "4": "iterative-2","5": "iterative-5", "6": "iterative-10",}
@@ -146,13 +144,13 @@ choice_dict = {"0": "binary", "1": "adaptive_global-50", "2": "adaptive_global-2
 timesDict ={}
 for choice in tqdm(range(0,7,1)):
     runShortPipeline(imageList, choice, timesDict)
-    print(timesDict)
+    # print(timesDict) 
 
-with open('./src/puck/dotpipeline/acc_dict_rerun_mar17.json', 'w') as f:
+with open('./output/experimental_results/iterative_adaptive_binary.json', 'w') as f:
     json.dump(timesDict, f)
 
 
-with open('./src/puck/dotpipeline/acc_dict_rerun_mar17.json' , "r") as json_file:
+with open('./output/experimental_results/iterative_adaptive_binary.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 pprint.pprint(file_data)

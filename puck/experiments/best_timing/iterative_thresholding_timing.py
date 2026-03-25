@@ -46,7 +46,7 @@ def detection(thresholds,blob_params,gray):
     return centers
 
 # Open the ground truth annotations
-with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration options
@@ -80,8 +80,8 @@ time_dict = {
     5: [],
     6: [],
 }
-for img_path in tqdm(sorted(list(p.glob('images_miniset/*/*/*/*/*0.jpg')))):
-    truthPath = ("images" + str(img_path)[14:])
+for img_path in tqdm(sorted(list(p.glob('data/images_miniset/*/*/*/*/*0.jpg')))):
+    truthPath = ("images" + str(img_path)[19:])
     gtkp = groundTruthKeyPoints(file_data.get(str(truthPath)))
     # print(truthPath) 
     for x in range(0,7,1):
