@@ -1,6 +1,6 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from pipelineGenerator import generator
+from cartesian_product import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -14,6 +14,7 @@ from datetime import datetime
 import statistics
 from tqdm import tqdm
 
+
 def blobParamFunc(minArea, minCircularity):
     params = cv.SimpleBlobDetector_Params()
     params.filterByCircularity = True
@@ -25,19 +26,18 @@ def blobParamFunc(minArea, minCircularity):
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
+
 def pipelineTests(args):
     test_pipeline, choice = args
-    results_path = Path("src/puck/dotpipeline/pipeline_results/" + str(choice))
+    results_path = Path("output/experimental_results/binary_otsu_updated_pipeline_results/" + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg'))):
+    for img_path in sorted(list(p.glob('data/images_copy/*/*/*/*/*[0].jpg'))):
         start = thread_time_ns()
-    # for x in range(1,2,1):
-        # img_path = "images/custom/davids/short/B/custom_davids_short_B_0.jpg"
-        gtkp = groundTruthKeyPoints(file_data.get(str(img_path)))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+str(img_path)[16:]))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, test_pipeline[0])
         thresholded1 = False
@@ -45,14 +45,6 @@ def pipelineTests(args):
         if choice == 0 : # binary
             gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
             _, thresholded = cv.threshold(gray, test_pipeline[3], 255, cv.THRESH_BINARY)
-        elif choice == 1: ## Adaptive Mean
-            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
-        elif choice == 2: ## Adaptive Gaussian
-            gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
-            thresholded1 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,test_pipeline[3],test_pipeline[4])
-            thresholded2 = cv.adaptiveThreshold(gray,255,cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV,test_pipeline[3],test_pipeline[4])
         else: 
             # convert the image into the hsv colour space
             image_hsv = cv.cvtColor(imageBlurred, cv.COLOR_RGB2HSV)
@@ -75,16 +67,10 @@ def pipelineTests(args):
             
         blob_params = blobParamFunc(test_pipeline[1], test_pipeline[2])
         detector = cv.SimpleBlobDetector_create(blob_params)
-        if choice == 1 or choice == 2:
-            keypoints1 = detector.detect(thresholded1)
-            keypoints2 = detector.detect(thresholded2)
-            keypoints = keypoints1 + keypoints2
-        else:
-            keypoints = detector.detect(thresholded)
+        keypoints = detector.detect(thresholded)
         end = thread_time_ns()
         # # print(str(len(keypoints)) + " blobs detected")
         blank = np.zeros((1, 1))
-        blobs = cv.drawKeypoints(image, keypoints, blank, (255, 0, 0), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         
         distances = []
 
@@ -116,8 +102,8 @@ def pipelineTests(args):
         timeToDetect = end - start
         times.append(timeToDetect)
         pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
-        # # print("...")
-    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / str(choice) / str(test_pipeline) + "_results.csv")
+        # # print("...")=
+    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / (str(test_pipeline) + "_results.csv"))
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
@@ -129,22 +115,21 @@ def pipelineTests(args):
 overall_start = thread_time_ns()
 
 # Open the ground truth annotations
-with open('./src/puck/cli/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 # Get the pipeline configuration options
-pipelines = ["src/puck/dotpipeline/binary0.json","src/puck/dotpipeline/adaptiveM0.json","src/puck/dotpipeline/adaptiveG0.json", "src/puck/dotpipeline/otsu0.json"]
+pipelines = ["experiments/best_thresholding/hyperparameters/binary0.json","experiments/best_thresholding/hyperparameters/otsu0.json"]
 
 # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [(0,0),(3,0)]
+choices = [(0,0),(1,0)]
 p = Path('.')
-
+updated =[]
 
 for choice, choice_time in choices:
     choice_start = thread_time_ns()
     pipeline_list_dict = {}
     with ThreadPoolExecutor(10) as pool:
-        # call a function on each item in a list and handle results
         generatored_pipelines = generator(pipelines[choice])[1]
         list_of_choices = [choice] * len(generatored_pipelines)
 
@@ -152,22 +137,31 @@ for choice, choice_time in choices:
             pipeline_list_dict.update({name:result})
 
     # ensure that output directory exists for the big picture
-    output_dir = Path("src/puck/dotpipeline/big_picture/")        
+    output_dir = Path("output/experimental_results/binary_otsu_updated_big_picture/")        
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # save the big picture results
-    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / (str(pipelines[choice])[21:]+ "_results.csv"))
+    directory = str(pipelines[choice]).split("/")[-1][:-5]
+    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir /( directory + "_results.csv"))
     choice_time = thread_time_ns() - choice_start
-    
+    updated.append([choice,choice_time])
+
 
 overall_end = thread_time_ns()
 overall_time = overall_end - overall_start
 
 txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-for option, option_time in choices:
+for option, option_time in updated:
     txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
-with open('./src/puck/dotpipline/timingResults_' + datetime.now() + '.txt', "w") as txt_file:
+print(updated)
+
+   # Ensure timing results directory exists
+timing_dir = Path('output/experimental_results')
+timing_dir.mkdir(parents=True, exist_ok=True)
+
+# Create timing results file with properly formatted datetime
+timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+
+with open(timing_filename, "w") as txt_file:
     txt_file.write(txtStr)
-    
-   
