@@ -17,9 +17,9 @@ from datetime import datetime
 import statistics
 from tqdm import tqdm
 import sys
-from puck.dotpipeline.timingtests.Computation_time_reporter import TimeOutput
+from puck.code_modules.helper_functions.computation_time_reporter import TimeOutput
 
-with open('./src/puck/datacollection/annotations.json' , "r") as json_file:
+with open('./data/annotations/annotations.json' , "r") as json_file:
     file_data = dict(json.loads(json_file.read()))
 
 def blobParamFunc(minArea, minCircularity):
@@ -62,7 +62,7 @@ def pipeline(imgList, choice, times_dict, times_dict_sum):
     correct = 0
     for path in imgList:
         start = thread_time_ns()
-        gtkp = groundTruthKeyPoints(file_data.get((str(path)[:])))
+        gtkp = groundTruthKeyPoints(file_data.get(("images"+str(path)[16:])))
         image = cv.imread(path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
@@ -118,7 +118,7 @@ overall_start = thread_time_ns()
 random.seed(2026)
 p = Path('.')
 
-imageList = [path for path in sorted(list(p.glob('images/*/*/*/*/*[0-4].jpg')))]
+imageList = [path for path in sorted(list(p.glob('data/images_copy/*/*/*/*/*[0-4].jpg')))]
 
 times_dict ={}
 times_dict_sum ={}
@@ -126,14 +126,14 @@ for choice in tqdm(range(0,2,1)):
     pipeline(imageList, choice, times_dict,times_dict_sum )
     print(times_dict_sum)
 
-with open('./results/timingDict_hvpp_summary.json', 'w') as f:
+with open('./output/timing_results/hough_paper_programs_timing_summary.json', 'w') as f:
     json.dump(times_dict_sum, f)
 
-with open('./results/timingDict_hvpp_raw.json', 'w') as f:
+with open('./output/timing_results/hough_paper_programs_timing_p_raw.json', 'w') as f:
     json.dump(times_dict, f)
 
 total_time = thread_time_ns() - overall_start
-file_out = open(f'./results/timingDict_hvpp_computation_time_text_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"', 'w')
+file_out = open(f'./output/timing_results/hough_paper_programs_computation_time_text_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"', 'w')
 sys.stdout = file_out
 TimeOutput(total=total_time)
 file_out.close()

@@ -126,14 +126,14 @@ for img_path in tqdm(sorted(list(p.glob('data/images_miniset/*/*/*/*/*0.jpg'))))
 pprint.pprint(len(time_dict.get(6)))
 
 
-with open('./src/puck/dotpipeline/iterative_dict_rerun_mar17.json', 'w') as f:
+with open('./output/experimental_results/iterative_dict.json', 'w') as f:
     json.dump(results, f)
 
-with open('./src/puck/dotpipeline/timing_iterative_dict_rerun_mar17.json', 'w') as f:
+with open('./output/timing_results/timing_iterative_dict.json', 'w') as f:
     json.dump(time_dict, f)
 
 
-with open('./src/puck/dotpipeline/timing_iterative_dict_rerun_mar17.json' , "r") as json_file:
+with open('./output/timing_results/timing_iterative_dict.json' , "r") as json_file:
     time_dict = dict(json.loads(json_file.read()))
 
 pprint.pprint(time_dict)
