@@ -35,4 +35,10 @@ for img in list(julia_dict.keys()):
 
 full = [a_list, b_list, c_list]
 
-print("Using the krippendoff interval metric, the inter-annotator reliability is: %.3f" % krippendorff_alpha(full, interval_metric))
+print(f"Using the krippendoff interval metric, the inter-annotator reliability for the following annotations, \n \
+      {julias_path} \n \
+      {davids_path} \n \
+      {michaels_path} \n \
+is: {krippendorff_alpha(full, interval_metric)}." )
+print("This calculation does not create any output files.")
+

@@ -7,7 +7,7 @@
 #If the variable pro is set to true, includes the pro template, but as all of these are dependant
 #on the timed program itself, their variables are left as [] in the text for the user to fill in.
 #
-#See the generated output in "Computation_time_text.txt"
+#See the generated output in "computation_time_text.txt"
 #
 #Run this by running the command: 
 #python Computation_time_reporter.py
