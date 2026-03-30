@@ -46,7 +46,12 @@ def detection(thresholds,blob_params,gray):
     return centers
 
 
-def main(input = "data/images_miniset", output_timing = "./output/timing_results", output_experimental = "./output/experimental_results",ground_truth='./data/annotations/annotations.json', cli_printout = True):
+def main(adjustment = "../", adjustment_on = False, input_path = "data/images_miniset", output_timing = "output/timing_results", output_experimental = "output/experimental_results",ground_truth='data/annotations/annotations.json', cli_printout = True):
+    if adjustment_on:
+        input_path = adjustment + input_path
+        output_timing = adjustment + output_timing
+        output_experimental = adjustment + output_experimental
+        ground_truth = adjustment + ground_truth
 # Open the ground truth annotations
     with open(ground_truth , "r") as json_file:
         file_data = dict(json.loads(json_file.read()))
@@ -82,8 +87,8 @@ def main(input = "data/images_miniset", output_timing = "./output/timing_results
         5: [],
         6: [],
     }
-    for img_path in tqdm(sorted(list(p.glob(f'{input}/*/*/*/*/*0.jpg')))):
-        truthPath = ("images" + str(img_path)[len(input):])
+    for img_path in tqdm(sorted(list(p.glob(f'{input_path}/*/*/*/*/*0.jpg')))):
+        truthPath = ("images" + str(img_path)[len(input_path):])
         gtkp = groundTruthKeyPoints(file_data.get(str(truthPath)))
         # print(truthPath) 
         for x in range(0,7,1):
@@ -131,12 +136,18 @@ def main(input = "data/images_miniset", output_timing = "./output/timing_results
     with open(f'{output_timing}/timing_iterative_dict.json', 'w') as f:
         json.dump(time_dict, f)
     if cli_printout:
-        print(f"This is a timing test run on {input}, for the iterative paper programs thresholding method.\n\
-This tests 1, 2, 3, 4, 5, 10, and 15 possible thresholds. \n \
-This will save two .json files at {output_experimental} and {output_timing}. \n\
-They are {output_experimental}/iterative_dict.json and {output_timing}/timing_iterative_dict.json.\n\
-The {output_experimental}/iterative_dict.json just returns how accurate the threshold was, whereas \
-{output_timing}/timing_iterative_dict.json records how long the thresholds took.")
+        print(f"This is a timing test run on {input_path}, for the iterative paper programs thresholding method.\n\
+It saves {output_experimental}/iterative_dict.json and {output_timing}/timing_iterative_dict.json.")
+    return {"accuracy_dict": f"{output_experimental}/iterative_dict.json", "timing_dict":f"{output_timing}/timing_iterative_dict.json"}
 
 if __name__ == "__main__":
     main()
+
+
+##. READ ME
+
+# This will save two .json files at {output_experimental} and {output_timing}. \n\
+# They are 
+# This tests 1, 2, 3, 4, 5, 10, and 15 possible thresholds. \n \.")?
+# The {output_experimental}/iterative_dict.json just returns how accurate the threshold was, whereas \
+# {output_timing}/timing_iterative_dict.json records how long the thresholds took

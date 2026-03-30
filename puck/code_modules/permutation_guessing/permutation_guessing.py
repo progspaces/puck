@@ -1,5 +1,5 @@
 import colorsys
-import code_modules.colour_conversion.colour_conversion as conv
+import puck.code_modules.colour_conversion.colour_conversion as conv
 from math import sqrt
 
 

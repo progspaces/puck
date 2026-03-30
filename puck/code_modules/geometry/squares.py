@@ -1,6 +1,6 @@
 from math import dist
 import numpy as np
-from code_modules.geometry.rectangles import convertRectToList
+from puck.code_modules.geometry.rectangles import convertRectToList
 
 
 def get_dot(rect):

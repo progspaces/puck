@@ -30,16 +30,17 @@ def groundTruthKeyPoints(entry):
 
 
 def pipelineTests(args):
-    test_pipeline , choice = args
-    results_path = Path("./output/experimental_results/hough_options")
+    p = Path('.')
+    test_pipeline , choice, input_path, file_data, results_path = args
+    results_path = Path(f"{results_path}")
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('data/images_copy/*/*/*/*/*[0].jpg'))):
+    for img_path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*[0].jpg'))):
         start = thread_time_ns()
-        gtkp = groundTruthKeyPoints(file_data.get("images"+ str(img_path)[16:]))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+ str(img_path)[len(input_path):]))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
@@ -96,7 +97,8 @@ def pipelineTests(args):
 
     choice_results_path = results_path / choice
     choice_results_path.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / "hough_results.csv")
+    file_name =  str(test_pipeline)+ "hough_results.csv"
+    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / file_name)
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
@@ -105,56 +107,82 @@ def pipelineTests(args):
 
 # print("is this optimized")
 # print(cv.useOptimized())
-
-overall_start = thread_time_ns()
+def main(input_path="data/images_copy", output_overall = "output/experimental_results/", output_results= "hough_options", output_bp ="hough_options_big_picture" ,output_timing ="output/timing_results", ground_truth="./data/annotations/annotations.json", cli_printout:bool = True):
+    overall_start = thread_time_ns()
 
 # Open the ground truth annotations
-with open('./data/annotations/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
+    with open(ground_truth , "r") as json_file:
+        file_data = dict(json.loads(json_file.read()))
 
-# Get the pipeline configuration optionsß
+    # Get the pipeline configuration optionsß
 
-# Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [("houghCircle",0), ("houghCircleAlt",0)]
-p = Path('.')
-updated = []
+    # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
+    choices = [("houghCircle",0), ("houghCircleAlt",0)]
 
-for choice, choice_time in choices:
-    choice_start = thread_time_ns()
-    pipeline_list_dict = {}
-    with ThreadPoolExecutor(10) as pool:
-        # call a function on each item in a list and handle results
-        generated_pipelines = houghGenerator("experiments/best_thresholding/hyperparameters/"+ choice + ".json")[1]
-        list_of_choices = [choice] * len(generated_pipelines)
-        for name, result in tqdm(pool.map(pipelineTests, zip(generated_pipelines,list_of_choices)), total=len(generated_pipelines)):
-            pipeline_list_dict.update({name:result})   
-            # print(name)
-            # print(result)
-    # ensure that output directory exists for the big picture
-    output_dir = Path("output/experimental_results/hough_options_big_picture")        
-    output_dir.mkdir(parents=True, exist_ok=True)
+    updated = []
+    results_path = output_overall + output_results
 
-    # save the big picture results
-    choice_results = choice +  "_results.csv"
-    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / choice_results)
-    choice_end =thread_time_ns()
-    choice_time = choice_end - choice_start 
-    updated.append([choice,choice_time])
+    pipelines = ["/experiments/best_thresholding/hyperparameters/houghCircle.json","/experiments/best_thresholding/hyperparameters/houghCircleAlt.json"]
 
-overall_end = thread_time_ns()
-overall_time = overall_end - overall_start
+    for choice, choice_time in choices:
+        choice_start = thread_time_ns()
+        pipeline_list_dict = {}
+        with ThreadPoolExecutor(10) as pool:
+            # call a function on each item in a list and handle results
+            generated_pipelines = houghGenerator("../experiments/best_thresholding/hyperparameters/"+ choice + ".json")[1]
+            list_of_choices = [choice] * len(generated_pipelines)
+            list_of_input_paths = [input_path] * len(generated_pipelines)
+            list_of_file_datas = [file_data] * len(generated_pipelines)
+            list_of_results_paths = [results_path]* len(generated_pipelines)
+            for name, result in tqdm(pool.map(pipelineTests, zip(generated_pipelines,list_of_choices, list_of_input_paths, list_of_file_datas, list_of_results_paths)), total=len(generated_pipelines)):
+                pipeline_list_dict.update({name:result})   
 
-txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-for option, option_time in updated:
-    txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
+        # ensure that output directory exists for the big picture
+        output_dir = Path(f"{output_overall}{output_bp}")        
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-   # Ensure timing results directory exists
-timing_dir = Path('output/timing_results')
-timing_dir.mkdir(parents=True, exist_ok=True)
+        # save the big picture results
+        choice_results = choice +  "_results.csv"
+        pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / choice_results)
+        choice_end =thread_time_ns()
+        choice_time = choice_end - choice_start 
+        updated.append([choice,choice_time])
 
-# Create timing results file with properly formatted datetime
-timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    overall_end = thread_time_ns()
+    overall_time = overall_end - overall_start
 
-with open(timing_filename, "w") as txt_file:
-    txt_file.write(txtStr)
+    txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
+    for option, option_time in updated:
+        txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
+    # Ensure timing results directory exists
+    timing_dir = Path(output_timing)
+    timing_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create timing results file with properly formatted datetime
+    timing_filename = timing_dir / f"timingResults_hough_alt_plain_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+
+    with open(timing_filename, "w") as txt_file:
+        txt_file.write(txtStr)
+    if cli_printout:
+        print(f"This has tested the hyperparameters generated by {pipelines[0]} and {pipelines[1]} \n \
+The summary statistics are saved in {output_overall}{output_bp} as a .csv \n \
+The tested pipelines are saved as many individual .csv files in {output_overall}{output_results}/houghCircle[Alt] \n \
+The timing info is saved as {str(timing_filename)}")
+    return {"bigpicture0": f"{output_overall}{output_bp}/houghCircle_results.csv", 
+            "bigpicture1":f"{output_overall}{output_bp}/houghCircleAlt_results.csv", 
+            "results0":f"{output_overall}{output_results}/houghCircle",
+            "results1":f"{output_overall}{output_results}/houghCircleAlt",
+            "output_timing":str(timing_filename)}
+
+if __name__ == "__main__":
+    main()
+
+# # push to readme
+# # It differs from the binary_otsu experiment in that it's focused on the hough process rather than the explicit thresholding and blob detection processt \n\
+# # It has saved the results of this in {output_overall}, where it will save the summary statistics in a folder called: {output_bp} and the individual results in a folder called {output_results}\n \
+# # The summary statistics are named after their hyperparameter files, and are stored as .csv files. \n\
+# # The results of each pipeline (ie each hyperparameter combination) are saved under a folder named after which thresholding method was used. \n \
+# # These results are saved as a .csv file per combo, and list each image tested and their success or failure and dot count. \n\
+# # Finally the total timing of each of these thresholding methods are saved in a txt file in the folder {output_timing}. \n \
+# # This file is named timingResults_hough_alt_plain_[datetime].txt

@@ -1,6 +1,6 @@
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-from cartesian_product import generator
+from puck.experiments.best_thresholding.cartesian_product import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -28,16 +28,17 @@ def groundTruthKeyPoints(entry):
 
 
 def pipelineTests(args):
-    test_pipeline, choice = args
-    results_path = Path("output/experimental_results/binary_otsu_updated_pipeline_results/" + str(choice))
+    p = Path('.')
+    test_pipeline, choice, input_path, results_path, file_data= args
+    results_path = Path("output/experimental_results/binary_otsu_pipeline_results/" + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob('data/images_copy/*/*/*/*/*[0].jpg'))):
+    for img_path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*[0].jpg'))):
         start = thread_time_ns()
-        gtkp = groundTruthKeyPoints(file_data.get("images"+str(img_path)[16:]))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+str(img_path)[len(input_path):]))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, test_pipeline[0])
         thresholded1 = False
@@ -111,57 +112,80 @@ def pipelineTests(args):
 
 
 
+def main(adjustment = "../", adjustment_on = False, input_path="data/images_copy", output_overall = "output/experimental_results/", output_results= "binary_otsu_updated_pipeline_results/", output_bp ="binary_otsu_updated_big_picture/" ,output_timing ="output/timing_results", ground_truth="./data/annotations/annotations.json", cli_printout:bool = True):
+    pipelines = ["experiments/best_thresholding/hyperparameters/binary0.json","experiments/best_thresholding/hyperparameters/otsu0.json"]
+    new_pipelines =[]
+    if adjustment_on:
+        input_path = adjustment + input_path
+        output_overall = adjustment + output_overall
+        output_timing = adjustment + output_timing
+        ground_truth = adjustment + ground_truth
+        for p in pipelines:
+            new_pipelines.append(adjustment + p) 
+        pipelines = new_pipelines    # Open the ground truth annotations
+    with open(ground_truth , "r") as json_file:
+        file_data = dict(json.loads(json_file.read()))
 
-overall_start = thread_time_ns()
+    overall_start = thread_time_ns()
+    # Get the pipeline configuration options
+    # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
+    choices = [(0,0),(1,0)]
 
-# Open the ground truth annotations
-with open('./data/annotations/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
+    results_path = output_overall + output_results
 
-# Get the pipeline configuration options
-pipelines = ["experiments/best_thresholding/hyperparameters/binary0.json","experiments/best_thresholding/hyperparameters/otsu0.json"]
+    updated = []
 
-# Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-choices = [(0,0),(1,0)]
-p = Path('.')
-updated =[]
+    for choice, choice_time in choices:
+        choice_start = thread_time_ns()
+        pipeline_list_dict = {}
+        with ThreadPoolExecutor(10) as pool:
+            generatored_pipelines = generator(pipelines[choice])[1]
+            list_of_choices = [choice] * len(generatored_pipelines)
+            list_of_input_paths = [input_path] * len(generatored_pipelines)
+            list_of_file_datas = [file_data] * len(generatored_pipelines)
+            list_of_results_paths = [results_path]* len(generatored_pipelines)
+            for name, result in tqdm(pool.map(pipelineTests, zip(generatored_pipelines, list_of_choices,list_of_input_paths,list_of_results_paths,list_of_file_datas)), total=len(generatored_pipelines)):
+                pipeline_list_dict.update({name:result})
 
-for choice, choice_time in choices:
-    choice_start = thread_time_ns()
-    pipeline_list_dict = {}
-    with ThreadPoolExecutor(10) as pool:
-        generatored_pipelines = generator(pipelines[choice])[1]
-        list_of_choices = [choice] * len(generatored_pipelines)
+        # ensure that output directory exists for the big picture
+        output_big_combo = output_overall + output_bp
+        output_dir = Path(output_big_combo)        
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-        for name, result in tqdm(pool.map(pipelineTests, zip(generatored_pipelines, list_of_choices)), total=len(generatored_pipelines)):
-            pipeline_list_dict.update({name:result})
+        # save the big picture results
+        directory = str(pipelines[choice]).split("/")[-1][:-5]
+        pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir /( directory + "_results.csv"))
+        choice_time = thread_time_ns() - choice_start
+        updated.append([choice,choice_time])
 
-    # ensure that output directory exists for the big picture
-    output_dir = Path("output/experimental_results/binary_otsu_updated_big_picture/")        
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    # save the big picture results
-    directory = str(pipelines[choice]).split("/")[-1][:-5]
-    pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir /( directory + "_results.csv"))
-    choice_time = thread_time_ns() - choice_start
-    updated.append([choice,choice_time])
+    overall_end = thread_time_ns()
+    overall_time = overall_end - overall_start
 
 
-overall_end = thread_time_ns()
-overall_time = overall_end - overall_start
+    txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
+    for option, option_time in updated:
+        txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
-txtStr = f"This pipeline runner took {overall_time} time in total. \n" 
-for option, option_time in updated:
-    txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
+    # Ensure timing results directory exists
+    timing_dir = Path(output_timing)
+    timing_dir.mkdir(parents=True, exist_ok=True)
 
-print(updated)
+    # Create timing results file with properly formatted datetime
+    timing_filename = timing_dir / f"timingResults_binary_otsu_updated_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
-   # Ensure timing results directory exists
-timing_dir = Path('output/timing_results')
-timing_dir.mkdir(parents=True, exist_ok=True)
+    with open(timing_filename, "w") as txt_file:
+        txt_file.write(txtStr)
 
-# Create timing results file with properly formatted datetime
-timing_filename = timing_dir / f"timingResults_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    if cli_printout:
+        print(f"This has tested the hyperparameters generated by {pipelines[0]} and {pipelines[1]} \n \
+It has saved the results of this in {output_overall}, where it will save the summary statistics in a folder called: {output_bp} and the individual results in a folder called {output_results}\n \
+The total timing of each of these thresholding methods are saved in a txt file called {timing_filename} in the folder {output_timing}.")
+        
+    return {"bigpicture0": f"{output_overall}{output_bp}/binary0_results.csv", 
+            "bigpicture1":f"{output_overall}{output_bp}/otsu0_results.csv", 
+            "results0":f"{output_overall}{output_results}/0",
+            "results1":f"{output_overall}{output_results}/1",
+            "output_timing":str(timing_filename)}
 
-with open(timing_filename, "w") as txt_file:
-    txt_file.write(txtStr)
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
-from code_modules.helper_functions.helper_functions import clamp
+from puck.code_modules.helper_functions.helper_functions import clamp
 import colorsys
-import code_modules.colour_conversion.colour_conversion as conversion
+import puck.code_modules.colour_conversion.colour_conversion as conversion
 from math import dist
 
 def get_colors_and_coords(point_list, side, image, colorspace):

@@ -11,9 +11,6 @@ def angle_to(p, q):
     dx = qx - px
     dy = qy - py
 
-    angle = math.atan(dy/dx)
-
-
     if dx == 0:
         if dy > 0:
             angle = math.pi /2

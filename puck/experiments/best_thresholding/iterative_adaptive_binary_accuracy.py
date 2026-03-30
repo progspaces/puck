@@ -1,25 +1,20 @@
 from time import thread_time_ns
 import numpy as np
 from pathlib import Path
-import random
 import itertools
 from concurrent.futures import ThreadPoolExecutor
-# from hypersearch.pipelineGenerator import generator
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
 import numpy as np
 import json
 import math
-import pprint
 import pandas as pd
 from time import thread_time_ns
 from datetime import datetime
 import statistics
 from tqdm import tqdm
-with open('./data/annotations/annotations.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
-    # print(file_data)
+
 
 def blobParamFunc(minArea, minCircularity):
     params = cv.SimpleBlobDetector_Params()
@@ -54,12 +49,12 @@ def detection(thresholds,blob_params, gray):
     return centers
 
 
-def runShortPipeline(shortenedImageList, choice, results_dict):
+def runShortPipeline(shortenedImageList, choice, choice_dict, times_dict,file_data, input_path, count_of_images):
     blobcounts=[]
     correct = 0
     close_enough_count =0
     for path in shortenedImageList:
-        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[19:])))
+        gtkp = groundTruthKeyPoints(file_data.get("images"+(str(path)[len(input_path):])))
         image = cv.imread(path, cv.IMREAD_COLOR_RGB)
         imageBlurred = cv.medianBlur(image, 3)
         blob_params = blobParamFunc(400, .8)
@@ -130,27 +125,31 @@ def runShortPipeline(shortenedImageList, choice, results_dict):
         blobcounts.append(count_of_blobs)
     choice_human = choice_dict.get(str(choice))
     #f"{choice_human}_blobcounts": blobcounts,
-    timesDict.update({ f"{choice_human}_correct_acc": correct/count_of_images, f"{choice_human}_close4_acc": close_enough_count/count_of_images})
-
-random.seed(2026)
-p = Path('.')
-
-imageList = [path for path in sorted(list(p.glob('data/images_miniset/*/*/*/*/*0.jpg')))]
-count_of_images = len(imageList)
-print(count_of_images)
-choice_dict = {"0": "binary", "1": "adaptive_global-50", "2": "adaptive_global-20", "3": "adaptive_global-80",  "4": "iterative-2","5": "iterative-5", "6": "iterative-10",}
+    times_dict.update({ f"{choice_human}_correct_acc": correct/count_of_images, f"{choice_human}_close4_acc": close_enough_count/count_of_images})
 
 
-timesDict ={}
-for choice in tqdm(range(0,7,1)):
-    runShortPipeline(imageList, choice, timesDict)
-    # print(timesDict) 
+def main(input_path = "data/images_miniset",ground_truth = "data/annotations/annotations.json", output_folder= "output/experimental_results/" , output_name = "iterative_adaptive_binary", cli_output=True):
+        
+    with open(ground_truth , "r") as json_file:
+        file_data = dict(json.loads(json_file.read()))
+    
+    p = Path('.')
 
-with open('./output/experimental_results/iterative_adaptive_binary.json', 'w') as f:
-    json.dump(timesDict, f)
+    imageList = [path for path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*0.jpg')))]
+    choice_dict = {"0": "binary", "1": "adaptive_global-50", "2": "adaptive_global-20", "3": "adaptive_global-80",  "4": "iterative-2","5": "iterative-5", "6": "iterative-10",}
+
+    times_dict ={}
+    for choice in tqdm(range(0,7,1)):
+        runShortPipeline(imageList, choice, choice_dict, times_dict,file_data, input_path, len(imageList))
+
+    with open(f'{output_folder}{output_name}.json', 'w') as f:
+        json.dump(times_dict, f)
+    if cli_output:
+        print(f"This experiment used the {input_path} and created{output_name}.json in {output_folder}.")
+    return f'{output_folder}{output_name}.json'
+##This has tested 3 iterative thresholding approaches, 3 adaptive global thresholding approaches and one binary threshold for a baseline. \n \
+##It tests the adaptive global at maximum - c where c is 20, 50, and 80. It tests the iterative with 2,5, and 10 thresholds. The binary threshold is 170
 
 
-with open('./output/experimental_results/iterative_adaptive_binary.json' , "r") as json_file:
-    file_data = dict(json.loads(json_file.read()))
-
-pprint.pprint(file_data)
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
-import code_modules.geometry.rectangles as rect
-import code_modules.geometry.clockwise_dots as clkwise
-import code_modules.geometry.squares as squares
+import puck.code_modules.geometry.rectangles as rect
+import puck.code_modules.geometry.clockwise_dots as clkwise
+import puck.code_modules.geometry.squares as squares
 
 
 from math import dist
