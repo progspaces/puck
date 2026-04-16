@@ -1,8 +1,9 @@
 import cv2 as cv
 from math import dist
 import numpy as np
+import matplotlib.pyplot as plt
 
-def find_centers_hough(file_path, min_dist):
+def find_centers_hough(file_path, min_dist, grayscale = False):
     '''
     CALIBRATION_MIN_DIST = 30
     PROGRAM_MIN_DIST = 170
@@ -10,6 +11,9 @@ def find_centers_hough(file_path, min_dist):
     image = cv.imread(file_path, cv.IMREAD_COLOR_RGB)
     imageBlurred = cv.medianBlur(image, 3)
     gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
+    if grayscale == True:
+        plt.imshow(gray, cmap="gray")
+        plt.show()
     circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT_ALT,1.5, min_dist, param1=300, param2=.9, minRadius=15, maxRadius=30)
     circles = circles[:,:,0:2][0] if circles is not None else []
     point_list = [(int(c[0]),int(c[1])) for c in circles]

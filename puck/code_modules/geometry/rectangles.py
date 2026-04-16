@@ -29,7 +29,7 @@ def same_midpoint(pairA, pairB, threshold=20):
     # note - threshold is in pixels
     def midpoint(pair):
         a, b = pair
-        return Point((b.x - a.x) / 2.0, (b.y - a.y) / 2.0)
+        return Point((b.x + a.x) / 2.0, (b.y  + a.y) / 2.0)
 
     # compute the midpoints of each pair
     midA = midpoint(pairA)

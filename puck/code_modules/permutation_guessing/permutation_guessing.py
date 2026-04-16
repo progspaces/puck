@@ -59,3 +59,34 @@ def get_color_perm(ordered_rectangle, true_colors,printing:bool = False, colorsp
                     print(f"the closest correct is {correct}")
         perm += correct
     return (perm)
+
+
+def get_color_perm_and_dist(ordered_rectangle, true_colors,printing:bool = False, colorspace:str = "LUV"):
+    ordered_colors = [c[1] for c in ordered_rectangle]
+    true_colors_custom_keys = true_colors.keys()
+    perm = ""
+    luv_cols_perm_detected = [conv.rgb_to_luv(col) for col in ordered_colors]
+    for col in ordered_colors:
+        dist = 1000
+        correct = ''
+        for k in true_colors_custom_keys:
+                k_luv = conv.rgb_to_luv(k)
+                col_luv = conv.rgb_to_luv(col)
+                a =(int(k_luv[0])-int(col_luv[0]))**2
+                b= (int(k_luv[1])-int(col_luv[1]))**2
+                c =(int(k_luv[2])-int(col_luv[2]))**2
+                pos = a+b+c
+                luv_dist= sqrt(pos)
+                if printing:
+                    print(f"K in LUV is {k_luv}")
+                    print(f"Col in LUV is {col_luv}")
+                    print(f"The distance between {k_luv}, and {col_luv} is "+str(luv_dist) +"\n") 
+                new_diff = luv_dist
+                if new_diff < dist:
+                    dist = new_diff
+                    correct = true_colors.get(k)
+                    if printing:
+                        print(new_diff)
+                        print(f"the closest correct is {correct}")
+        perm += correct
+    return (perm,luv_cols_perm_detected)

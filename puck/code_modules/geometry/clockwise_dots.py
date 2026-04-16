@@ -60,9 +60,9 @@ def order_rectangle(color_point_list, reference):
     ordered[2] = clockwise_pt(point_list, ordered[1])
     # ordered[2] = point_list[point_list not in ordered]
     colored_coords = [c for c in color_point_list if c[0] != reference]
-    print(reference)
-    print(colored_coords)
-    print(ordered)
+    # print(reference)
+    # print(colored_coords)
+    # print(ordered)
     return sorted(colored_coords, key = lambda x: ordered.index(x[0]))
 
 if __name__ == "__main__":
