@@ -23,6 +23,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "tex>=1.8",
     "tqdm>=4.67.1",
+    "nbformat>=4.2.0",
 ]
 
 [project.scripts]
