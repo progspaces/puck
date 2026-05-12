@@ -107,7 +107,20 @@ def pipelineTests(args):
 
 # print("is this optimized")
 # print(cv.useOptimized())
-def main(input_path="data/images_copy", output_overall = "output/experimental_results/", output_results= "hough_options", output_bp ="hough_options_big_picture" ,output_timing ="output/timing_results", ground_truth="./data/annotations/annotations.json", cli_printout:bool = True):
+def main(adjustment = "../", adjustment_on = False,input_path="data/images_copy", output_overall = "output/experimental_results/", 
+         output_results= "hough_options", output_bp ="hough_options_big_picture" ,output_timing ="output/timing_results", ground_truth="./data/annotations/annotations.json", cli_printout:bool = True):
+    pipelines = ["/experiments/best_thresholding/hyperparameters/houghCircle.json","/experiments/best_thresholding/hyperparameters/houghCircleAlt.json"]
+    new_pipelines =[]
+    if adjustment_on:
+        input_path = adjustment + input_path
+        output_overall = adjustment + output_overall
+        output_timing = adjustment + output_timing
+        ground_truth = adjustment + ground_truth
+        for p in pipelines:
+            new_pipelines.append(adjustment + p) 
+        pipelines = new_pipelines 
+
+    
     overall_start = thread_time_ns()
 
 # Open the ground truth annotations
@@ -122,7 +135,8 @@ def main(input_path="data/images_copy", output_overall = "output/experimental_re
     updated = []
     results_path = output_overall + output_results
 
-    pipelines = ["/experiments/best_thresholding/hyperparameters/houghCircle.json","/experiments/best_thresholding/hyperparameters/houghCircleAlt.json"]
+
+
 
     for choice, choice_time in choices:
         choice_start = thread_time_ns()

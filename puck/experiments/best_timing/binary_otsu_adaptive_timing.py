@@ -126,26 +126,34 @@ def runShortPipeline(shortenedImageList, input, choice, file_data, choice_dict,t
     choice_human = choice_dict.get(str(choice))
     timesDict.update({f"{choice_human}_all_time": all_time, f"{choice_human}_blobcounts": blobcounts, f"{choice_human}_times": times, f"{choice_human}_avg": avgTimeToDetect, f"{choice_human}_median": medianTimeToDetect, f"{choice_human}_correct": correct, f"{choice_human}_close4": close_enough_count})
 
-def main(input:str ="data/images_miniset" , output:str = "./output/timing_results/binary_otsu_adaptive_timing_dict.json", ground_truth_path:str = "./data/annotations/annotations.json", cli_printout:bool= True):
+def main(adjustment = "../", adjustment_on = False, input_path:str ="data/images_miniset" ,
+          output:str = "output/timing_results/binary_otsu_adaptive_timing_dict_new.json", ground_truth_path:str = "data/annotations/annotations.json", cli_printout:bool= True):
+    if adjustment_on:
+        input_path = adjustment + input_path
+        output = adjustment + output
+        ground_truth_path = adjustment + ground_truth_path
+    print(output)
+   
     with open(ground_truth_path , "r") as json_file:
         file_data = dict(json.loads(json_file.read()))
     p = Path('.')
-    imageList = [path for path in sorted(list(p.glob(f'{input}/*/*/*/*/*[0-4].jpg')))]
+    imageList = [path for path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*[0-4].jpg')))]
     choice_dict = {"0": "binary", "1": "adaptive_mean", "2": "adaptive_gaussian", "3":"otsu"}
     timesDict ={}
     for choice in tqdm(range(0,4,1)):
-        runShortPipeline(imageList, input, choice, file_data, choice_dict, timesDict)
+        runShortPipeline(imageList, input_path, choice, file_data, choice_dict, timesDict)
     with open(output, 'w') as f:
         json.dump(timesDict, f)
     if cli_printout:
-        print(f"This is a timing test run on {input}. \n \
+        print(f"This is a timing test run on {input_path}. \n \
 The timing information has been saved as a .json file at {output} \n \
 it has the average time and median time it took to run each of the following possible thresholding method: \n \
           - 0: binary \n \
           - 1: adaptive mean \n \
           - 2: adaptive gaussian \n \
           - 3: otsu \n \
-As well as the total time for each, and the time it took per individual image within the {input}.")
+As well as the total time for each, and the time it took per individual image within the {input_path}.")
+        return output
 
 
 if __name__ == "__main__":

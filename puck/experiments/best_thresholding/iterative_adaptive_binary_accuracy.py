@@ -129,7 +129,7 @@ def runShortPipeline(shortenedImageList, choice, choice_dict, times_dict,file_da
 
 
 def main(input_path = "data/images_miniset",ground_truth = "data/annotations/annotations.json", output_folder= "output/experimental_results/" , output_name = "iterative_adaptive_binary", cli_output=True):
-        
+    
     with open(ground_truth , "r") as json_file:
         file_data = dict(json.loads(json_file.read()))
     
