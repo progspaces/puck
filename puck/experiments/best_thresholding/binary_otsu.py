@@ -30,7 +30,7 @@ def groundTruthKeyPoints(entry):
 def pipelineTests(args):
     p = Path('.')
     test_pipeline, choice, input_path, results_path, file_data= args
-    results_path = Path("output/experimental_results/binary_otsu_pipeline_results/" + str(choice))
+    results_path = Path(results_path + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
@@ -115,7 +115,7 @@ def pipelineTests(args):
 
 
 
-def main(adjustment = "../", adjustment_on = False, input_path="data/images_copy", output_overall = "output/experimental_results/", output_results= "binary_otsu_pipeline_results", output_bp ="binary_otsu_big_picture" ,output_timing ="output/timing_results", ground_truth="data/annotations/annotations.json", cli_printout:bool = True):
+def main(adjustment = "../", adjustment_on = False, input_path="data/images_copy", output_overall = "output/experimental_results/", output_results= "binary_otsu_pipeline_results/", output_bp ="binary_otsu_big_picture" ,output_timing ="output/timing_results", ground_truth="data/annotations/annotations.json", cli_printout:bool = True):
     pipelines = ["experiments/best_thresholding/hyperparameters/binary0.json","experiments/best_thresholding/hyperparameters/otsu0.json"]
     new_pipelines =[]
     if adjustment_on:
@@ -123,6 +123,7 @@ def main(adjustment = "../", adjustment_on = False, input_path="data/images_copy
         output_overall = adjustment + output_overall
         output_timing = adjustment + output_timing
         ground_truth = adjustment + ground_truth
+        print(output_overall)
         for p in pipelines:
             new_pipelines.append(adjustment + p) 
         pipelines = new_pipelines

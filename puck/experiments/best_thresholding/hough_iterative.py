@@ -1,68 +1,84 @@
 import itertools
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import cv2 as cv
 from matplotlib import pyplot as plt
 import numpy as np
 import json
 import math
-import pprint
 import pandas as pd
 from time import thread_time_ns
 from datetime import datetime
 import statistics
-from tqdm import tqdm
-from puck.experiments.best_thresholding.cartesian_product import houghGenerator
-from skimage.feature import canny
-from skimage.transform import hough_ellipse
-from skimage.draw import ellipse_perimeter
 
 ## A file to check the hyper parameters of CV as well as compare the houghCircle function in OpenCV to the scikit-image hough_ellipse function.
 ## Use hyper paremter files, houghCircle.json for cv and houghEllispe.json for scikit
 
 
-
+def blobParamFunc(minArea, minCircularity):
+    params = cv.SimpleBlobDetector_Params()
+    params.filterByCircularity = True
+    params.minCircularity = minCircularity
+    params.minArea=minArea
+    params.blobColor = 0
+    return params
 
 def groundTruthKeyPoints(entry):
     return [tuple(point[1:3]) for point in entry]
 
 
-
+def detection(thresholds,blob_params, gray):
+    detector = cv.SimpleBlobDetector_create(blob_params)
+    centers= []
+    for thresh in thresholds:
+        _, thresholded = cv.threshold(gray, thresh, 255, cv.THRESH_BINARY)
+        keypoints = detector.detect(thresholded)
+        current_centers = [(round(kp.pt[0]), round(kp.pt[1])) for kp in keypoints]
+        new_centers = []
+        for curr_center in current_centers:
+            isNew = True
+            for c in centers:
+                    distance = math.dist(curr_center, c)
+                    isNew = distance >= 10
+                    if not isNew:
+                        break
+            if isNew:
+                new_centers.append(curr_center)
+        centers = centers + new_centers
+    return centers
 
 def pipelineTests(args):
     p = Path('.')
-    test_pipeline , choice, input_path, file_data, results_path = args
+    choice, input_path, file_data, results_path = args
     results_path = Path(f"{results_path}")
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
     times = []
     pipeline_img_dict = {}
-    for img_path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*[0].jpg'))):
+    for img_path in sorted(list(p.glob(f'{input_path}/*/*/*/*/*[0-4].jpg'))):
         start = thread_time_ns()
+        adjusted_path = ("images"+ str(img_path)[len(input_path):])
+        # print(adjusted_path)
+        # print(img_path)
         gtkp = groundTruthKeyPoints(file_data.get("images"+ str(img_path)[len(input_path):]))
         image = cv.imread(img_path, cv.IMREAD_COLOR_RGB)
+        # print(image)
         imageBlurred = cv.medianBlur(image, 3)
         gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
         if choice == "houghCircle":
             rows = gray.shape[0]
-            circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT,
-                                     int(test_pipeline[0]), test_pipeline[1],
-                            param1=test_pipeline[2], param2=test_pipeline[3],
-                            minRadius=test_pipeline[4], maxRadius=30)
+            circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
+                               param1=100, param2=30,
+                               minRadius=1, maxRadius=30)
             circles = circles[:,:,0:2][0] if circles is not None else []
-        elif choice == "houghCircleAlt":
-            circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT_ALT, test_pipeline[0], test_pipeline[1],
-                            param1=test_pipeline[2], param2=test_pipeline[3],
-                            minRadius=test_pipeline[4], maxRadius=30)
-            circles = circles[:,:,0:2][0] if circles is not None else []
-        elif choice == "houghEllipse":
-            edges = canny(gray, sigma=test_pipeline[0], low_threshold=test_pipeline[1], high_threshold=test_pipeline[2])
-            result = hough_ellipse(edges, accuracy=test_pipeline[3], threshold=test_pipeline[4], min_size=test_pipeline[5], max_size=120)
-            circles = result.sort(order='accumulator')
+            point_list = [(float(c[0]),float(c[1])) for c in circles]
+        else:
+            thresholds = np.arange(160,190,10)
+            blob_params = blobParamFunc(400, .8)
+            point_list = detection(thresholds=thresholds, blob_params= blob_params, gray=gray)
         end = thread_time_ns()
         # print(test_pipeline, str(img_path)[:-4] , str((end-start)/1_000_000_000))
-        point_list = [(float(c[0]),float(c[1])) for c in circles]
+        
  
         distances = []
 
@@ -92,33 +108,23 @@ def pipelineTests(args):
         timeToDetect = end - start
         times.append(timeToDetect)
         pipeline_img_dict.update({img_path: (count_of_blobs, close_enough, only_4_close_enough, timeToDetect,distances)})
-        # # print("...")
-    # Create subdirectory for choice results
-
-    choice_results_path = results_path / choice
-    choice_results_path.mkdir(parents=True, exist_ok=True)
-    file_name =  str(test_pipeline)+ "hough_results.csv"
-    pd.DataFrame(pipeline_img_dict).T.to_csv(choice_results_path / file_name)
+        # # print("...")\
+    pd.DataFrame(pipeline_img_dict).T.to_csv(results_path / f"{choice}_results.csv")
     accuracy = (correct/480)
     avgTimeToDetect = statistics.mean(times)
     medianTimeToDetect = statistics.median(times)
-    return str(test_pipeline), (choice, accuracy, avgTimeToDetect, medianTimeToDetect)
+    return  {"choice": choice,"accuracy": accuracy, "avgTimeToDetect": avgTimeToDetect, "medianTimeToDetect": medianTimeToDetect}
 
 
 # print("is this optimized")
 # print(cv.useOptimized())
-def main(adjustment = "../", adjustment_on = False,input_path="data/images_copy", output_overall = "output/experimental_results/", 
-         output_results= "hough_options", output_bp ="hough_options_big_picture" ,output_timing ="output/timing_results", ground_truth="./data/annotations/annotations.json", cli_printout:bool = True):
-    pipelines = ["/experiments/best_thresholding/hyperparameters/houghCircle.json","/experiments/best_thresholding/hyperparameters/houghCircleAlt.json"]
-    new_pipelines =[]
+def main(adjustment = "../", adjustment_on = False, input_path="data/images_copy", output_overall = "output/experimental_results/hough_iterative"
+          ,output_timing ="output/timing_results", ground_truth="data/annotations/annotations.json", cli_printout:bool = True):
     if adjustment_on:
         input_path = adjustment + input_path
         output_overall = adjustment + output_overall
         output_timing = adjustment + output_timing
         ground_truth = adjustment + ground_truth
-        for p in pipelines:
-            new_pipelines.append(adjustment + p) 
-        pipelines = new_pipelines 
 
     
     overall_start = thread_time_ns()
@@ -130,34 +136,19 @@ def main(adjustment = "../", adjustment_on = False,input_path="data/images_copy"
     # Get the pipeline configuration optionsß
 
     # Manually set this, (choice choice_time), so 0-3, and then 0 initially for choice_time, reset at the end of each for loop.
-    choices = [("houghCircle",0), ("houghCircleAlt",0)]
+    choices = [("houghCircle",0), ("iterative",0)]
 
     updated = []
-    results_path = output_overall + output_results
-
-
+    results_list = []
 
 
     for choice, choice_time in choices:
         choice_start = thread_time_ns()
-        pipeline_list_dict = {}
-        with ThreadPoolExecutor(10) as pool:
-            # call a function on each item in a list and handle results
-            generated_pipelines = houghGenerator("../experiments/best_thresholding/hyperparameters/"+ choice + ".json")[1]
-            list_of_choices = [choice] * len(generated_pipelines)
-            list_of_input_paths = [input_path] * len(generated_pipelines)
-            list_of_file_datas = [file_data] * len(generated_pipelines)
-            list_of_results_paths = [results_path]* len(generated_pipelines)
-            for name, result in tqdm(pool.map(pipelineTests, zip(generated_pipelines,list_of_choices, list_of_input_paths, list_of_file_datas, list_of_results_paths)), total=len(generated_pipelines)):
-                pipeline_list_dict.update({name:result})   
-
-        # ensure that output directory exists for the big picture
-        output_dir = Path(f"{output_overall}{output_bp}")        
-        output_dir.mkdir(parents=True, exist_ok=True)
-
+        # (DO A RUN HERE)
+        results = pipelineTests([choice, input_path, file_data, output_overall])
+        print(results)
+        results_list.append(results)
         # save the big picture results
-        choice_results = choice +  "_results.csv"
-        pd.DataFrame(pipeline_list_dict).T.to_csv(output_dir / choice_results)
         choice_end =thread_time_ns()
         choice_time = choice_end - choice_start 
         updated.append([choice,choice_time])
@@ -169,25 +160,23 @@ def main(adjustment = "../", adjustment_on = False,input_path="data/images_copy"
     for option, option_time in updated:
         txtStr = txtStr + f"It spent {option_time} time on choice {option}. \n"
 
+
     # Ensure timing results directory exists
     timing_dir = Path(output_timing)
     timing_dir.mkdir(parents=True, exist_ok=True)
 
     # Create timing results file with properly formatted datetime
-    timing_filename = timing_dir / f"timingResults_hough_alt_plain_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    timing_filename = timing_dir / f"timingResults_hough_iterative_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
     with open(timing_filename, "w") as txt_file:
         txt_file.write(txtStr)
     if cli_printout:
-        print(f"This has tested the hyperparameters generated by {pipelines[0]} and {pipelines[1]} \n \
-The summary statistics are saved in {output_overall}{output_bp} as a .csv \n \
-The tested pipelines are saved as many individual .csv files in {output_overall}{output_results}/houghCircle[Alt] \n \
-The timing info is saved as {str(timing_filename)}")
-    return {"bigpicture0": f"{output_overall}{output_bp}/houghCircle_results.csv", 
-            "bigpicture1":f"{output_overall}{output_bp}/houghCircleAlt_results.csv", 
-            "results0":f"{output_overall}{output_results}/houghCircle",
-            "results1":f"{output_overall}{output_results}/houghCircleAlt",
-            "output_timing":str(timing_filename)}
+        print(f"The summary statistics are saved in {output_overall} as .csvs \n \
+                The timing info is saved as {str(timing_filename)}")
+    return {"bigpicture0": f"{output_overall}/houghCircle_results.csv", 
+            "bigpicture1":f"{output_overall}/iterative_results.csv", 
+            "output_timing":str(timing_filename),
+            "results": results_list}
 
 if __name__ == "__main__":
     main()

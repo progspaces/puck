@@ -30,7 +30,7 @@ def groundTruthKeyPoints(entry):
 def pipelineTests(args):
     p = Path('.')
     test_pipeline, choice, input_path, results_path, file_data= args
-    results_path = Path("output/experimental_results/binary_otsu_pipeline_results/" + str(choice))
+    results_path = Path(results_path + str(choice))
     results_path.mkdir(parents=True, exist_ok=True)
     # print(test_pipeline)
     correct = 0 
