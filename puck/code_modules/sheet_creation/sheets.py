@@ -35,7 +35,7 @@ def page_setup():
     return fig, ax, scaler
 
 
-def sheet_maker(palette = "custom", set_choice = "A"):
+def sheet_maker_old(palette = "custom", set_choice = "A"):
     pal = custom if palette == "custom" else dark
     setA = [ "#000000", pal[1], pal[4], pal[6]]
     setB = [ "#000000", pal[1], pal[3], pal[8]]
@@ -51,21 +51,70 @@ def sheet_maker(palette = "custom", set_choice = "A"):
     fig.savefig(f"output/sheets/set_{palette}_{set_choice}.pdf")
 
 
-# This example fits a4 paper with 5mm margin printers
-def create_cal_sheet(palette = "custom"):
-    pal = custom if palette == "custom" else dark
-    fig, ax, scaler = page_setup()
-    s = np.tile([(2*scaler)**2], 9)
-    ax.scatter([ 3, 3, 3, 8, 8, 8, 13, 13, 13],[3,8,13,3,8,13,3,8,13], c = pal, s = s )
-    rect = patches.Rectangle((1, 1), 14.5, 14.5, linewidth=10, edgecolor='black', facecolor='None')
-    ax.add_patch(rect)
 
-    # save figure ( printing png file had better resolution, pdf was lighter and better on screen)
+def sheet_maker(colour_pal, n_colours):
+    pal = ["#000000"] + colour_pal
+    fig, ax, scaler = page_setup()
+    s = np.tile([(2*scaler)**2], 4)
+    ax.scatter([1,1,25.5,25.5], [1,17,1,17], c=pal, s=s)
     plt.axis('off')
     plt.show()
-    fig.savefig(f"output/sheets/{palette}_calibration.png", dpi=1000)
-    fig.savefig(f"output/sheets/{palette}_calibration.pdf")
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/permutations/", dpi=1000)
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/p{n_col}_calibration.png", dpi=1000)
+    # fig.savefig(f"output/sheets/set_{palette}_{set_choice}.pdf")
+
+# This example fits a4 paper with 5mm margin printers
+def create_cal_sheet(pal):
+    n_col = len(pal) - 1
+    edgecolors = ["#000000"] * 9
+    if len(pal) == 4:        
+        # n = 3 
+        # 0 1 2 3 4 5 6 7 
+        # 1 0 1 1 0 0 0 0
+        edgecolors[1],edgecolors[3],edgecolors[4] = ['none']* n_col
+        pal.insert(2,"#FFFFFF")
+        pal.extend(["#FFFFFF"]*4)
+    elif len(pal) == 5:
+        # n = 4
+        # 0 1 2 3 4 5 6 7
+        # 1 1 1 1 0 0 0 0
+        edgecolors[1],edgecolors[2],edgecolors[3],edgecolors[4] = ['none']* n_col
+        pal.extend(["#FFFFFF"]*4)
+    elif len(pal) == 6:
+        # n = 5
+        # 0 1 2 3 4 5 6 7
+        # 1 1 1 1 0 0 0 1
+        edgecolors[1],edgecolors[2],edgecolors[3],edgecolors[4],edgecolors[8] = ['none']* n_col
+        last = pal.pop()
+        pal.extend(["#FFFFFF"]*3)
+        pal.append(last)
+    elif len(pal) == 7:
+        # n = 6 
+        # 0 1 2 3 4 5 6 7 
+        # 1 1 1 1 0 1 0 1 
+        edgecolors[1],edgecolors[2],edgecolors[3],edgecolors[4],edgecolors[6], edgecolors[8] = ['none']* n_col
+        pal.insert(5, "#FFFFFF")
+        pal.insert(7, "#FFFFFF")
+    elif len(pal) == 8:
+        # n = 7
+        # 0 1 2 3 4 5 6 7
+        # 1 1 1 1 1 1 0 1
+        edgecolors = ["none"] * 9
+        edgecolors[7] = "#000000"
+        pal.insert(7,"#FFFFFF")
+    else:
+        edgecolors = ["none"] * 9
+    fig, ax, scaler = page_setup()
+    s = np.tile([(2*scaler)**2], 9)
+    ax.scatter([ 3, 3, 3, 8, 8, 8, 13, 13, 13],[3,8,13,3,8,13,3,8,13], c = pal, linewidths= 4, edgecolors = edgecolors,s = s )
+    rect = patches.Rectangle((1, 1), 14.5, 14.5, linewidth=10, edgecolor='black', facecolor='None')
+    ax.add_patch(rect)
+    # save figure ( printing png file had better resolution, pdf was lighter and better on screen)
+    plt.axis('off')
+    # plt.show()
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/p{n_col}_calibration.png", dpi=1000)
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/p{n_col}_calibration.pdf")
 
 
-create_cal_sheet(palette="dark")
-sheet_maker()
+# create_cal_sheet()
+# sheet_maker()
