@@ -54,6 +54,7 @@
 
 import sheets
 import pprint
+import json 
 
 def to_base(number, base):
     """Converts a non-negative number to a list of digits in the given base.
@@ -87,7 +88,7 @@ n_colours = 3
 colour_palette = polychrome_dictionary.get(n_colours)
 colour_palette_w_black = ["#000000"] + colour_palette
 
-sheets.create_cal_sheet(pal = colour_palette_w_black)
+# sheets.create_cal_sheet(pal = colour_palette_w_black)
 
 def colour_perm(number, n_colours, colour_palette):
     index_list = to_base(number,n_colours)
@@ -99,7 +100,10 @@ def colour_perm(number, n_colours, colour_palette):
 ## in the case of n_colours = 4, that would be 4^3, n_colours**3
 ## then we generate the corresponding colour permutations using the palette (sans black), colour_perm(x,n_colours,colour_palette)
 ## and make a dicitonary that assigns those to their corresponding integer, x:colour_perm(x,n_colours,colour_palette)
-# int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3 - 17)}
-truth_array = [some_number == translate_perm_to_int(colour_perm(some_number, n_colours,colour_palette), colour_palette, n_colours) for some_number in range(0,n_colours**3)]
-print(all(truth_array))
-# for k,v in int_to_colour_perm.items(): sheets.sheet_maker(v, n_colours)
+int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)}
+
+## Make permutation sheets
+# for k,v in int_to_colour_perm.items(): sheets.sheet_maker(k,v, n_colours)
+
+with open(f'puck/puck/output/p{n_colours}_lookup.json', 'w') as fp:
+    json.dump(int_to_colour_perm, fp, indent=3)

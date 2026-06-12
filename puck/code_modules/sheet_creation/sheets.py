@@ -52,16 +52,16 @@ def sheet_maker_old(palette = "custom", set_choice = "A"):
 
 
 
-def sheet_maker(colour_pal, n_colours):
+def sheet_maker(int_value, colour_pal, n_col):
+    # print(int_value)
     pal = ["#000000"] + colour_pal
     fig, ax, scaler = page_setup()
     s = np.tile([(2*scaler)**2], 4)
     ax.scatter([1,1,25.5,25.5], [1,17,1,17], c=pal, s=s)
     plt.axis('off')
-    plt.show()
-    fig.savefig(f"puck/puck/output/sheets/p{n_col}/permutations/", dpi=1000)
-    fig.savefig(f"puck/puck/output/sheets/p{n_col}/p{n_col}_calibration.png", dpi=1000)
-    # fig.savefig(f"output/sheets/set_{palette}_{set_choice}.pdf")
+    # plt.show()
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.png", dpi=1000)
+    fig.savefig(f"puck/puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.pdf")
 
 # This example fits a4 paper with 5mm margin printers
 def create_cal_sheet(pal):
