@@ -70,11 +70,11 @@ def get_calibration_colors(black_dot_coords, color_coord_list):
     colors_sorted = sorted(colored_coord_list, key = lambda x: calibration_order_list.index(x[0]))
     colors = [c[1] for c in colors_sorted]
     # print(colors)
-    letters = (list(map(chr, range(97, 105))))
+    indicies = range(0,9)
     color_dict = {}
     for i in range(len(colors)):
         r,g,b = colors[i]
-        color_dict.update({ (int(r),int(g),int(b)):letters[i]})
+        color_dict.update({ (int(r),int(g),int(b)):indicies[i]})
+        # inverse_color_dict.update({ indicies[i]:(int(r),int(g),int(b))})
     return color_dict
-
 

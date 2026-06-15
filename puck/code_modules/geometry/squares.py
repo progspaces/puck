@@ -23,7 +23,7 @@ def get_key_squares(rect_list, keypoint):
          dist_ab = dist(a,b)
          dist_ac = dist(a,c)
          set_version = set([a,b,c,d])
-         if (abs(dist_ab-dist_ac) < 5) and len(set_version) == 4:
+         if (abs(dist_ab-dist_ac) < 15) and len(set_version) == 4:
               square_list.append(rect)
     # print(len(square_list))
     # print(square_list)

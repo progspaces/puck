@@ -52,7 +52,7 @@
 # 
 '''
 
-import sheets
+import puck.code_modules.sheet_creation.sheets as sheets
 import pprint
 import json 
 
@@ -84,7 +84,7 @@ polychrome_dictionary = {8:["#FD1622", "#FE00FF", "#00FE16", "#0084FE", "#FEAA0D
                          4:["#FF2216", "#FD16F9", "#00F700", "#1683FC"],
                          3:["#FE0D16", "#FD00FF", "#00F916"]}
 
-n_colours = 3
+n_colours = 8
 colour_palette = polychrome_dictionary.get(n_colours)
 colour_palette_w_black = ["#000000"] + colour_palette
 
@@ -95,15 +95,23 @@ def colour_perm(number, n_colours, colour_palette):
     # print(index_list)
     return [colour_palette[x] for x in index_list]
 
+
+# int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)}
+
+
 ## This is a list comprehension generated dictionary
 ## We generate a list of all the integers that can be represented, range(0,n_colours**3)
 ## in the case of n_colours = 4, that would be 4^3, n_colours**3
 ## then we generate the corresponding colour permutations using the palette (sans black), colour_perm(x,n_colours,colour_palette)
 ## and make a dicitonary that assigns those to their corresponding integer, x:colour_perm(x,n_colours,colour_palette)
-int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)}
+def main():
 
-## Make permutation sheets
-# for k,v in int_to_colour_perm.items(): sheets.sheet_maker(k,v, n_colours)
+    int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)}
 
-with open(f'puck/puck/output/p{n_colours}_lookup.json', 'w') as fp:
-    json.dump(int_to_colour_perm, fp, indent=3)
+    ## Make permutation sheets
+    # for k,v in int_to_colour_perm.items(): sheets.sheet_maker(k,v, n_colours)
+
+    with open(f'puck/output/polychrome_lookup.json', 'w') as fp:
+        json.dump(polychrome_dictionary, fp, indent=3)
+
+# main()
