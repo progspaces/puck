@@ -84,7 +84,7 @@ polychrome_dictionary = {8:["#FD1622", "#FE00FF", "#00FE16", "#0084FE", "#FEAA0D
                          4:["#FF2216", "#FD16F9", "#00F700", "#1683FC"],
                          3:["#FE0D16", "#FD00FF", "#00F916"]}
 
-n_colours = 8
+n_colours = 4
 colour_palette = polychrome_dictionary.get(n_colours)
 colour_palette_w_black = ["#000000"] + colour_palette
 
@@ -106,12 +106,19 @@ def colour_perm(number, n_colours, colour_palette):
 ## and make a dicitonary that assigns those to their corresponding integer, x:colour_perm(x,n_colours,colour_palette)
 def main():
 
-    int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)}
+    int_to_colour_perm = {x:colour_perm(x,n_colours,colour_palette) for x in range(0,n_colours**3)[0:10]}
 
     ## Make permutation sheets
-    # for k,v in int_to_colour_perm.items(): sheets.sheet_maker(k,v, n_colours)
+    for k,v in int_to_colour_perm.items(): sheets.sheet_maker(k,v, n_colours)
 
-    with open(f'puck/output/polychrome_lookup.json', 'w') as fp:
-        json.dump(polychrome_dictionary, fp, indent=3)
+    # with open(f'puck/output/polychrome_lookup.json', 'w') as fp:
+        # json.dump(polychrome_dictionary, fp, indent=3)
 
 # main()
+
+polychrome_dictionary = {8:["#FD1622", "#FE00FF", "#00FE16", "#0084FE", "#FEAA0D", "#DB4F89", "#EBFB26", "#00F8C4"],
+                         7:["#FF0D1C", "#FF00FB", "#16FF26", "#267EFB", "#F89F0D", "#AA0056", "#F4FF1C" ],
+                         6:["#F80D16", "#FF00FC", "#0DFC16", "#1C8CFD", "#FBA600", "#A61658" ],
+                         5:["#FF1C22", "#F400FE", "#00FC22", "#168FFB", "#F6A200"],
+                         4:["#FF2216", "#FD16F9", "#00F700", "#1683FC"],
+                         3:["#FE0D16", "#FD00FF", "#00F916"]}

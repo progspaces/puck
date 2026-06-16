@@ -9,12 +9,9 @@ import puck.code_modules.permutation_guessing.permutation_guessing as perm_guess
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
-n_colours = 3
+n_colours = 4
 
-#calibration_colours are blah
-
-
-def webcamCapture(save_path):
+def webcamSingleCapture(save_path):
     i = 0
     vc = cv2.VideoCapture(0) 
     if vc.isOpened(): 
@@ -35,39 +32,73 @@ def webcamCapture(save_path):
     cv2.destroyWindow("preview")
     vc.release()    
 
+def calibration_frame(path):
+    cal_centers,cal_image = df.find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=10, maxRadius=60,grayscale=True)
+    colors_and_coords=cf.get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
+    black_dot_cal_coords = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
+    calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords)
+    return calibration_colors
 
-# webcamCapture("puck/output/test_frame.jpg")
-
-
-cal_centers,cal_image = df.find_centers_hough("puck/output/test_cal.jpg", min_dist=CALIBRATION_MIN_DIST, minRadius=30, maxRadius=60)
-colors_and_coords=cf.get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
-black_dot_cal_coords = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
-calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords)
-
-path = "puck/output/test_frame.jpg"
-centers,image = df.find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=True)
-colors_and_coords=cf.get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
-if len(colors_and_coords) ==4:
-    black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-    # print(colors_and_coords)
-    ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
-    perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, calibration_colors,colorspace= "LUV")
-    print(perm)
-else:
-      print("HELP")
+def single_frame_path(path, calibration_colors):
+    centers,image = df.find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=True)
+    colors_and_coords=cf.get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
+    if len(colors_and_coords) ==4:
+        black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
+        ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
+        perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
+        print(perm)
+        print(int(perm,n_colours))
+    else:
+        print("HELP, FOUR DOTS NOT FOUND")
 
 
+def single_frame(frame, calibration_colors):
+    centers,image = df.find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False)
+    colors_and_coords=cf.get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
+    if len(colors_and_coords) ==4:
+        black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
+        ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
+        perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
+        print(perm)
+        print(int(perm,n_colours))
+    else:
+        print("HELP, FOUR DOTS NOT FOUND")
 
-# 1) get frame
-# 2) get dots
-# 3) get colors relative to calibration (ie assign a permutation)
-# 4) open up json and search up what the permutation's assigned int is
 
 
 
-with open(f'puck/output/polychrome_lookup.json', 'r') as fp:
-    polychrome = dict(json.loads(fp.read()))
+def webcamManyCaptures(calibration_colours):
+    # Open the default camera
+    cam = cv2.VideoCapture(0)
 
-# print(dc.translate_perm_to_int(sample_perm,  polychrome.get(str(n_colours)) , n_colours))
+    # Get the default frame width and height
+    # frame_width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+    # frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+    # Define the codec and create VideoWriter object
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
 
+    while True:
+        ret, frame = cam.read()
+
+        # Write the frame to the output file
+        # out.write(frame)
+
+        # Display the captured frame
+        # print(type(frame))
+        cv2.imshow('Camera', frame)
+        single_frame(frame,calibration_colours)
+        # Press 'q' to exit the loop
+        if cv2.waitKey(1) == ord('q'):
+            break
+
+    # Release the capture and writer objects
+    cam.release()
+    # out.release()
+    cv2.destroyAllWindows()
+
+# webcamSingleCapture("puck/output/test_cal.jpg")
+calibration_colors = calibration_frame("puck/output/test_cal.jpg")
+single_frame_path("puck/output/test_frame.jpg",calibration_colors)
+webcamManyCaptures(calibration_colors)

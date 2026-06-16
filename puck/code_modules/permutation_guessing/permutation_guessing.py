@@ -3,9 +3,9 @@ import puck.code_modules.colour_conversion.colour_conversion as conv
 from math import sqrt
 
 
-def get_color_perm(ordered_rectangle, true_colors,printing:bool = False, colorspace:str = "LUV"):
+def get_color_perm(ordered_rectangle, n_colours, true_colors,printing:bool = False, colorspace:str = "LUV"):
     ordered_colors = [c[1] for c in ordered_rectangle]
-    true_colors_custom_keys = true_colors.keys()
+    true_colors_custom_keys =list(true_colors.keys())[0:n_colours]
     perm = ""
     for col in ordered_colors:
         dist = 1000
@@ -61,9 +61,9 @@ def get_color_perm(ordered_rectangle, true_colors,printing:bool = False, colorsp
     return (perm)
 
 
-def get_color_perm_and_dist(ordered_rectangle, true_colors,printing:bool = False, colorspace:str = "LUV"):
+def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:bool = False, colorspace:str = "LUV"):
     ordered_colors = [c[1] for c in ordered_rectangle]
-    true_colors_custom_keys = true_colors.keys()
+    true_colors_custom_keys = list(true_colors.keys())[0:n_colours]
     perm = ""
     luv_cols_perm_detected = [conv.rgb_to_luv(col) for col in ordered_colors]
     for col in ordered_colors:
