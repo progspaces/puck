@@ -44,7 +44,10 @@ def single_frame_path(path, calibration_colors):
     colors_and_coords=cf.get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
     if len(colors_and_coords) ==4:
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
+        try:
+            ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
+        except:
+             print("error")## this is where the error is being thrown
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         print(int(perm,n_colours))
@@ -52,13 +55,18 @@ def single_frame_path(path, calibration_colors):
         print("HELP, FOUR DOTS NOT FOUND")
 
 
-def single_frame(frame, calibration_colors):
+def single_frame(frame, calibration_colors, n):
     centers,image = df.find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False)
     colors_and_coords=cf.get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
     if len(colors_and_coords) ==4:
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
         ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
-        print(ordered_rectangle)
+        if type(ordered_rectangle) == dict:
+            cv2.imwrite(f"puck/output/problem_frames/problem_frame{n}.jpg", frame)
+            with open(f'puck/output/problem_frames/problem_frame{n}.json', 'w') as fp:
+                json.dump(ordered_rectangle, fp, indent=3)
+            print("SAVED")
+            exit()
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         print(int(perm,n_colours))
@@ -79,13 +87,13 @@ def webcamManyCaptures(calibration_colours):
     # Define the codec and create VideoWriter object
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
-
+    n = 6 + 13
     while True:
         ret, frame = cam.read()
 
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        single_frame(frame,calibration_colours)
+        single_frame(frame,calibration_colours, n)
         # Press 'q' to exit the loop
         if cv2.waitKey(1) == ord('q'):
             break

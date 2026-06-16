@@ -3,6 +3,10 @@ import puck.code_modules.colour_conversion.colour_conversion as conv
 from math import sqrt
 
 
+
+
+
+
 def get_color_perm(ordered_rectangle, n_colours, true_colors,printing:bool = False, colorspace:str = "LUV"):
     ordered_colors = [c[1] for c in ordered_rectangle]
     true_colors_custom_keys =list(true_colors.keys())[0:n_colours]

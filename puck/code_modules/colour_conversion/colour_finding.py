@@ -19,7 +19,7 @@ def get_colors_and_coords(point_list, side, image, colorspace):
     for dot_pair in dot_list:
         dot = dot_pair[0]
         x,y = dot_pair[1]
-        maxPixel = (side*2)-1
+        maxPixel = len(dot)-1
         corner_points = [dot[0,maxPixel],dot[maxPixel,0],dot[0,maxPixel],dot[maxPixel,maxPixel]]
         if colorspace == "RGB":
             baseline_white_rgb = [max([corner_points[i][0] for i in range(0,4)]),
