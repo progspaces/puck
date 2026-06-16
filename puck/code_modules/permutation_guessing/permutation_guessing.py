@@ -6,10 +6,11 @@ from math import sqrt
 def get_color_perm(ordered_rectangle, n_colours, true_colors,printing:bool = False, colorspace:str = "LUV"):
     ordered_colors = [c[1] for c in ordered_rectangle]
     true_colors_custom_keys =list(true_colors.keys())[0:n_colours]
+    # print(true_colors_custom_keys)
     perm = ""
     for col in ordered_colors:
         dist = 1000
-        correct = ''
+        # correct = ''
         for k in true_colors_custom_keys:
             if colorspace == "RGB":
                 rgb_summed_diff = abs(k[0]-col[0]) +  abs(k[1]-col[1])  + abs(k[2]-col[2])
@@ -63,12 +64,16 @@ def get_color_perm(ordered_rectangle, n_colours, true_colors,printing:bool = Fal
 
 def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:bool = False, colorspace:str = "LUV"):
     ordered_colors = [c[1] for c in ordered_rectangle]
+    # print(f"ordered_rectangle: {ordered_rectangle}")
+    # print(f"ordered_colors: {ordered_colors}")
     true_colors_custom_keys = list(true_colors.keys())[0:n_colours]
+    # print(true_colors_custom_keys)
+    # print(true_colors)
     perm = ""
     luv_cols_perm_detected = [conv.rgb_to_luv(col) for col in ordered_colors]
     for col in ordered_colors:
         dist = 1000
-        correct = ''
+        # correct = ''
         for k in true_colors_custom_keys:
                 k_luv = conv.rgb_to_luv(k)
                 col_luv = conv.rgb_to_luv(col)
@@ -81,10 +86,15 @@ def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:b
                     print(f"K in LUV is {k_luv}")
                     print(f"Col in LUV is {col_luv}")
                     print(f"The distance between {k_luv}, and {col_luv} is "+str(luv_dist) +"\n") 
+                    print(f"K in RGB is {k}")
+                    print(f"Col in RGB is {col}")
                 new_diff = luv_dist
                 if new_diff < dist:
                     dist = new_diff
                     correct = true_colors.get(k)
+                    # print(col)
+                    # print(k)
+                    # print(correct)
                     if printing:
                         print(new_diff)
                         print(f"the closest correct is {correct}")

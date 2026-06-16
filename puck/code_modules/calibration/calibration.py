@@ -27,7 +27,7 @@ def small_big(rect_list, keypoint):
     return (small,big)
 
 
-def get_calibration_colors(black_dot_coords, color_coord_list):
+def get_calibration_colors(black_dot_coords, color_coord_list, n_colours):
     coord_list = [c[0] for c in color_coord_list]
     small, big = small_big(rect.check_rects(coord_list),black_dot_coords)
     small_list = rect.convertRectToList(small)
@@ -72,9 +72,9 @@ def get_calibration_colors(black_dot_coords, color_coord_list):
     # print(colors)
     indicies = range(0,9)
     color_dict = {}
-    for i in range(len(colors)):
+    for i in range(n_colours):
         r,g,b = colors[i]
         color_dict.update({ (int(r),int(g),int(b)):indicies[i]})
-        # inverse_color_dict.update({ indicies[i]:(int(r),int(g),int(b))})
+    print(color_dict)
     return color_dict
 

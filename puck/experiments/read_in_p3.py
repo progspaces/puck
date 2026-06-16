@@ -9,7 +9,7 @@ import puck.code_modules.permutation_guessing.permutation_guessing as perm_guess
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
-n_colours = 4
+n_colours = 3
 
 def webcamSingleCapture(save_path):
     i = 0
@@ -36,7 +36,7 @@ def calibration_frame(path):
     cal_centers,cal_image = df.find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=10, maxRadius=60,grayscale=True)
     colors_and_coords=cf.get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
     black_dot_cal_coords = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
-    calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords)
+    calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
     return calibration_colors
 
 def single_frame_path(path, calibration_colors):
@@ -58,6 +58,7 @@ def single_frame(frame, calibration_colors):
     if len(colors_and_coords) ==4:
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
         ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
+        print(ordered_rectangle)
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         print(int(perm,n_colours))
@@ -82,12 +83,8 @@ def webcamManyCaptures(calibration_colours):
     while True:
         ret, frame = cam.read()
 
-        # Write the frame to the output file
-        # out.write(frame)
-
-        # Display the captured frame
-        # print(type(frame))
         cv2.imshow('Camera', frame)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         single_frame(frame,calibration_colours)
         # Press 'q' to exit the loop
         if cv2.waitKey(1) == ord('q'):
@@ -98,7 +95,7 @@ def webcamManyCaptures(calibration_colours):
     # out.release()
     cv2.destroyAllWindows()
 
-# webcamSingleCapture("puck/output/test_cal.jpg")
-calibration_colors = calibration_frame("puck/output/test_cal.jpg")
-single_frame_path("puck/output/test_frame.jpg",calibration_colors)
+# webcamSingleCapture("puck/output/test_frame_p3_2.jpg")
+calibration_colors = calibration_frame("puck/output/test_cal_p3.jpg")
+single_frame_path("puck/output/test_frame_p3_2.jpg",calibration_colors) 
 webcamManyCaptures(calibration_colors)
