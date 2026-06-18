@@ -8,6 +8,7 @@ import puck.code_modules.geometry.clockwise_dots as clkwise
 import puck.code_modules.geometry.rectangles as rectangles
 import puck.code_modules.permutation_guessing.permutation_guessing as perm_guess
 import pprint
+import collections
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -62,12 +63,11 @@ def single_frame_path(path, calibration_colors,image_colorsaved= "RGB"):
         ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
-        print(int(perm,n_colours))
-        print(path)
+        return (int(perm,n_colours))
     elif not found_rectangle:
-        print("didn't find a rectangle darn it")
+        return -1 ## error code for not rectangular 
     else:
-        print("HELP, FOUR DOTS NOT FOUND")
+        return -2 ## error code for not 4 dots
 
 
 def check_coords(colors_and_coords):
@@ -83,14 +83,21 @@ def single_frame(frame, calibration_colors, n):
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
         ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
-        print(perm)
-        print(int(perm,n_colours))
+        # print(perm)
+        return (int(perm,n_colours))
     elif not found_rectangle:
-         print("didn't find a rectangle")
+        return -1 # error code for not a rectangle
     else:
-        print("HELP, FOUR DOTS NOT FOUND")
+        return -2 ## error code for not 4 dots
 
 
+def buffer(buffer, input):
+    buffer.pop(0)
+    buffer.append(input)
+    return buffer
+
+def max_freq(buffer):
+    return (collections.Counter(buffer).most_common(1)[0][0])
 
 
 def webcamManyCaptures(calibration_colours):
@@ -105,12 +112,14 @@ def webcamManyCaptures(calibration_colours):
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
     n = 6 + 13
+    buffer_arr = [0] * 100
     while True:
         ret, frame = cam.read()
 
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        single_frame(frame,calibration_colours, n)
+        response = single_frame(frame,calibration_colours, n)
+        print(max_freq(buffer(buffer_arr, response)))
         # Press 'q' to exit the loop
         if cv2.waitKey(1) == ord('q'):
             break
@@ -122,13 +131,13 @@ def webcamManyCaptures(calibration_colours):
 
 # webcamSingleCapture("puck/output/test_frame_p3_2.jpg")
 calibration_colors = calibration_frame("puck/output/test_cal_p3.jpg")
-path1 = "puck/output/problem_frames/problem_frame14.jpg"
+# path1 = "puck/output/problem_frames/problem_frame14.jpg"
 # path2 = path1[:-4] + "_test.jpg"
-# webcamManyCaptures(calibration_colors)
+webcamManyCaptures(calibration_colors)
 
 
 
-single_frame_path(path1,calibration_colors, image_colorsaved = "BGR") 
+# single_frame_path(path1,calibration_colors, image_colorsaved = "BGR") 
 # single_frame_path(path1,calibration_colors, image_colorsaved = "RGB") 
 
 # single_frame_path(path2,calibration_colors) 
@@ -137,4 +146,5 @@ single_frame_path(path1,calibration_colors, image_colorsaved = "BGR")
 # for i in range(7,20):
 #     single_frame_path(f"puck/output/problem_frames/problem_frame{i}.jpg",calibration_colors) 
 # # webcamManyCaptures(calibration_colors)
+
 

@@ -62,7 +62,7 @@ def get_color_perm(ordered_rectangle, n_colours, true_colors,printing:bool = Fal
                 if printing:
                     print(new_diff)
                     print(f"the closest correct is {correct}")
-        perm += str(correct)
+        perm = str(correct) + perm ## need to preppend
     return (perm)
 
 
@@ -103,5 +103,5 @@ def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:b
                     if printing:
                         print(new_diff)
                         print(f"the closest correct is {correct}")
-        perm = str(correct) + perm
+        perm = str(correct) + perm ## need to prepend
     return (perm,luv_cols_perm_detected)

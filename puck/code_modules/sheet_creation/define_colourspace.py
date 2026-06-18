@@ -87,7 +87,7 @@ colour_palette_w_black = ["#000000"] + colour_palette
 
 def colour_perm(number, n_colours, colour_palette):
     index_list = to_base(number,n_colours)
-    # print(index_list)
+    index_list.reverse()
     return [colour_palette[x] for x in index_list]
 
 
@@ -109,4 +109,4 @@ def main():
     with open(f'puck/output/polychrome_lookup.json', 'w') as fp:
         json.dump(polychrome_dictionary, fp, indent=3)
 
-# main()
+main()
