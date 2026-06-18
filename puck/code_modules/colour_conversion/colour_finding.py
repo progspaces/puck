@@ -2,8 +2,11 @@ from puck.code_modules.helper_functions.helper_functions import clamp
 import colorsys
 import puck.code_modules.colour_conversion.colour_conversion as conversion
 from math import dist
+import cv2 as cv
 
 def get_colors_and_coords(point_list, side, image, colorspace):
+
+
     def get_dot_list(point_list, side, image):
         dot_list = []
         for pt in point_list:
@@ -14,7 +17,6 @@ def get_colors_and_coords(point_list, side, image, colorspace):
         return dot_list
 
     dot_list = get_dot_list(point_list, side, image)
-
     colors_and_coords = []
     for dot_pair in dot_list:
         dot = dot_pair[0]
@@ -27,7 +29,8 @@ def get_colors_and_coords(point_list, side, image, colorspace):
                             max([corner_points[i][2] for i in range(0,4)])]
             ## white in this RGB is (255,255,255) so the maximal R G and B are the closest to white you will get
             circle_color= image[y,x]
-            # print(f"circle color: {circle_color_rgb}")
+            # print(f"x: {x}, y:{y}")
+            # print(f"circle color: {circle_color}")
             # print(f"baseline white: {baseline_white_rgb}")
             for i in range(len(baseline_white_rgb)):
                 if baseline_white_rgb[i] == 0:

@@ -3,7 +3,7 @@ from math import dist
 import numpy as np
 import matplotlib.pyplot as plt
 
-def find_centers_hough(file_path, min_dist, grayscale = False,minRadius=15, maxRadius=30):
+def find_centers_hough(file_path, min_dist, grayscale = False, minRadius=15, maxRadius=30,image_colorsaved = "RGB"):
     '''
     CALIBRATION_MIN_DIST = 30
     PROGRAM_MIN_DIST = 170
@@ -13,23 +13,29 @@ def find_centers_hough(file_path, min_dist, grayscale = False,minRadius=15, maxR
     gray = cv.cvtColor(imageBlurred, cv.COLOR_RGBA2GRAY)
     circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT_ALT,1.5, min_dist, param1=300, param2=.9, minRadius=minRadius, maxRadius=maxRadius)
     if grayscale == True:
+        image_copy = image.copy()
+        image_copy_grey = gray.copy()
+        # image_copy = cv.cvtColor(image_copy, cv.COLOR_RGB2BGR)
         if circles is not None:
             circles2 = np.round(circles[0, :]).astype("int")
             for (x, y, r) in circles2:
 		# draw the circle in the output image, then draw a rectangle
             # corresponding to the center of the circle
-                cv.circle(gray, (x, y), r, (0, 255, 0), 4)
-                print(f"x is {x}, y is {y}, r is {r}")
-                cv.rectangle(gray, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-            cv.imshow("output", np.hstack([gray, gray]))
+                cv.circle(image_copy, (x, y), r, (0, 255, 0), 4)
+                cv.circle(image_copy_grey, (x, y), r, (0, 255, 0), 4)
+                # print(f"x is {x}, y is {y}, r is {r}")
+                cv.rectangle(image_copy, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                cv.rectangle(image_copy_grey, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+            cv.imshow("markedup output", image_copy)
+            cv.imshow("markedup grey", image_copy_grey)
             cv.waitKey(0)
     circles = circles[:,:,0:2][0] if circles is not None else []
     point_list = [(int(c[0]),int(c[1])) for c in circles]
-    return (point_list,image)
+    # print(point_list)
+    return (point_list, cv.imread(file_path, cv.IMREAD_COLOR_BGR)) if image_colorsaved == "BGR" else (point_list, image)
 
 
-
-def find_centers_hough_frames(frame, min_dist, grayscale = False,minRadius=15, maxRadius=30):
+def find_centers_hough_frames(frame, min_dist, grayscale = True,minRadius=15, maxRadius=30):
     '''
     CALIBRATION_MIN_DIST = 30
     PROGRAM_MIN_DIST = 170

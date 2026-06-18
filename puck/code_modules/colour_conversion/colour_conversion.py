@@ -3,6 +3,7 @@ import numpy as np
 import colorsys
 
 def rgb_to_luv(rgb):
+        # print(rgb)
         rgb = np.array([rgb[0], rgb[1], rgb[2]],dtype=np.uint8) # yellow
         rgb = rgb.reshape((1,1,3))
         luv = cv.cvtColor(rgb,cv.COLOR_RGB2Luv)[:,0][0]

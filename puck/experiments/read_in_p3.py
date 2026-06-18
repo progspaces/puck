@@ -5,7 +5,9 @@ import puck.code_modules.sheet_creation.define_colourspace as dc
 import puck.code_modules.colour_conversion.colour_finding as cf
 import puck.code_modules.calibration.calibration as cal
 import puck.code_modules.geometry.clockwise_dots as clkwise
+import puck.code_modules.geometry.rectangles as rectangles
 import puck.code_modules.permutation_guessing.permutation_guessing as perm_guess
+import pprint
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -34,42 +36,57 @@ def webcamSingleCapture(save_path):
 
 def calibration_frame(path):
     cal_centers,cal_image = df.find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=10, maxRadius=60,grayscale=True)
+    while True:
+        cv2.imshow("cal image returned", cal_image)
+        if cv2.waitKey(0) == ord('q'):
+             break
+    cv2.destroyWindow("cal image returned")
     colors_and_coords=cf.get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
+    pprint.pprint(f"colors and coords {colors_and_coords}")
     black_dot_cal_coords = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
     calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
     return calibration_colors
 
-def single_frame_path(path, calibration_colors):
-    centers,image = df.find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=True)
+def single_frame_path(path, calibration_colors,image_colorsaved= "RGB"):
+    centers,image = df.find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False,image_colorsaved=image_colorsaved)
+    while True:
+        cv2.imshow("image returned", image)
+        if cv2.waitKey(0) == ord('q'):
+             break
+    cv2.destroyWindow("image returned")
     colors_and_coords=cf.get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
-    if len(colors_and_coords) ==4:
+    pprint.pprint(colors_and_coords)
+    found_rectangle = check_coords(colors_and_coords)
+    if len(colors_and_coords) ==4 and found_rectangle:
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        try:
-            ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
-        except:
-             print("error")## this is where the error is being thrown
+        ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         print(int(perm,n_colours))
+        print(path)
+    elif not found_rectangle:
+        print("didn't find a rectangle darn it")
     else:
         print("HELP, FOUR DOTS NOT FOUND")
+
+
+def check_coords(colors_and_coords):
+     rect = [[pair[0] for pair in colors_and_coords ]][0]
+     return len(rectangles.get_all_rects(rect)) >0
 
 
 def single_frame(frame, calibration_colors, n):
     centers,image = df.find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False)
     colors_and_coords=cf.get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
-    if len(colors_and_coords) ==4:
+    found_rectangle = check_coords(colors_and_coords)
+    if len(colors_and_coords) ==4 and found_rectangle:
         black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        ordered_rectangle= clkwise.order_rectangle(colors_and_coords, black_dot[0])
-        if type(ordered_rectangle) == dict:
-            cv2.imwrite(f"puck/output/problem_frames/problem_frame{n}.jpg", frame)
-            with open(f'puck/output/problem_frames/problem_frame{n}.json', 'w') as fp:
-                json.dump(ordered_rectangle, fp, indent=3)
-            print("SAVED")
-            exit()
+        ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         print(int(perm,n_colours))
+    elif not found_rectangle:
+         print("didn't find a rectangle")
     else:
         print("HELP, FOUR DOTS NOT FOUND")
 
@@ -105,5 +122,19 @@ def webcamManyCaptures(calibration_colours):
 
 # webcamSingleCapture("puck/output/test_frame_p3_2.jpg")
 calibration_colors = calibration_frame("puck/output/test_cal_p3.jpg")
-single_frame_path("puck/output/test_frame_p3_2.jpg",calibration_colors) 
-webcamManyCaptures(calibration_colors)
+path1 = "puck/output/problem_frames/problem_frame14.jpg"
+# path2 = path1[:-4] + "_test.jpg"
+# webcamManyCaptures(calibration_colors)
+
+
+
+single_frame_path(path1,calibration_colors, image_colorsaved = "BGR") 
+# single_frame_path(path1,calibration_colors, image_colorsaved = "RGB") 
+
+# single_frame_path(path2,calibration_colors) 
+
+# counter = 0
+# for i in range(7,20):
+#     single_frame_path(f"puck/output/problem_frames/problem_frame{i}.jpg",calibration_colors) 
+# # webcamManyCaptures(calibration_colors)
+

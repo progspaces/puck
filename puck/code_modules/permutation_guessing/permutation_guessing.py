@@ -74,6 +74,7 @@ def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:b
     # print(true_colors_custom_keys)
     # print(true_colors)
     perm = ""
+    # print(ord)
     luv_cols_perm_detected = [conv.rgb_to_luv(col) for col in ordered_colors]
     for col in ordered_colors:
         dist = 1000
@@ -102,5 +103,5 @@ def get_color_perm_and_dist(ordered_rectangle, n_colours, true_colors,printing:b
                     if printing:
                         print(new_diff)
                         print(f"the closest correct is {correct}")
-        perm += str(correct)
+        perm = str(correct) + perm
     return (perm,luv_cols_perm_detected)

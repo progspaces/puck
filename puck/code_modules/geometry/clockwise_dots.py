@@ -50,7 +50,10 @@ def clockwise_pt(points, black):
 
 
 def order_rectangle(color_point_list, reference):
+    assert len(color_point_list) == 4
     point_list =[p[0] for p in color_point_list]
+    assert len(point_list) == 4
+    assert reference in point_list
     ordered = [None, None, None]
     # print(reference)
     ordered[0] = clockwise_pt(point_list, reference)
@@ -59,13 +62,17 @@ def order_rectangle(color_point_list, reference):
     # print(point_list)
     ordered[2] = clockwise_pt(point_list, ordered[1])
     # ordered[2] = point_list[point_list not in ordered]
+    assert ordered[0] != ordered[1]
+    assert ordered[1] != ordered[2]
+    assert ordered[0] != ordered[2]
     colored_coords = [c for c in color_point_list if c[0] != reference]
-    print(f"reference is : {reference}")
-    print(f"color_coords: {colored_coords}")
-    try:
-        return sorted(colored_coords, key = lambda x: ordered.index(x[0]))
-    except ValueError:
-        return {"reference": reference, "color_coords": str(colored_coords), "ordered": str(ordered)}
+    # print(f"reference is : {reference}")
+    # print(f"color_coords: {colored_coords}")
+    return sorted(colored_coords, key = lambda x: ordered.index(x[0]))
+    # try:
+    #     return sorted(colored_coords, key = lambda x: ordered.index(x[0]))
+    # except ValueError:
+    #     return {"reference": reference, "color_coords": str(colored_coords), "ordered": str(ordered)}
 
 
 if __name__ == "__main__":
