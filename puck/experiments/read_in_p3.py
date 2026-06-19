@@ -1,14 +1,14 @@
-import json 
+# import json 
 import cv2
-import puck.code_modules.dot_finding.dot_finder as df
-import puck.code_modules.sheet_creation.define_colourspace as dc
-import puck.code_modules.colour_conversion.colour_finding as cf
-import puck.code_modules.calibration.calibration as cal
-import puck.code_modules.geometry.clockwise_dots as clkwise
-import puck.code_modules.geometry.rectangles as rectangles
-import puck.code_modules.permutation_guessing.permutation_guessing as perm_guess
-import pprint
-import collections
+from puck.code_modules.dot_finding.dot_finder import find_centers_hough, find_centers_hough_frames
+from puck.code_modules.colour_conversion.colour_finding import get_colors_and_coords, get_black_dot
+from puck.code_modules.calibration.calibration import get_calibration_colors
+from puck.code_modules.geometry.clockwise_dots import order_rectangle
+from puck.code_modules.geometry.rectangles import get_all_rects
+from puck.code_modules.permutation_guessing.permutation_guessing import get_color_perm_and_dist
+from pprint import pprint
+from collections import Counter
+from puck.image_annotation.annotator import run_radius
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -35,60 +35,67 @@ def webcamSingleCapture(save_path):
     cv2.destroyWindow("preview")
     vc.release()    
 
-def calibration_frame(path):
-    cal_centers,cal_image = df.find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=10, maxRadius=60,grayscale=True)
-    while True:
-        cv2.imshow("cal image returned", cal_image)
-        if cv2.waitKey(0) == ord('q'):
-             break
-    cv2.destroyWindow("cal image returned")
-    colors_and_coords=cf.get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
-    pprint.pprint(f"colors and coords {colors_and_coords}")
-    black_dot_cal_coords = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
-    calibration_colors =cal.get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
-    return calibration_colors
+def calibration_frame(path, tolerance):
+    print("please click and drag your mouse around one of the calibration circles, so we have an approximent size of the circle from the camera's perspective")
+    rad_range = draw_circle_get_range(path,tolerance)
+    cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
+    while cal_centers == [] :
+        print("the sought for circles are not the size specified, please redraw them")
+        rad_range = draw_circle_get_range(path,tolerance)
+        cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
 
-def single_frame_path(path, calibration_colors,image_colorsaved= "RGB"):
-    centers,image = df.find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False,image_colorsaved=image_colorsaved)
+                # while True:
+    #     cv2.imshow("cal image returned", cal_image)
+    #     if cv2.waitKey(0) == ord('q'):
+    #          break
+    # cv2.destroyWindow("cal image returned")
+    colors_and_coords=get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
+    pprint(f"colors and coords {colors_and_coords}")
+    black_dot_cal_coords = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
+    calibration_colors =get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
+    return calibration_colors, rad_range
+
+def single_frame_path(path, calibration_colors, rad_range = (17,22), image_colorsaved= "RGB"):
+    centers,image = find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]), grayscale=False,image_colorsaved=image_colorsaved)
     while True:
         cv2.imshow("image returned", image)
         if cv2.waitKey(0) == ord('q'):
              break
     cv2.destroyWindow("image returned")
-    colors_and_coords=cf.get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
-    pprint.pprint(colors_and_coords)
+    colors_and_coords=get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
+    pprint(colors_and_coords)
     found_rectangle = check_coords(colors_and_coords)
     if len(colors_and_coords) ==4 and found_rectangle:
-        black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
-        perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
+        black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
+        ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
+        perm,luv_detected_colours = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         print(perm)
         return (int(perm,n_colours))
     elif not found_rectangle:
-        return -1 ## error code for not rectangular 
+        return "not rectangular" ## error code for not rectangular 
     else:
-        return -2 ## error code for not 4 dots
+        return "not 4 dots" ## error code for not 4 dots
 
 
 def check_coords(colors_and_coords):
      rect = [[pair[0] for pair in colors_and_coords ]][0]
-     return len(rectangles.get_all_rects(rect)) >0
+     return len(get_all_rects(rect)) >0
 
 
-def single_frame(frame, calibration_colors, n):
-    centers,image = df.find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=0, maxRadius=60, grayscale=False)
-    colors_and_coords=cf.get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
+def single_frame(frame, calibration_colors, rad_range = (17,21)):
+    centers,image = find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]), grayscale=False)
+    colors_and_coords=get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
     found_rectangle = check_coords(colors_and_coords)
     if len(colors_and_coords) ==4 and found_rectangle:
-        black_dot = cf.get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        ordered_rectangle = clkwise.order_rectangle(colors_and_coords, black_dot[0]) 
-        perm,luv_detected_colours = perm_guess.get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
+        black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
+        ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
+        perm,luv_detected_colours = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         # print(perm)
         return (int(perm,n_colours))
     elif not found_rectangle:
-        return -1 # error code for not a rectangle
+        return "not rectangular" # error code for not a rectangle
     else:
-        return -2 ## error code for not 4 dots
+        return "not 4 dots" ## error code for not 4 dots
 
 
 def buffer(buffer, input):
@@ -97,7 +104,7 @@ def buffer(buffer, input):
     return buffer
 
 def max_freq(buffer):
-    return (collections.Counter(buffer).most_common(1)[0][0])
+    return (Counter(buffer).most_common(1)[0][0])
 
 
 def webcamManyCaptures(calibration_colours):
@@ -129,22 +136,11 @@ def webcamManyCaptures(calibration_colours):
     # out.release()
     cv2.destroyAllWindows()
 
-# webcamSingleCapture("puck/output/test_frame_p3_2.jpg")
-calibration_colors = calibration_frame("puck/output/test_cal_p3.jpg")
-# path1 = "puck/output/problem_frames/problem_frame14.jpg"
-# path2 = path1[:-4] + "_test.jpg"
-webcamManyCaptures(calibration_colors)
+
+def draw_circle_get_range(image,tolerance):
+    return run_radius(image,tolerance)
 
 
-
-# single_frame_path(path1,calibration_colors, image_colorsaved = "BGR") 
-# single_frame_path(path1,calibration_colors, image_colorsaved = "RGB") 
-
-# single_frame_path(path2,calibration_colors) 
-
-# counter = 0
-# for i in range(7,20):
-#     single_frame_path(f"puck/output/problem_frames/problem_frame{i}.jpg",calibration_colors) 
-# # webcamManyCaptures(calibration_colors)
-
-
+calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
+path1 = "puck/output/problem_frames/problem_frame14.jpg"
+single_frame_path(path1,calibration_colors, rad_range = rad_range, image_colorsaved = "BGR") 
