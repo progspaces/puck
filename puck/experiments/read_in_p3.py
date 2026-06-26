@@ -1,4 +1,6 @@
 # import json 
+from tkinter import Tk
+base = Tk()
 import cv2
 from puck.code_modules.dot_finding.dot_finder import find_centers_hough, find_centers_hough_frames
 from puck.code_modules.colour_conversion.colour_finding import get_colors_and_coords, get_black_dot
@@ -9,6 +11,8 @@ from puck.code_modules.permutation_guessing.permutation_guessing import get_colo
 from pprint import pprint
 from collections import Counter
 from puck.image_annotation.annotator import run_radius
+from puck.graphics.paper_recognition_prints import recognize
+from statistics import mean
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -36,10 +40,11 @@ def webcamSingleCapture(save_path):
     vc.release()    
 
 def calibration_frame(path, tolerance):
-    print("please click and drag your mouse around one of the calibration circles, so we have an approximent size of the circle from the camera's perspective")
+    print("please click and drag your mouse around one of the calibration circles, so we have an approximent size of the circle from the camera's perspective," \
+    "press enter when you are satisfied with your circle. click again to draw a new circle.")
     rad_range = draw_circle_get_range(path,tolerance)
     cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
-    while cal_centers == [] :
+    while len(cal_centers) < 9 :
         print("the sought for circles are not the size specified, please redraw them")
         rad_range = draw_circle_get_range(path,tolerance)
         cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
@@ -50,7 +55,7 @@ def calibration_frame(path, tolerance):
     #          break
     # cv2.destroyWindow("cal image returned")
     colors_and_coords=get_colors_and_coords(cal_centers,side = 25, image =cal_image,colorspace= "RGB")
-    pprint(f"colors and coords {colors_and_coords}")
+    # pprint(f"colors and coords {colors_and_coords}")
     black_dot_cal_coords = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
     calibration_colors =get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
     return calibration_colors, rad_range
@@ -63,18 +68,18 @@ def single_frame_path(path, calibration_colors, rad_range = (17,22), image_color
              break
     cv2.destroyWindow("image returned")
     colors_and_coords=get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
-    pprint(colors_and_coords)
+    # pprint(colors_and_coords)
     found_rectangle = check_coords(colors_and_coords)
     if len(colors_and_coords) ==4 and found_rectangle:
         black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
         ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
-        print(perm)
-        return (int(perm,n_colours))
+        coords_only = ([x[0] for x in ordered_rectangle])
+        return (perm,coords_only)
     elif not found_rectangle:
-        return "not rectangular" ## error code for not rectangular 
+        return ("not rectangular", [(0,0),(0,0),(0,0),(0,0)]) ## error code for not rectangular 
     else:
-        return "not 4 dots" ## error code for not 4 dots
+        return ("not 4 dots",[(0,0),(0,0),(0,0),(0,0)]) ## error code for not 4 dots
 
 
 def check_coords(colors_and_coords):
@@ -91,11 +96,12 @@ def single_frame(frame, calibration_colors, rad_range = (17,21)):
         ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         # print(perm)
-        return (int(perm,n_colours))
+        coords_only = ([x[0] for x in ordered_rectangle])
+        return (perm,coords_only)
     elif not found_rectangle:
-        return "not rectangular" # error code for not a rectangle
+        return ("not rectangular", [(0,0),(0,0),(0,0),(0,0)]) # error code for not a rectangle
     else:
-        return "not 4 dots" ## error code for not 4 dots
+        return ("not 4 dots",[(0,0),(0,0),(0,0),(0,0)]) ## error code for not 4 dots
 
 
 def buffer(buffer, input):
@@ -104,10 +110,22 @@ def buffer(buffer, input):
     return buffer
 
 def max_freq(buffer):
-    return (Counter(buffer).most_common(1)[0][0])
+    ids = [x[0] for x in buffer]
+    most_freq = Counter(ids).most_common(1)[0][0]
+    most_freq_coords = [x[1] for x in buffer if x[0]==most_freq]
+    # print(most_freq)
+    # print(f"{most_freq_coords}")
+    #  print(len(most_freq_coords))
+    
+    x0= int(mean([coord[0][0] for coord in most_freq_coords]))
+    y0= int(mean([coord[0][1] for coord in most_freq_coords]))
+    #  average_1= [coord[1] for coord in most_freq_coords]x
+    x2= int(mean([coord[2][0]for coord in most_freq_coords]))
+    y2= int(mean([coord[2][1] for coord in most_freq_coords]))
+    # #  average_3= [coord[3] for coord in most_freq_coords]
+    return (most_freq,[(x0,y0),(x2,y2)]) #  return (Counter(buffer).most_common(1)[0][0])
 
-
-def webcamManyCaptures(calibration_colours):
+def webcamManyCaptures(calibration_colours, rad_range):
     # Open the default camera
     cam = cv2.VideoCapture(0)
 
@@ -118,29 +136,52 @@ def webcamManyCaptures(calibration_colours):
     # Define the codec and create VideoWriter object
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
-    n = 6 + 13
-    buffer_arr = [0] * 100
+    # n = 6 + 13
+    buffer_arr = [(-11,[(0,0),(0,0),(0,0),(0,0)])] * 50
     while True:
         ret, frame = cam.read()
-
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        response = single_frame(frame,calibration_colours, n)
-        print(max_freq(buffer(buffer_arr, response)))
-        # Press 'q' to exit the loop
+        response = single_frame(frame,calibration_colours, rad_range)
+        # print(response)
+        buffer(buffer_arr, response)
+        current_recognized = (max_freq(buffer_arr))
+        print(current_recognized)
+        if current_recognized[0] == "not rectangular" or current_recognized[0] == "not 4 dots":
+             pass
+        elif int(current_recognized[0]) > 0 and type(current_recognized[0]) == str:
+        # current_recognized = max_freq()
+            recognize(base, current_recognized[0], current_recognized[1])
         if cv2.waitKey(1) == ord('q'):
             break
 
-    # Release the capture and writer objects
+    # Releasethe capture and writer objects
     cam.release()
     # out.release()
     cv2.destroyAllWindows()
 
+
+def main():
+     pass
+
+
+
+def webcamVideoCalibration(tolerance):
+    cam = cv2.VideoCapture(0)
+    while True:
+        ret, frame = cam.read()
+        cv2.imshow('Camera', frame)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        calibration_colors, rad_range = calibration_frame(frame,tolerance)
+        if cv2.waitKey(1) == ord('q'):
+            break
+    cam.release()
+    cv2.destroyAllWindows()
+    return calibration_colors, rad_range
 
 def draw_circle_get_range(image,tolerance):
     return run_radius(image,tolerance)
 
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
-path1 = "puck/output/problem_frames/problem_frame14.jpg"
-single_frame_path(path1,calibration_colors, rad_range = rad_range, image_colorsaved = "BGR") 
+webcamManyCaptures(calibration_colors, rad_range)

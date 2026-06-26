@@ -152,8 +152,8 @@ def run_radius(imgPath,tolerance):
          #SAVES THE location
          radius = calc_radius(x1, y1, holdx, holdy)
          cv.circle(img, (x1, y1), radius, (255, 0, 0), 1)
-         print(f"radius is {radius}, click again to redraw, esc to end")
-      elif k == 27: # ESE to terminate a program
+         print(f"radius is {radius}, click again to redraw, q to save the value")
+      elif k == ord('q'): # ESE to terminate a program
           cv.destroyAllWindows()
           break
     radius_tol= (radius*tolerance)

@@ -75,6 +75,6 @@ def get_calibration_colors(black_dot_coords, color_coord_list, n_colours):
     for i in range(n_colours):
         r,g,b = colors[i]
         color_dict.update({ (int(r),int(g),int(b)):indicies[i]})
-    print(color_dict)
+    # print(color_dict)
     return color_dict
 
