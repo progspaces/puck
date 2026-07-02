@@ -1,6 +1,13 @@
 # import json 
 from tkinter import Tk
 base = Tk()
+# import threading
+# from puck.graphics.paper_recognition_prints import recognize
+# permutation = None
+# paper_coordinates = None
+# stop_tk = False
+# drawing_thread = threading.Thread(target = recognize, kwargs={"base":base,"permutation":permutation, 
+                                        #   "paper_coordinates":paper_coordinates, "stop_tk":stop_tk})
 import cv2
 from puck.code_modules.dot_finding.dot_finder import find_centers_hough, find_centers_hough_frames
 from puck.code_modules.colour_conversion.colour_finding import get_colors_and_coords, get_black_dot
@@ -11,8 +18,8 @@ from puck.code_modules.permutation_guessing.permutation_guessing import get_colo
 from pprint import pprint
 from collections import Counter
 from puck.image_annotation.annotator import run_radius
-from puck.graphics.paper_recognition_prints import recognize
 from statistics import mean
+
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -138,6 +145,7 @@ def webcamManyCaptures(calibration_colours, rad_range):
     # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
     # n = 6 + 13
     buffer_arr = [(-11,[(0,0),(0,0),(0,0),(0,0)])] * 50
+    # drawing_thread.start()
     while True:
         ret, frame = cam.read()
         cv2.imshow('Camera', frame)
@@ -146,13 +154,19 @@ def webcamManyCaptures(calibration_colours, rad_range):
         # print(response)
         buffer(buffer_arr, response)
         current_recognized = (max_freq(buffer_arr))
-        print(current_recognized)
+        print(f"currently recognized: {current_recognized}")
         if current_recognized[0] == "not rectangular" or current_recognized[0] == "not 4 dots":
              pass
         elif int(current_recognized[0]) > 0 and type(current_recognized[0]) == str:
+            print("HIIIIII")
         # current_recognized = max_freq()
-            recognize(base, current_recognized[0], current_recognized[1])
+            # print(stop_tk)
+            permutation= current_recognized[0]
+            paper_coordinates = current_recognized[1]
+            
+
         if cv2.waitKey(1) == ord('q'):
+            stop_tk = True
             break
 
     # Releasethe capture and writer objects
@@ -184,4 +198,5 @@ def draw_circle_get_range(image,tolerance):
 
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
+
 webcamManyCaptures(calibration_colors, rad_range)
