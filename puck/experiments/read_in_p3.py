@@ -1,6 +1,8 @@
 # import json 
-from tkinter import Tk
+from tkinter import *
 base = Tk()
+base.title('Tkinter Widget Size')
+base.geometry("1000x800")
 # import threading
 # from puck.graphics.paper_recognition_prints import recognize
 # permutation = None
@@ -132,21 +134,23 @@ def max_freq(buffer):
     # #  average_3= [coord[3] for coord in most_freq_coords]
     return (most_freq,[(x0,y0),(x2,y2)]) #  return (Counter(buffer).most_common(1)[0][0])
 
-def webcamManyCaptures(calibration_colours, rad_range):
+def webcamManyCaptures(calibration_colours, rad_range,base):
     # Open the default camera
+    ## Setup elements
     cam = cv2.VideoCapture(0)
-
-    # Get the default frame width and height
-    # frame_width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
-    # frame_height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    # Define the codec and create VideoWriter object
-    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    # out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (frame_width, frame_height))
-    # n = 6 + 13
     buffer_arr = [(-11,[(0,0),(0,0),(0,0),(0,0)])] * 50
-    # drawing_thread.start()
-    while True:
+    v = StringVar() 
+    v.set("Warming up")
+    lbl = Label(base, textvariable= v, font=("Helvetica", 50))
+    canvas = Canvas(height= 800, width = 1000)
+    canvas.pack()
+    box = canvas.create_rectangle(297, 681, 507, 154,
+                          outline='blue', width=2)
+    lbl.pack()
+
+
+
+    def update(cam,canvas,box):
         ret, frame = cam.read()
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -155,29 +159,24 @@ def webcamManyCaptures(calibration_colours, rad_range):
         buffer(buffer_arr, response)
         current_recognized = (max_freq(buffer_arr))
         print(f"currently recognized: {current_recognized}")
-        if current_recognized[0] == "not rectangular" or current_recognized[0] == "not 4 dots":
-             pass
-        elif int(current_recognized[0]) > 0 and type(current_recognized[0]) == str:
-            print("HIIIIII")
-        # current_recognized = max_freq()
-            # print(stop_tk)
-            permutation= current_recognized[0]
-            paper_coordinates = current_recognized[1]
-            
+        previous = v.get()
+        previous_coords = canvas.coords(box)
+        print(f"previous is {previous}")
+        if current_recognized[0] != "not 4 dots" or current_recognized[0] != "not rectangular":
+                  canvas.moveto(box, 500 , 500)
+                  print(current_recognized[1])
+                  print(previous_coords)
+        if current_recognized[0] != previous:
+             v.set(current_recognized[0])
+        if cv2.waitKey(1) == ord('q'): ## stopping condition
+            base.quit()
+        base.after(20, update, cam, canvas,box)  # Timed Check, adding itself back onto the queue to run 20ms later
 
-        if cv2.waitKey(1) == ord('q'):
-            stop_tk = True
-            break
+    base.after(20,update, cam, canvas,box)
+    base.mainloop()
 
-    # Releasethe capture and writer objects
     cam.release()
-    # out.release()
     cv2.destroyAllWindows()
-
-
-def main():
-     pass
-
 
 
 def webcamVideoCalibration(tolerance):
@@ -199,4 +198,4 @@ def draw_circle_get_range(image,tolerance):
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
 
-webcamManyCaptures(calibration_colors, rad_range)
+webcamManyCaptures(calibration_colors, rad_range,base)
