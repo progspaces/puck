@@ -2,7 +2,13 @@
 from tkinter import *
 base = Tk()
 base.title('Tkinter Widget Size')
-base.geometry("1000x800")
+base.geometry("950x640")
+
+## Errors
+NOT_4_DOTS = "not 4 dots"
+NOT_RECT = "not rectangular"
+NOT_SEEING_FULL_DOTS = "can't see all dots properly",
+
 # import threading
 # from puck.graphics.paper_recognition_prints import recognize
 # permutation = None
@@ -10,6 +16,7 @@ base.geometry("1000x800")
 # stop_tk = False
 # drawing_thread = threading.Thread(target = recognize, kwargs={"base":base,"permutation":permutation, 
                                         #   "paper_coordinates":paper_coordinates, "stop_tk":stop_tk})
+
 import cv2
 from puck.code_modules.dot_finding.dot_finder import find_centers_hough, find_centers_hough_frames
 from puck.code_modules.colour_conversion.colour_finding import get_colors_and_coords, get_black_dot
@@ -86,9 +93,9 @@ def single_frame_path(path, calibration_colors, rad_range = (17,22), image_color
         coords_only = ([x[0] for x in ordered_rectangle])
         return (perm,coords_only)
     elif not found_rectangle:
-        return ("not rectangular", [(0,0),(0,0),(0,0),(0,0)]) ## error code for not rectangular 
+        return (NOT_RECT, [(0,0),(0,0),(0,0),(0,0)]) ## error code for not rectangular 
     else:
-        return ("not 4 dots",[(0,0),(0,0),(0,0),(0,0)]) ## error code for not 4 dots
+        return (NOT_SEEING_FULL_DOTS,[(0,0),(0,0),(0,0),(0,0)]) ## error code for not 4 dots
 
 
 def check_coords(colors_and_coords):
@@ -98,19 +105,22 @@ def check_coords(colors_and_coords):
 
 def single_frame(frame, calibration_colors, rad_range = (17,21)):
     centers,image = find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]), grayscale=False)
-    colors_and_coords=get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
+    try:
+        colors_and_coords=get_colors_and_coords(centers,side = 10, image =image,colorspace= "RGB")
+    except:
+        return (NOT_SEEING_FULL_DOTS, [(0,0), (0,50), (50,50),(50,0)])
     found_rectangle = check_coords(colors_and_coords)
     if len(colors_and_coords) ==4 and found_rectangle:
         black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
         ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
         perm,luv_detected_colours = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
         # print(perm)
-        coords_only = ([x[0] for x in ordered_rectangle])
+        coords_only = ([black_dot[0]] + [x[0] for x in ordered_rectangle])
         return (perm,coords_only)
     elif not found_rectangle:
-        return ("not rectangular", [(0,0),(0,0),(0,0),(0,0)]) # error code for not a rectangle
+        return (NOT_RECT, [(0,0), (0,50), (50,50),(50,0)]) # error code for not a rectangle
     else:
-        return ("not 4 dots",[(0,0),(0,0),(0,0),(0,0)]) ## error code for not 4 dots
+        return (NOT_4_DOTS,[(0,0), (0,50), (50,50),(50,0)]) ## error code for not 4 dots
 
 
 def buffer(buffer, input):
@@ -122,57 +132,81 @@ def max_freq(buffer):
     ids = [x[0] for x in buffer]
     most_freq = Counter(ids).most_common(1)[0][0]
     most_freq_coords = [x[1] for x in buffer if x[0]==most_freq]
-    # print(most_freq)
+    # printq(most_freq)
     # print(f"{most_freq_coords}")
     #  print(len(most_freq_coords))
     
     x0= int(mean([coord[0][0] for coord in most_freq_coords]))
     y0= int(mean([coord[0][1] for coord in most_freq_coords]))
-    #  average_1= [coord[1] for coord in most_freq_coords]x
+
+    x1= int(mean([coord[1][0] for coord in most_freq_coords]))
+    y1= int(mean([coord[1][1] for coord in most_freq_coords]))
+
     x2= int(mean([coord[2][0]for coord in most_freq_coords]))
     y2= int(mean([coord[2][1] for coord in most_freq_coords]))
-    # #  average_3= [coord[3] for coord in most_freq_coords]
-    return (most_freq,[(x0,y0),(x2,y2)]) #  return (Counter(buffer).most_common(1)[0][0])
+
+
+    x3= int(mean([coord[3][0]for coord in most_freq_coords]))
+    y3= int(mean([coord[3][1] for coord in most_freq_coords]))
+    ### CHECK THAT THIS COMES IN THE RIGHT ORDER, IT SHOULD BECAUSE IT SHOULD BE CLOCKWISE
+    return (most_freq,[(x0,y0),(x1,y1),(x2,y2), (x3,y3)]) #  return (Counter(buffer).most_common(1)[0][0])
+
+
+def scale(cwidth, cheight, fheight, fwidth, coord_list):
+    scaled_list = [(int(pair[0] * (cwidth/fwidth)), int(pair[1] * (cheight/fheight)) ) for pair in coord_list]
+    print(scaled_list)
+    return scaled_list
 
 def webcamManyCaptures(calibration_colours, rad_range,base):
     # Open the default camera
     ## Setup elements
     cam = cv2.VideoCapture(0)
-    buffer_arr = [(-11,[(0,0),(0,0),(0,0),(0,0)])] * 50
+    ret, frame = cam.read()
+    fheight, fwidth, fchannel = frame.shape
+    print(f"{fheight} , {fwidth}")
+    buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * 35
     v = StringVar() 
     v.set("Warming up")
     lbl = Label(base, textvariable= v, font=("Helvetica", 50))
-    canvas = Canvas(height= 800, width = 1000)
-    canvas.pack()
-    box = canvas.create_rectangle(297, 681, 507, 154,
-                          outline='blue', width=2)
+    cheight = 550
+    cwidth =  950
+    canvas = Canvas(height= cheight, width = cwidth, background='gray75')
     lbl.pack()
+    canvas.pack()
+    box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0),
+                          outline='blue', width=2)
 
 
 
-    def update(cam,canvas,box):
+
+
+    def update(cam,canvas, box):
         ret, frame = cam.read()
+        fheight, fwidth, fchannel = (frame.shape)
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         response = single_frame(frame,calibration_colours, rad_range)
-        # print(response)
+        print(response)
         buffer(buffer_arr, response)
         current_recognized = (max_freq(buffer_arr))
         print(f"currently recognized: {current_recognized}")
         previous = v.get()
-        previous_coords = canvas.coords(box)
+        # previous_coords = canvas.coords(box)
         print(f"previous is {previous}")
-        if current_recognized[0] != "not 4 dots" or current_recognized[0] != "not rectangular":
-                  canvas.moveto(box, 500 , 500)
-                  print(current_recognized[1])
-                  print(previous_coords)
+        if current_recognized[0] != "not 4 dots" or current_recognized[0] != "not rectangular" or current_recognized[0] != NOT_SEEING_FULL_DOTS :
+            ## Recognizing a paper here, which might already be recognized 
+            ## ,but likely has slightly different coordinates than the frame before
+            ## Update the coordinates of box
+            scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
+            canvas.coords(box, scaled)
         if current_recognized[0] != previous:
+             ## if recognizing a new item, update the label.
              v.set(current_recognized[0])
         if cv2.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
-        base.after(20, update, cam, canvas,box)  # Timed Check, adding itself back onto the queue to run 20ms later
+        base.after(10, update, cam, canvas, box)  # Timed Check, adding itself back onto the queue to run 20ms later
 
-    base.after(20,update, cam, canvas,box)
+    base.after(20,update, cam, canvas, box)
     base.mainloop()
 
     cam.release()
@@ -197,5 +231,4 @@ def draw_circle_get_range(image,tolerance):
 
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
-
 webcamManyCaptures(calibration_colors, rad_range,base)
