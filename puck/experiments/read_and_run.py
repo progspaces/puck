@@ -8,6 +8,7 @@ base.geometry("1970x1080")
 NOT_4_DOTS = "not 4 dots"
 NOT_RECT = "not rectangular"
 NOT_SEEING_FULL_DOTS = "can't see all dots properly",
+WARMING_UP = "Warming up"
 
 # import threading
 # from puck.graphics.paper_recognition_prints import recognize
@@ -28,11 +29,15 @@ from pprint import pprint
 from collections import Counter
 from puck.image_annotation.annotator import run_radius
 from statistics import mean
-
+from json import load
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
 n_colours = 3
+
+program_lookup = {}
+with open('puck/program_store/program_lookup.json') as f:
+    program_lookup = dict(load(f))
 
 def webcamSingleCapture(save_path):
     i = 0
@@ -167,14 +172,20 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * 35
     v = StringVar() 
     v.set("Warming up")
-    lbl = Label(base, textvariable= v, font=("Helvetica", 50))
+    extra = StringVar()
+    extra.set("")
+    extra_lbl = Label(base, textvariable= extra, font=("Helvetica", 50), fg="blue")
+    lbl = Label(base, textvariable= v, font=("Helvetica", 50), fg="blue")
     cheight = 1080
     cwidth =  1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
     lbl.pack()
+    extra_lbl.pack()
     canvas.pack()
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0),
                           outline='blue',fill="white", width=2)
+    # image = Image(base,)
+    # image.pack()
 
 
 
@@ -191,6 +202,11 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         current_recognized = (max_freq(buffer_arr))
         print(f"currently recognized: {current_recognized}")
         previous = v.get()
+        if current_recognized[0] != NOT_4_DOTS and  current_recognized[0] != WARMING_UP and  current_recognized[0] != NOT_RECT and  current_recognized[0] != NOT_SEEING_FULL_DOTS:
+            int_form = int(current_recognized[0],n_colours)
+        else:
+            int_form = -12
+        print(int_form)
         # previous_coords = canvas.coords(box)
         print(f"previous is {previous}")
         if current_recognized[0] != "not 4 dots" or current_recognized[0] != "not rectangular" or current_recognized[0] != NOT_SEEING_FULL_DOTS :
@@ -202,6 +218,13 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         if current_recognized[0] != previous:
              ## if recognizing a new item, update the label.
              v.set(current_recognized[0])
+        if int_form >= 0 and int_form <= 2:
+            program_name = "puck/program_store/" + program_lookup.get(str(int_form))
+            program_code = (open(program_name).read())
+            exec(program_code, {"base": base, "Label": Label, "extra": extra})
+            # print("IS RIGHT")
+        else:
+            extra.set("")
         if cv2.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
         base.after(10, update, cam, canvas, box)  # Timed Check, adding itself back onto the queue to run 20ms later
