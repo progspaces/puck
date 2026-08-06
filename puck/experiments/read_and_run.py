@@ -1,8 +1,10 @@
 # import json 
 from tkinter import *
 base = Tk()
+base.tk.call('tk', 'scaling', 2.0)
 base.title('Tkinter Widget Size')
-base.geometry("1970x1080")
+base.geometry("1920x1080+0+-1080")
+base.wm_attributes("-fullscreen", True)
 
 ## Errors
 NOT_4_DOTS = "not 4 dots"
@@ -67,6 +69,7 @@ def calibration_frame(path, tolerance):
     print("please click and drag your mouse around one of the calibration circles, so we have an approximent size of the circle from the camera's perspective," \
     "press enter when you are satisfied with your circle. click again to draw a new circle.")
     rad_range = draw_circle_get_range(path,tolerance)
+    rad_range = [16,20]
     cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
     while len(cal_centers) < 9 :
         print("the sought for circles are not the size specified, please redraw them")
@@ -134,30 +137,36 @@ def single_frame(frame, calibration_colors, rad_range = (17,21)):
 def buffer(buffer, input):
     buffer.pop(0)
     buffer.append(input)
+    print(f"this is the buffer {buffer}")
     return buffer
 
 def max_freq(buffer):
     ids = [x[0] for x in buffer]
     most_freq = Counter(ids).most_common(1)[0][0]
-    most_freq_coords = [x[1] for x in buffer if x[0]==most_freq]
+    most_freq_coords = [x[1] for x in buffer if x[0]==most_freq][-1]
     # printq(most_freq)
     # print(f"{most_freq_coords}")
     #  print(len(most_freq_coords))
+
+    # x0, y0 = most_freq_coords[0]
+    # x1, y1 = most_freq_coords[1]
+    # x2, y2 = most_freq_coords[2]
+    # x3, y3 = most_freq_coords[3]
     
-    x0= int(mean([coord[0][0] for coord in most_freq_coords]))
-    y0= int(mean([coord[0][1] for coord in most_freq_coords]))
+    # x0= int(mean([coord[0][0] for coord in most_freq_coords]))
+    # y0= int(mean([coord[0][1] for coord in most_freq_coords]))
 
-    x1= int(mean([coord[1][0] for coord in most_freq_coords]))
-    y1= int(mean([coord[1][1] for coord in most_freq_coords]))
+    # x1= int(mean([coord[1][0] for coord in most_freq_coords]))
+    # y1= int(mean([coord[1][1] for coord in most_freq_coords]))
 
-    x2= int(mean([coord[2][0]for coord in most_freq_coords]))
-    y2= int(mean([coord[2][1] for coord in most_freq_coords]))
+    # x2= int(mean([coord[2][0]for coord in most_freq_coords]))
+    # y2= int(mean([coord[2][1] for coord in most_freq_coords]))
 
 
-    x3= int(mean([coord[3][0]for coord in most_freq_coords]))
-    y3= int(mean([coord[3][1] for coord in most_freq_coords]))
+    # x3= int(mean([coord[3][0]for coord in most_freq_coords]))
+    # y3= int(mean([coord[3][1] for coord in most_freq_coords]))
     ### CHECK THAT THIS COMES IN THE RIGHT ORDER, IT SHOULD BECAUSE IT SHOULD BE CLOCKWISE
-    return (most_freq,[(x0,y0),(x1,y1),(x2,y2), (x3,y3)]) #  return (Counter(buffer).most_common(1)[0][0])
+    return (most_freq, most_freq_coords) #  return (Counter(buffer).most_common(1)[0][0])
 
 
 def scale(cwidth, cheight, fheight, fwidth, coord_list):
@@ -209,8 +218,8 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         ## Case one: We've never seen this ever before 
         if current_recognized[0] not in recognized_in_run:
             recognized_in_run.add(current_recognized[0])
-            if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
-                run_spawn(value = current_recognized[0])
+            # if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
+            #     run_spawn(value = current_recognized[0])
             ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
         ## Case two: We have seen this before
         else:
@@ -220,6 +229,10 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
                          ## if recognizing a new item, update the label.
                 v.set(current_recognized[0])
             ## Okay now we need to check if it is a paper program
+            current = v.get()
+            full_info = f"Current is: {current}, base geo{base.geometry()}"
+            print(full_info)
+            v.set(full_info)
             if combined_errors(current_recognized[0]):
                 int_form = int(current_recognized[0],n_colours)
                 scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
