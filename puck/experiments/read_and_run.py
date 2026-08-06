@@ -39,6 +39,9 @@ program_lookup = {}
 with open('puck/program_store/program_lookup.json') as f:
     program_lookup = dict(load(f))
 
+recognized_in_run = set()
+graphics_storage = dict()
+
 def webcamSingleCapture(save_path):
     i = 0
     vc = cv2.VideoCapture(0) 
@@ -168,19 +171,19 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     cam = cv2.VideoCapture(0)
     ret, frame = cam.read()
     fheight, fwidth, fchannel = frame.shape
-    print(f"{fheight} , {fwidth}")
+    # print(f"{fheight} , {fwidth}")
     buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * 35
     v = StringVar() 
     v.set("Warming up")
-    extra = StringVar()
-    extra.set("")
-    extra_lbl = Label(base, textvariable= extra, font=("Helvetica", 50), fg="blue")
+    # extra = StringVar()
+    # extra.set("")
+    # extra_lbl = Label(base, textvariable= extra, font=("Helvetica", 50), fg="blue")
     lbl = Label(base, textvariable= v, font=("Helvetica", 50), fg="blue")
     cheight = 1080
     cwidth =  1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
     lbl.pack()
-    extra_lbl.pack()
+    # extra_lbl.pack()
     canvas.pack()
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0),
                           outline='blue',fill="white", width=2)
@@ -188,7 +191,45 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     # image.pack()
 
 
+    def combined_errors(value):
+        return value != NOT_4_DOTS and value != WARMING_UP and value != NOT_RECT and value != NOT_SEEING_FULL_DOTS
 
+    def run_spawn(value):
+            item_dict = {}
+            int_form = int(value,n_colours)
+            program_name = "puck/program_store/" + program_lookup.get(str(int_form))
+            program_code = open(program_name).read()
+            exec(program_code, {"item_dict": item_dict, "spawning_id": int_form})
+            print(item_dict)
+            spawner_code = open("puck/program_store/spawner.py").read()
+            exec(spawner_code, {"base": base, "canvas": canvas, "item_dict": item_dict, "graphics_storage": graphics_storage})
+
+
+    def handle_currently_recognized(current_recognized,v):
+        ## Case one: We've never seen this ever before 
+        if current_recognized[0] not in recognized_in_run:
+            recognized_in_run.add(current_recognized[0])
+            if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
+                run_spawn(value = current_recognized[0])
+            ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
+        ## Case two: We have seen this before
+        else:
+            ## Now we need to check if it's changed from the previous or not
+            previous = v.get()
+            if current_recognized[0] != previous:
+                         ## if recognizing a new item, update the label.
+                v.set(current_recognized[0])
+            ## Okay now we need to check if it is a paper program
+            if combined_errors(current_recognized[0]):
+                int_form = int(current_recognized[0],n_colours)
+                scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
+                canvas.coords(box, scaled)
+                if int_form >= 0 and int_form <= 2: ## in other words the int form is a good value and we like it.
+                    program_name = "puck/program_store/" + program_lookup.get(str(int_form))
+                    program_code = (open(program_name).read())
+                    exec(program_code, {"base": base, "Label": Label})
+            else:
+                int_form = -12
 
 
     def update(cam,canvas, box):
@@ -197,41 +238,18 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         cv2.imshow('Camera', frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         response = single_frame(frame,calibration_colours, rad_range)
-        print(response)
         buffer(buffer_arr, response)
         current_recognized = (max_freq(buffer_arr))
         print(f"currently recognized: {current_recognized}")
-        previous = v.get()
-        if current_recognized[0] != NOT_4_DOTS and  current_recognized[0] != WARMING_UP and  current_recognized[0] != NOT_RECT and  current_recognized[0] != NOT_SEEING_FULL_DOTS:
-            int_form = int(current_recognized[0],n_colours)
-        else:
-            int_form = -12
-        print(int_form)
-        # previous_coords = canvas.coords(box)
-        print(f"previous is {previous}")
-        if current_recognized[0] != "not 4 dots" or current_recognized[0] != "not rectangular" or current_recognized[0] != NOT_SEEING_FULL_DOTS :
-            ## Recognizing a paper here, which might already be recognized 
-            ## ,but likely has slightly different coordinates than the frame before
-            ## Update the coordinates of box
-            scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
-            canvas.coords(box, scaled)
-        if current_recognized[0] != previous:
-             ## if recognizing a new item, update the label.
-             v.set(current_recognized[0])
-        if int_form >= 0 and int_form <= 2:
-            program_name = "puck/program_store/" + program_lookup.get(str(int_form))
-            program_code = (open(program_name).read())
-            exec(program_code, {"base": base, "Label": Label, "extra": extra})
-            # print("IS RIGHT")
-        else:
-            extra.set("")
+        handle_currently_recognized(current_recognized,v)
         if cv2.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
         base.after(10, update, cam, canvas, box)  # Timed Check, adding itself back onto the queue to run 20ms later
 
     base.after(20,update, cam, canvas, box)
     base.mainloop()
-
+    print(recognized_in_run)
+    print(graphics_storage)
     cam.release()
     cv2.destroyAllWindows()
 
