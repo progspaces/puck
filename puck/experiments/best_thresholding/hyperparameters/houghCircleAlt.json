@@ -1,0 +1,18 @@
+{
+    "method": "circleAlt",
+    "dp_min": 1,
+    "dp_step": 0.5,
+    "dp_max": 2,
+    "minDist_min": 100,
+    "minDist_step": 50,
+    "minDist_max": 300,
+    "param1_min": 300,
+    "param1_step": 50,
+    "param1_max": 400,
+    "param2_min": 0.7,
+    "param2_step": 0.1,
+    "param2_max": 0.9,
+    "minRadius_min": 10,
+    "minRadius_step": 10,
+    "minRadius_max":20
+}
