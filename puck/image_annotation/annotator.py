@@ -4,7 +4,7 @@ import cv2 as cv
 import os
 
 
-cv.namedWindow('image', cv.WND_PROP_ASPECT_RATIO)
+# cv.namedWindow('image', cv.WND_PROP_ASPECT_RATIO)
 drawing = False  # true if mouse is pressed
  # Coordinate
 x1, y1, x2, y2 = -1, -1, -1, -1
@@ -92,9 +92,9 @@ def run(imgPath, user):
 
 
 
-def run_radius(imgPath,tolerance):
+def run_radius(imgPath,tolerance, name= "image1234"):
     img = cv.imread(imgPath)  
-    cv.imshow('image', img)
+    cv.imshow(name, img)
     # Create a layer to draw circle. The layer has the same dimension of image
     layer = np.zeros((img.shape[0], img.shape[1], 3), dtype="uint8")
 

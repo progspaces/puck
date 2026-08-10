@@ -65,16 +65,18 @@ def webcamSingleCapture(save_path):
     cv2.destroyWindow("preview")
     vc.release()    
 
-def calibration_frame(path, tolerance):
+def calibration_frame(path, tolerance, radius_already_set = False):
     print("please click and drag your mouse around one of the calibration circles, so we have an approximent size of the circle from the camera's perspective," \
     "press enter when you are satisfied with your circle. click again to draw a new circle.")
-    rad_range = draw_circle_get_range(path,tolerance)
-    rad_range = [16,20]
-    cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
-    while len(cal_centers) < 9 :
+    if radius_already_set:
+        rad_range = [16,21]
+    else:
+        rad_range = draw_circle_get_range(path,tolerance, "image BALHHHH")
+    cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=False)
+    while len(cal_centers) < 9:
         print("the sought for circles are not the size specified, please redraw them")
-        rad_range = draw_circle_get_range(path,tolerance)
-        cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=True)
+        rad_range = draw_circle_get_range(path,tolerance, "awoeuhroiewhf")
+        cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=False)
 
                 # while True:
     #     cv2.imshow("cal image returned", cal_image)
@@ -88,11 +90,11 @@ def calibration_frame(path, tolerance):
     return calibration_colors, rad_range
 
 def single_frame_path(path, calibration_colors, rad_range = (17,22), image_colorsaved= "RGB"):
-    centers,image = find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]), grayscale=False,image_colorsaved=image_colorsaved)
+    centers,image = find_centers_hough(path, min_dist=PROGRAM_MIN_DIST,minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]), grayscale=False,image_colorsaved=image_colorsaved, image_show = True)
     while True:
         cv2.imshow("image returned", image)
         if cv2.waitKey(0) == ord('q'):
-             break
+            break
     cv2.destroyWindow("image returned")
     colors_and_coords=get_colors_and_coords(centers,side = 25, image =image,colorspace= "RGB")
     # pprint(colors_and_coords)
@@ -137,7 +139,7 @@ def single_frame(frame, calibration_colors, rad_range = (17,21)):
 def buffer(buffer, input):
     buffer.pop(0)
     buffer.append(input)
-    print(f"this is the buffer {buffer}")
+    # print(f"this is the buffer {buffer}")
     return buffer
 
 def max_freq(buffer):
@@ -184,20 +186,16 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * 35
     v = StringVar() 
     v.set("Warming up")
-    # extra = StringVar()
-    # extra.set("")
-    # extra_lbl = Label(base, textvariable= extra, font=("Helvetica", 50), fg="blue")
     lbl = Label(base, textvariable= v, font=("Helvetica", 50), fg="blue")
     cheight = 1080
     cwidth =  1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
+    # text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
+    # text_label_replace.config("text")
     lbl.pack()
-    # extra_lbl.pack()
     canvas.pack()
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0),
                           outline='blue',fill="white", width=2)
-    # image = Image(base,)
-    # image.pack()
 
 
     def combined_errors(value):
@@ -218,8 +216,9 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         ## Case one: We've never seen this ever before 
         if current_recognized[0] not in recognized_in_run:
             recognized_in_run.add(current_recognized[0])
-            # if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
+            if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
             #     run_spawn(value = current_recognized[0])
+                print("IT's A NEW PAPER")
             ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
         ## Case two: We have seen this before
         else:
@@ -230,9 +229,8 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
                 v.set(current_recognized[0])
             ## Okay now we need to check if it is a paper program
             current = v.get()
-            full_info = f"Current is: {current}, base geo{base.geometry()}"
-            print(full_info)
-            v.set(full_info)
+            print(f"Current is {current}")
+            v.set(current)
             if combined_errors(current_recognized[0]):
                 int_form = int(current_recognized[0],n_colours)
                 scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
@@ -248,12 +246,16 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     def update(cam,canvas, box):
         ret, frame = cam.read()
         fheight, fwidth, fchannel = (frame.shape)
-        cv2.imshow('Camera', frame)
+        window_name = "Second Monitor Window"
+        cv2.namedWindow(window_name, cv2.WINDOW_FREERATIO,)
+        cv2.moveWindow(window_name, 0, 300)
+        cv2.resizeWindow(window_name, 600, 500)
+        cv2.imshow(window_name, frame)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         response = single_frame(frame,calibration_colours, rad_range)
         buffer(buffer_arr, response)
         current_recognized = (max_freq(buffer_arr))
-        print(f"currently recognized: {current_recognized}")
+        # print(f"currently recognized: {current_recognized}")
         handle_currently_recognized(current_recognized,v)
         if cv2.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
@@ -280,9 +282,9 @@ def webcamVideoCalibration(tolerance):
     cv2.destroyAllWindows()
     return calibration_colors, rad_range
 
-def draw_circle_get_range(image,tolerance):
-    return run_radius(image,tolerance)
+def draw_circle_get_range(image,tolerance, name):
+    return run_radius(image,tolerance, name)
 
 
-calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2)
+calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2, radius_already_set=True)
 webcamManyCaptures(calibration_colors, rad_range,base)

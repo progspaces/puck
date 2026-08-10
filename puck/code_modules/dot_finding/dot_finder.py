@@ -3,7 +3,7 @@ from math import dist
 import numpy as np
 import matplotlib.pyplot as plt
 
-def find_centers_hough(file_path, min_dist, grayscale = False, minRadius=15, maxRadius=30,image_colorsaved = "RGB"):
+def find_centers_hough(file_path, min_dist, grayscale = False, minRadius=15, maxRadius=30,image_colorsaved = "RGB", image_show = True):
     '''
     CALIBRATION_MIN_DIST = 30
     PROGRAM_MIN_DIST = 170
@@ -35,7 +35,7 @@ def find_centers_hough(file_path, min_dist, grayscale = False, minRadius=15, max
     return (point_list, cv.imread(file_path, cv.IMREAD_COLOR_BGR)) if image_colorsaved == "BGR" else (point_list, image)
 
 
-def find_centers_hough_frames(frame, min_dist, grayscale = True,minRadius=15, maxRadius=30):
+def find_centers_hough_frames(frame, min_dist, grayscale = True,minRadius=15, maxRadius=30,image_show = True):
     '''
     CALIBRATION_MIN_DIST = 30
     PROGRAM_MIN_DIST = 170
