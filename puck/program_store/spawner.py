@@ -4,10 +4,8 @@ from tkinter import *
 def creation(id, item,canvas, base):
     type =  item.get("type")
     if type == "text":            
-        variable_text = StringVar()
-        variable_text.set(item.get("display_text"))
-        label_item = Label(base, textvariable= variable_text, font=("Helvetica", 50), fg="blue")
-        return {id: label_item}
+        text_item = canvas.create_text((600,50),text=item.get("display_text"),font=("Helvetica", 50), fill= "White")
+        return {id: text_item}
     elif type == "shape":
         shape_type = item.get("shape_type")
         if shape_type == "square":

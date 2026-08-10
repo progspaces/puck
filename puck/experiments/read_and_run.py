@@ -32,6 +32,7 @@ from collections import Counter
 from puck.image_annotation.annotator import run_radius
 from statistics import mean
 from json import load
+import importlib
 
 CALIBRATION_MIN_DIST = 20
 PROGRAM_MIN_DIST= 100
@@ -186,14 +187,11 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * 35
     v = StringVar() 
     v.set("Warming up")
-    lbl = Label(base, textvariable= v, font=("Helvetica", 50), fg="blue")
     cheight = 1080
     cwidth =  1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
-    # text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
-    # text_label_replace.config("text")
-    lbl.pack()
     canvas.pack()
+    text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0),
                           outline='blue',fill="white", width=2)
 
@@ -204,20 +202,19 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     def run_spawn(value):
             item_dict = {}
             int_form = int(value,n_colours)
-            program_name = "puck/program_store/" + program_lookup.get(str(int_form))
-            program_code = open(program_name).read()
-            exec(program_code, {"item_dict": item_dict, "spawning_id": int_form})
-            print(item_dict)
-            spawner_code = open("puck/program_store/spawner.py").read()
-            exec(spawner_code, {"base": base, "canvas": canvas, "item_dict": item_dict, "graphics_storage": graphics_storage})
-
+            module_name = "puck.program_store." + program_lookup.get(str(int_form))
+            module = importlib.import_module(module_name)
+            graphics_storage.update({int_form:[]})
+            module.on_start(graphics_storage.get(int_form),canvas, box)
+            
+        
 
     def handle_currently_recognized(current_recognized,v):
         ## Case one: We've never seen this ever before 
         if current_recognized[0] not in recognized_in_run:
             recognized_in_run.add(current_recognized[0])
             if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
-            #     run_spawn(value = current_recognized[0])
+                run_spawn(value = current_recognized[0])
                 print("IT's A NEW PAPER")
             ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
         ## Case two: We have seen this before
@@ -254,6 +251,7 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         response = single_frame(frame,calibration_colours, rad_range)
         buffer(buffer_arr, response)
+        canvas.itemconfig(tagOrId = text_label_replace, text=v.get())
         current_recognized = (max_freq(buffer_arr))
         # print(f"currently recognized: {current_recognized}")
         handle_currently_recognized(current_recognized,v)

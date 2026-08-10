@@ -1,11 +1,11 @@
-keys_sorted = (sorted(item_dict.keys()))
-if len(keys_sorted) != 0:
-    new_key = keys_sorted[-1] + 1
-else:
-    new_key = 0
-item_dict.update({new_key:{
-    "type" : "text",
-    "originator": variable, 
-    "display_text" :"hello world", 
-    }})
+from tkinter import *
+def on_start(owned_graphics: list[int], canvas:Canvas, box:int):
+    hello = canvas.create_text((500,500),text="hello world",font=("Helvetica", 50), fill= "blue")
+    owned_graphics.append(hello)
 
+def on_update(owned_graphics: list[int], canvas:Canvas, box:int):
+    print("hello update")
+    pass
+
+def on_the_destruction_and_the_salting_of_the_earth():
+    pass #you shall not
