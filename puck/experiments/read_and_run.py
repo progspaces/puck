@@ -206,6 +206,7 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
             module = importlib.import_module(module_name)
             graphics_storage.update({int_form:[]})
             module.on_start(graphics_storage.get(int_form),canvas, box)
+            return module
             
         
 
@@ -232,10 +233,10 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
                 int_form = int(current_recognized[0],n_colours)
                 scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
                 canvas.coords(box, scaled)
-                if int_form >= 0 and int_form <= 2: ## in other words the int form is a good value and we like it.
-                    program_name = "puck/program_store/" + program_lookup.get(str(int_form))
-                    program_code = (open(program_name).read())
-                    exec(program_code, {"base": base, "Label": Label})
+                if int_form >= 0 and int_form <= 2 or int_form == 7 or int_form == 9: ## in other words the int form is a good value and we like it.
+                    module_name = "puck.program_store." + program_lookup.get(str(int_form))
+                    module = importlib.import_module(module_name)
+                    module.on_update(graphics_storage.get(int_form),canvas, box)
             else:
                 int_form = -12
 
