@@ -202,6 +202,7 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     def run_spawn(value):
             item_dict = {}
             int_form = int(value,n_colours)
+            print(int_form)
             module_name = "puck.program_store." + program_lookup.get(str(int_form))
             module = importlib.import_module(module_name)
             graphics_storage.update({int_form:[]})
