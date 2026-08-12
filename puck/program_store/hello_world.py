@@ -1,6 +1,11 @@
 from tkinter import *
 from tkinter import font
 import math
+from statistics import mean
+
+def rad2deg(value):
+    return value * (180/math.pi)
+
 
 def on_start(owned_graphics: list[int], canvas:Canvas, box:int):
     ## get the box coordinates
@@ -24,9 +29,10 @@ def on_update(owned_graphics: list[int], canvas:Canvas, box:int):
     font_test = font.Font(font=canvas.itemcget(owned_graphics[0], 'font'))    
     distance = font_test.measure(text_is)
     # print(distance)
-    mean_box_x = sum(box_x)/len(box_x)
-    mean_box_y = sum(box_y)/len(box_y)
-    angle_deg= np.rad2deg(math.atan2((mean_box_y-(box_y0),(mean_box_x-box_x0)))
+    mean_box_x = mean(box_x)
+    mean_box_y = mean(box_y)
+    midline_point = (mean([box_x0,box_x1]),mean([box_y0,box_y1]))
+    angle_deg= rad2deg(math.atan2((mean_box_y-midline_point[1]),(mean_box_x-midline_point[0])))
     canvas.moveto(owned_graphics[0],mean_box_x - distance/2, mean_box_y-font_test.cget("size"),)
     print(f"angle previously:{ (canvas.itemcget(owned_graphics[0], "angle"))}")
     canvas.itemconfig(owned_graphics[0], angle=-angle_deg)
