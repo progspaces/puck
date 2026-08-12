@@ -42,6 +42,7 @@ program_lookup = {}
 with open('puck/program_store/program_lookup.json') as f:
     program_lookup = dict(load(f))
 
+
 recognized_in_run = set()
 graphics_storage = dict()
 
@@ -199,10 +200,10 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
     def combined_errors(value):
         return value != NOT_4_DOTS and value != WARMING_UP and value != NOT_RECT and value != NOT_SEEING_FULL_DOTS
 
-    def run_spawn(value):
-            item_dict = {}
-            int_form = int(value,n_colours)
-            print(int_form)
+    def run_spawn(int_form):
+            print(program_lookup)
+            print(str(int_form))
+            print(program_lookup.get(str(int_form)))
             module_name = "puck.program_store." + program_lookup.get(str(int_form))
             module = importlib.import_module(module_name)
             graphics_storage.update({int_form:[]})
@@ -216,7 +217,10 @@ def webcamManyCaptures(calibration_colours, rad_range,base):
         if current_recognized[0] not in recognized_in_run:
             recognized_in_run.add(current_recognized[0])
             if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
-                run_spawn(value = current_recognized[0])
+                int_form = int(current_recognized[0],n_colours)
+                print(int_form)
+                if int_form<=9:
+                    run_spawn(int_form= int_form)
                 print("IT's A NEW PAPER")
             ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
         ## Case two: We have seen this before
