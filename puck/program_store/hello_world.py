@@ -9,35 +9,66 @@ def rad2deg(value):
 
 def on_start(owned_graphics: list[int], canvas:Canvas, box:int):
     ## get the box coordinates
-    box_x0, box_y0,box_x1, box_y1,  box_x2, box_y2, box_x3, box_y3= (canvas.coords(box))
-    ## Store the angle of 0, to 1, to 2, 
-    print(f"The coords are 0: { box_x0, box_y0}, 1:{box_x1, box_y1 },2:{ box_x2,box_y2,}")
-    hello = canvas.create_text(( box_x0, box_y0),text="hello world",font=("Helvetica", 50), fill= "blue")
+    x0, y0,_,_,_,_,_,_= (canvas.coords(box))
+    hello = canvas.create_text(( x0, y0),text="hello world",font=("Helvetica", 50), fill= "blue")
     owned_graphics.append(hello)
 
-def on_update(owned_graphics: list[int], canvas:Canvas, box:int):
+
+def center(canvas, box):
     box_coordinates = canvas.coords(box)
     box_x = [box_coordinates[i] for i in range(len(box_coordinates)) if i%2 == 0]
     box_y = [box_coordinates[i] for i in range(len(box_coordinates)) if i%2 == 1]
-    box_x0, box_y0,box_x1, box_y1,  box_x2, box_y2, box_x3, box_y3= (canvas.coords(box))
-    ## Store the angle of 0, to 1, to 2, 
-    print(f"The coords are 0: { box_x0, box_y0}, 1:{box_x1, box_y1 },2:{ box_x2,box_y2,}")
-    # angle_deg = np.rad2deg(angle_between(vecs[0], vecs[1]))
-   
-    # print(angle_deg, angl)
-    text_is = (canvas.itemcget(owned_graphics[0], "text"))
-    font_test = font.Font(font=canvas.itemcget(owned_graphics[0], 'font'))    
-    distance = font_test.measure(text_is)
-    # print(distance)
-    mean_box_x = mean(box_x)
-    mean_box_y = mean(box_y)
-    midline_point = (mean([box_x0,box_x1]),mean([box_y0,box_y1]))
-    angle_deg= rad2deg(math.atan2((mean_box_y-midline_point[1]),(mean_box_x-midline_point[0])))
-    canvas.moveto(owned_graphics[0],mean_box_x - distance/2, mean_box_y-font_test.cget("size"),)
-    print(f"angle previously:{ (canvas.itemcget(owned_graphics[0], "angle"))}")
-    canvas.itemconfig(owned_graphics[0], angle=-angle_deg)
-    print(f"angle now:{ (canvas.itemcget(owned_graphics[0], "angle"))}")
+    return mean(box_x),mean(box_y)
 
+def rotate(canvas, box, side_xs, side_ys):
+    mean_box_x, mean_box_y =center(canvas, box)
+    midline_point = (mean(side_xs),mean(side_ys))
+    angle_deg = rad2deg(math.atan2((mean_box_y-midline_point[1]),(mean_box_x-midline_point[0])))
+    return angle_deg
+
+def follow_paper(canvas, box, id, point_or_side = "point", location = "center", rotation = True):
+    x0,y0, x1,y1, x2,y2,x3,y3= canvas.coords(box)
+    if rotation:
+        angle_deg = rotate(canvas, box, side_xs=[x0,x1], side_ys=[y0,y1])
+        canvas.itemconfig(id,angle=-angle_deg)
+
+    if point_or_side == "point":
+        if location == "centre" or location == "center":
+            point_x,point_y = center(canvas=canvas, box=box)
+        elif location =="bottom_left":
+            point_x,point_y = (x0,y0)
+        elif location == "top_left":
+             point_x,point_y = (x1,y1)
+        elif location == "top_right":
+            point_x,point_y = (x2,y2)
+        elif location == "bottom_right":
+            point_x,point_y = (x3,y3)
+        else:
+            point_x,point_y = (0,0) ## default point
+    else: ## implication here being side
+        if location == "left":
+            point_x,point_y =(mean([x0,x1]),mean([y0,y1]))  ## default side
+        elif location =="right":
+            point_x,point_y = (mean([x2,x3]),mean([y2,y3])) 
+        elif location == "top":
+            point_x,point_y =  (mean([x1,x2]),mean([y1,y2])) 
+        elif location == "bottom":
+            point_x,point_y =(mean([x0,x3]),mean([y0,y3])) 
+        else:
+            point_x,point_y = (0,0) ## default point
+            
+    if str(canvas.type(id)) == "text":
+        value = canvas.itemcget(id, "text")
+        font_test = font.Font(font=canvas.itemcget(id, 'font'))    
+        distance = font_test.measure(value)
+        point_x = point_x - distance/2,  
+
+    canvas.moveto(id,point_x, point_y)
+    
+
+def on_update(owned_graphics: list[int], canvas:Canvas, box:int):
+    for i in owned_graphics:
+        follow_paper(canvas, box, i, point_or_side="side", location="bottom", rotation = False)
 
 def on_the_destruction_and_the_salting_of_the_earth(owned_graphics: list[int], canvas:Canvas, box:int):
     for i in owned_graphics:
