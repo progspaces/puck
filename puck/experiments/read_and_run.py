@@ -1,13 +1,13 @@
 # Tkinter imports and set up, necessary before the rest of the imports for macOS
 from tkinter import *
-# base = Tk()
-# base.tk.call('tk', 'scaling', 2.0)
+base = Tk()
+base.tk.call('tk', 'scaling', 2.0)
 ## Name of the window you're opening
-# base.title('Tkinter Widget Size')
+base.title('Tkinter Widget Size')
 ## 1920x1080, display size, +0+-1080 repositioning
-# base.geometry("1920x1080+0+-1080")
+base.geometry("1920x1080+0+-1080")
 ## set to be fullscrean
-# base.wm_attributes("-fullscreen", True)
+base.wm_attributes("-fullscreen", True)
 
 ## Other Imports
 import cv2
@@ -29,7 +29,7 @@ NOT_SEEING_FULL_DOTS = "can't see all dots properly",
 WARMING_UP = "Warming up"
 
 ## Other Constants
-CALIBRATION_MIN_DIST = 20
+CALIBRATION_MIN_DIST = 5
 PROGRAM_MIN_DIST= 100
 n_colours = 3
 
@@ -232,5 +232,5 @@ def webcamManyCaptures(calibration_colours, rad_range,base, buffer_size = 35):
 
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_higher_projection.jpg", tolerance= .3, radius_already_set=True ,preset_radius_range= [6.3, 11.7])
-# webcamManyCaptures(calibration_colors, rad_range,base)
+webcamManyCaptures(calibration_colors, rad_range,base)
 

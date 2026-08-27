@@ -53,7 +53,7 @@ def convertRectToList(rect):
 def get_all_rects(point_list):
     pointified = [Point.from_tuple(pt) for pt in point_list]
     pairs = list(combinations(pointified, 2))
-    bucketed = [bucket(round(euc_dist(a, b)), 100) for a, b in pairs]
+    bucketed = [bucket(round(euc_dist(a, b)), 400) for a, b in pairs]
     tally = defaultdict(list)
     for pair, dist in zip(pairs, bucketed):
         tally[dist].append(pair)
