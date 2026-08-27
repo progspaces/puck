@@ -1,13 +1,13 @@
 # Tkinter imports and set up, necessary before the rest of the imports for macOS
 from tkinter import *
-base = Tk()
-base.tk.call('tk', 'scaling', 2.0)
+# base = Tk()
+# base.tk.call('tk', 'scaling', 2.0)
 ## Name of the window you're opening
-base.title('Tkinter Widget Size')
+# base.title('Tkinter Widget Size')
 ## 1920x1080, display size, +0+-1080 repositioning
-base.geometry("1920x1080+0+-1080")
+# base.geometry("1920x1080+0+-1080")
 ## set to be fullscrean
-base.wm_attributes("-fullscreen", True)
+# base.wm_attributes("-fullscreen", True)
 
 ## Other Imports
 import cv2
@@ -59,7 +59,7 @@ def calibration_frame(path, tolerance, radius_already_set = False, preset_radius
         print("please click and drag your mouse around one of the calibration circles, " \
               "so we have an approximent size of the circle from the camera's perspective," \
               "press enter when you are satisfied with your circle. click again to draw a new circle.")
-        rad_range = run_radius(path,tolerance, "Find Circle Radius")
+        rad_range = run_radius(path,tolerance, name = "Find Circle Radius")
     ## Find the centres of the images circles and returns the image
     cal_centers,cal_image = find_centers_hough(path, min_dist=CALIBRATION_MIN_DIST, minRadius=int(rad_range[0]), maxRadius=int(rad_range[1]),grayscale=False)
     ## If you cannot find all 9 circles, you need to redo the radius size, 
@@ -74,6 +74,7 @@ def calibration_frame(path, tolerance, radius_already_set = False, preset_radius
     black_dot_cal_coords = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")[0]
     ## Determine the colors that each circle is (relative to the white paper that surrounds it)
     calibration_colors =get_calibration_colors(black_dot_cal_coords,colors_and_coords,n_colours)
+    print(rad_range)
     return calibration_colors, rad_range
 
 def check_coords(colors_and_coords):
@@ -230,5 +231,6 @@ def webcamManyCaptures(calibration_colours, rad_range,base, buffer_size = 35):
 
 
 
-calibration_colors, rad_range = calibration_frame("puck/output/test_cal_p3.jpg", .2, radius_already_set=True)
-webcamManyCaptures(calibration_colors, rad_range,base)
+calibration_colors, rad_range = calibration_frame("puck/output/test_cal_higher_projection.jpg", tolerance= .3, radius_already_set=True ,preset_radius_range= [6.3, 11.7])
+# webcamManyCaptures(calibration_colors, rad_range,base)
+

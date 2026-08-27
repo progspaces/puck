@@ -92,14 +92,15 @@ def run(imgPath, user):
 
 
 
-def run_radius(imgPath,tolerance, name= "image1234"):
+def run_radius(imgPath,tolerance, name= "image"):
     img = cv.imread(imgPath)  
     cv.imshow(name, img)
     # Create a layer to draw circle. The layer has the same dimension of image
     layer = np.zeros((img.shape[0], img.shape[1], 3), dtype="uint8")
 
-   # mouse callback function
+    # mouse callback function
     def draw_circle(event, x, y, flags, param):
+      print("HIII")
       global x1, y1, x2, y2, drawing,holdx, holdy
       # Manage different button state
       if event == cv.EVENT_LBUTTONDOWN:
@@ -119,25 +120,25 @@ def run_radius(imgPath,tolerance, name= "image1234"):
               _img = img.copy()
               # Set the value of mask to 0, to avoid color overlap problems
               _img[np.where(mask)] = 0
-              cv.imshow('image', np.where(layer == 0, _img, layer))
+              cv.imshow(name, np.where(layer == 0, _img, layer))
       elif event == cv.EVENT_LBUTTONUP:
-            drawing = False
-            layer.fill(0)
-            radius = calc_radius(x1, y1, x, y)
-            holdx= x
-            holdy = y
-            cv.circle(layer, (x1, y1), radius, (255, 0, 0), 1)
-            # Create a mask of shape
-            img2gray = cv.cvtColor(layer, cv.COLOR_BGR2GRAY)
-            ret, mask = cv.threshold(img2gray, 0, 255, cv.THRESH_BINARY)
-            _img = img.copy()
-            # Set the value of mask to 0, to avoid color overlap problems
-            _img[np.where(mask)] = 0
-            # Merge two array using Numpy where function
-            cv.imshow('image', np.where(layer == 0, _img, layer))
+          drawing = False
+          layer.fill(0)
+          radius = calc_radius(x1, y1, x, y)
+          holdx= x
+          holdy = y
+          cv.circle(layer, (x1, y1), radius, (255, 0, 0), 1)
+          # Create a mask of shape
+          img2gray = cv.cvtColor(layer, cv.COLOR_BGR2GRAY)
+          ret, mask = cv.threshold(img2gray, 0, 255, cv.THRESH_BINARY)
+          _img = img.copy()
+          # Set the value of mask to 0, to avoid color overlap problems
+          _img[np.where(mask)] = 0
+          # Merge two array using Numpy where function
+          cv.imshow(name, np.where(layer == 0, _img, layer))
 
   # Assig callback 
-    cv.setMouseCallback('image', draw_circle)
+    cv.setMouseCallback(name, draw_circle)
 
  # Service function to calculate radius (Pythagorean theorem) 
     def calc_radius(x1, y1, x2, y2):

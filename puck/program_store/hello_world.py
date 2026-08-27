@@ -68,7 +68,7 @@ def follow_paper(canvas, box, id, point_or_side = "point", location = "center", 
 
 def on_update(owned_graphics: list[int], canvas:Canvas, box:int):
     for i in owned_graphics:
-        follow_paper(canvas, box, i, point_or_side="side", location="bottom", rotation = False)
+        follow_paper(canvas, box, i, point_or_side="point", location="center", rotation = True)
 
 def on_the_destruction_and_the_salting_of_the_earth(owned_graphics: list[int], canvas:Canvas, box:int):
     for i in owned_graphics:
