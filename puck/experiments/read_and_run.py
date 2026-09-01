@@ -93,7 +93,7 @@ def single_frame(frame, calibration_colors,radius_range = (17,21), side_set = 10
         - no rectangle found
         - any number of dots that isn't 4: this is so that we only see one prgoram at a time, will be removed in future iters
     '''
-    centers,image = find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=int(radius_range[0]), maxRadius=int(radius_range[1]), grayscale=False)
+    centers,image = find_centers_hough_frames(frame, min_dist=PROGRAM_MIN_DIST,minRadius=int(radius_range[0]), maxRadius=int(radius_range[1]), grayscale=True)
     try:
         colors_and_coords=get_colors_and_coords(centers,side = side_set, image =image,colorspace= "RGB")
     except:
@@ -169,40 +169,41 @@ def webcamManyCaptures(calibration_colours, rad_range,base, buffer_size = 35):
     canvas.pack()
     text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
-                    
+    print("REACHED 2")
 
     def handle_currently_recognized(current_recognized,v):
-        ## Case one: We've never seen this ever before 
-        if current_recognized[0] not in recognized_in_run:
-            recognized_in_run.add(current_recognized[0])
-            if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
-                int_form = int(current_recognized[0],n_colours)
-                print(int_form)
-                if int_form<=9:
-                    run_spawn(int_form= int_form, canvas= canvas, box= box)
-                print("IT's A NEW PAPER")
-            ## Else, it is not a paper and you do not need to spawn anything as it is one of the combined errors
-        ## Case two: We have seen this before
-        else:
-            ## Now we need to check if it's changed from the previous or not
-            previous = v.get()
-            if current_recognized[0] != previous:
-                         ## if recognizing a new item, update the label.
-                v.set(current_recognized[0])
-            ## Okay now we need to check if it is a paper program
-            current = v.get()
-            print(f"Current is {current}")
-            v.set(current)
-            if combined_errors(current_recognized[0]):
-                int_form = int(current_recognized[0],n_colours)
-                scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
-                canvas.coords(box, scaled)
-                if int_form >= 0 and int_form <= 2 or int_form == 7 or int_form == 9: ## in other words the int form is a good value and we like it.
-                    module_name = "puck.program_store." + program_lookup.get(str(int_form))
-                    module = importlib.import_module(module_name)
+        if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics
+            int_form = int(current_recognized[0],n_colours)
+            if int_form >= 0 and int_form <= 2 or int_form == 7 or int_form == 9: ## in other words the int form is a good value and we like it.
+                module_name = "puck.program_store." + program_lookup.get(str(int_form))##
+                module = importlib.import_module(module_name)##
+                if current_recognized[0] not in recognized_in_run:## Case one: We've never seen this ever before 
+                    recognized_in_run.add(current_recognized[0])
+                    graphics_storage.update({int_form:[]}) ## create an entry in the graphics storage
+                    module.on_start(graphics_storage.get(int_form),canvas, box)
+                    print("IT's A NEW PAPER")
+                else: ## Case two: We have seen this before
+                    previous = v.get()
+                    if current_recognized[0] != previous:
+                        ## if recognizing a new item, update the label.
+                        v.set(current_recognized[0])
+                    ## Okay now we need to check if it is a paper program
+                    current = v.get()
+                    print(f"Current is {current}")
+                    v.set(current)
+                    scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
+                    canvas.coords(box, scaled)
                     module.on_update(graphics_storage.get(int_form),canvas, box)
             else:
-                int_form = -12
+                print("we do not have a valid program")
+                int_form = -13 ## we do not have a valid programm associated with this
+                print(current_recognized[0])
+        else:
+            # if current_recognized[0] not in recognized_in_run:## we've never seen this error, please add to the list
+                # recognized_in_run.add(current_recognized[0])
+            v.set(current_recognized[0])
+            print(current_recognized[0])
+            int_form = -12 ## this is not a paper as we recognize papers
 
 
     def update(cam,canvas, box):
@@ -228,7 +229,6 @@ def webcamManyCaptures(calibration_colours, rad_range,base, buffer_size = 35):
     print(graphics_storage)
     cam.release()
     cv2.destroyAllWindows()
-
 
 
 calibration_colors, rad_range = calibration_frame("puck/output/test_cal_higher_projection.jpg", tolerance= .3, radius_already_set=True ,preset_radius_range= [6.3, 11.7])

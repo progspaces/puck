@@ -10,7 +10,7 @@ def rad2deg(value):
 def on_start(owned_graphics: list[int], canvas:Canvas, box:int):
     ## get the box coordinates
     x0, y0,_,_,_,_,_,_= (canvas.coords(box))
-    hello = canvas.create_text(( x0, y0),text="hello world",font=("Helvetica", 50), fill= "blue")
+    hello = canvas.create_text((x0, y0),text="hello world",font=("Helvetica", 50), fill= "blue")
     owned_graphics.append(hello)
 
 
