@@ -98,17 +98,22 @@ def single_frame(frame, calibration_colors,radius_range = (17,21), side_set = 10
         colors_and_coords=get_colors_and_coords(centers,side = side_set, image =image,colorspace= "RGB")
     except:
         return (NOT_SEEING_FULL_DOTS, [(0,0), (0,50), (50,50),(50,0)])
-    found_rectangle = check_coords(colors_and_coords)
-    if len(colors_and_coords) ==4 and found_rectangle:
-        black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
-        ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
-        perm,_ = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
-        coords_only = ([black_dot[0]] + [x[0] for x in ordered_rectangle])
-        return (perm,coords_only)
-    elif not found_rectangle:
-        return (NOT_RECT, [(0,0), (0,50), (50,50),(50,0)]) # error code for not a rectangle
-    else:
-        return (NOT_4_DOTS,[(0,0), (0,50), (50,50),(50,0)]) ## error code for not 4 dots
+    ### HERES WHERE I NEED TO START MESSING WITH THINGS BECAUSE THE FOUND_RECTANGLE ALONE IS NO LONGER VALID CODE TO TEST
+
+
+
+
+    # found_rectangle = check_coords(colors_and_coords)
+    # if len(colors_and_coords) ==4 and found_rectangle:
+    #     black_dot = get_black_dot(colors_and_coords=colors_and_coords, colorspace= "rgb")
+    #     ordered_rectangle = order_rectangle(colors_and_coords, black_dot[0]) 
+    #     perm,_ = get_color_perm_and_dist(ordered_rectangle, n_colours, calibration_colors,colorspace= "LUV")
+    #     coords_only = ([black_dot[0]] + [x[0] for x in ordered_rectangle])
+    #     return (perm,coords_only)
+    # elif not found_rectangle:
+    #     return (NOT_RECT, [(0,0), (0,50), (50,50),(50,0)]) # error code for not a rectangle
+    # else:
+    #     return (NOT_4_DOTS,[(0,0), (0,50), (50,50),(50,0)]) ## error code for not 4 dots
 
 
 def buffer(buffer, input):
@@ -169,7 +174,6 @@ def webcamManyCaptures(calibration_colours, rad_range,base, buffer_size = 35):
     canvas.pack()
     text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
-    print("REACHED 2")
 
     def handle_currently_recognized(current_recognized,v):
         if combined_errors(current_recognized[0]): ## it is a paper and thus might have code that needs you to spawn graphics

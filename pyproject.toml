@@ -26,6 +26,7 @@ dependencies = [
     "tqdm>=4.67.1",
     "nbformat>=4.2.0",
     "pyglet>=2.1.14",
+    "cmake>=4.4.3",
 ]
 
 [project.scripts]

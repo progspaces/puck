@@ -6,6 +6,7 @@ import matplotlib.patches as patches
 custom = [ "#000000", "#FD1622" ,"#FE00FF", "#00FE16", "#0084FE", "#FEAA0D", "#DB4F89","#EBFB26" ,"#00F8C4" ]
 dark = [  "#000000","#2E91E5" , "#E15F99" , "#1CA71C", "#FB0D0D" , "#DA16FF" ,"#B68100" ,"#750D86" ,"#EB663B" ]
 
+custom2 = [ "#000000", "#FD1622" , "#00FE16", "#0084FE"]
 def page_setup():
     # Source - https://stackoverflow.com/a
     # Posted by Mahmoud, modified by community. See post 'Timeline' for change history
@@ -52,17 +53,44 @@ def sheet_maker_old(palette = "custom", set_choice = "A"):
 
 
 
-def sheet_maker(int_value, colour_pal, n_col):
+def sheet_maker(int_value, colour_pal, n_col, show_or_save = "save"):
     # print(int_value)
     pal = ["#000000"] + colour_pal
+    pal_sub = pal[0:n_col+1]
+    # pal_sub_tiled = np.tile(pal_sub, 4)
     fig, ax, scaler = page_setup()
     s = np.tile([(2*scaler)**2], 4)
-    ax.scatter([1,1,25.5,25.5], [1,17,17,1], c=pal, s=s)
+    print(s)
+    ax.scatter([1,1,25.5,25.5], [1,17,17,1], c=pal_sub, s=s)
+    # plt.axis('off')
+    # plt.show()
+    if show_or_save == "save":
+        fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.png", dpi=1000)
+        fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.pdf") 
+    elif show_or_save == "show":
+        plt.show()
+
+
+def sheet_maker_3s(int_value, colour_pal, n_col, spacing_n, show_or_save = "save"):
+    # print(int_value)
+    pal = colour_pal
+    pal_sub = pal[0:n_col+1]
+    pal_sub_tiled = np.tile(pal_sub,3)
+    fig, ax, scaler = page_setup()
+    spacing = spacing_n*scaler
+    s = np.tile([(2*scaler)**2], 12)
+    print(pal_sub_tiled)
+    ax.scatter([1,1,25.5,25.5,1,1,25.5,25.5, 1+spacing,1+spacing,25.5-spacing,25.5-spacing], [1,17,17,1, 1+spacing,17-spacing,17-spacing,1+spacing, 1,17,17,1], c=pal_sub_tiled, s=s)
     plt.axis('off')
     # plt.show()
-    fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.png", dpi=1000)
-    fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.pdf")
-
+    if show_or_save == "save":
+        fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.png", dpi=1000)
+        fig.savefig(f"puck/output/sheets/p{n_col}/permutations/p{n_col}_{int_value}.pdf") 
+    elif show_or_save == "show":
+        plt.show()
+    scat_collection = ax.collections[0]  # Index of your scatter plot
+    coordinates = scat_collection.get_offsets().data
+    print(coordinates)
 # This example fits a4 paper with 5mm margin printers
 def create_cal_sheet(pal):
     n_col = len(pal) - 1
@@ -81,4 +109,4 @@ def create_cal_sheet(pal):
 
 
 # create_cal_sheet()
-# sheet_maker()
+sheet_maker_3s(0,custom2,n_col = 3, spacing_n= .1, show_or_save= "save" )
