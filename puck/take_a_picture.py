@@ -20,4 +20,4 @@ def webcamSingleCapture(save_path):
     cv2.destroyWindow("preview")
     vc.release()    
 
-webcamSingleCapture("testcase_3.png")
+webcamSingleCapture("puck/apriltag_stills/test_5.png")
