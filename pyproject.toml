@@ -27,6 +27,7 @@ dependencies = [
     "nbformat>=4.2.0",
     "pyglet>=2.1.14",
     "cmake>=4.4.3",
+    "screeninfo>=0.8.1",
 ]
 
 [project.scripts]
