@@ -35,32 +35,57 @@ def bigger_smaller_frame(frame_0, frame_1):
 def frame_to_polygon_list(frame):
     x0 = int(frame[0][0])
     x1 = int(frame[1][0])
+    x2 = int(frame[2][0])
+    x3 = int(frame[3][0])
     y0 = int(frame[0][1])
     y1 = int(frame[1][1])
-    return [(x0,y0), (x0,y1), (x1,y1), (x1,y0)]
+    y2 = int(frame[2][1])
+    y3 = int(frame[3][1])
+    return [(x0,y0),(x1,y1), (x2,y2),(x3,y3) ]
 
-def frames(path):
+
+def frames_path_based(path):
     input = cv.imread(path)
     detector = cv.aruco.ArucoDetector(dictionary=DICT)
     corners, ids, _ = detector.detectMarkers(input)
-    ## grab the first two ids and their coordinates, that's all we're considering rn
+    ## grab the first three ids and their coordinates, that's all we're considering rn
     corners_a = corners[0][0]
     corners_b = corners[1][0]
-    frame_0 = (corners_a[1], corners_b[3])
-    frame_1 = (corners_a[3], corners_b[1])
-    outer_frame, inner_frame = (bigger_smaller_frame(frame_0, frame_1))
-    return (outer_frame, inner_frame, ids)
+    corners_c = corners[2][0]
+    print(corners_a)
+    print(corners_b)
+    print(corners_c)
+    # frame_0 = (corners_a[1], corners_b[3])
+    # frame_1 = (corners_a[3], corners_b[1])
+    # outer_frame, inner_frame = (bigger_smaller_frame(frame_0, frame_1))
+    # return (outer_frame, inner_frame, ids)
 
-outer_frame, inner_frame, ids= frames("puck/apriltag_stills/test_0.png")
-outer_polygon = frame_to_polygon_list(outer_frame)
-inner_polygon = frame_to_polygon_list(inner_frame)
+# # outer_frame, inner_frame, ids= frames_path_based("puck/apriltag_stills/test_0.png")
+# outer_polygon = frame_to_polygon_list(outer_frame)
+# inner_polygon = frame_to_polygon_list(inner_frame)
+def average_pt(corners):
+    sum_x = 0
+    sum_y = 0 
+    for pair in corners:
+        sum_x += pair[0]
+        sum_y += pair[1]
+    return (int(sum_x/4), int(sum_y/4))
 
-## Storage dictionaries and sets
-program_lookup = {}
-with open('puck/program_store/program_lookup.json') as f:
-    program_lookup = dict(load(f))
-recognized_in_run = set()
-graphics_storage = dict()
+def frames_frame_based(frame):
+    input = frame
+    detector = cv.aruco.ArucoDetector(dictionary=DICT)
+    corners, ids, _ = detector.detectMarkers(input)
+    ## grab the first two ids and their coordinates, that's all we're considering rn
+    if ids is not None and len(ids)>=4:
+        print(ids)
+        corners_a = corners[0][0]
+        corners_b = corners[1][0]
+        corners_c = corners[2][0]
+        corners_d = corners[3][0]
+        average_frame = [average_pt(corners_a),average_pt(corners_b),average_pt(corners_d),average_pt(corners_c)]
+        return (average_frame, ids)
+    else:
+        return (0,0)
 
 
 def buffer(buffer, input):
@@ -99,8 +124,8 @@ def scale(cwidth, cheight, fheight, fwidth, coord_list):
 def webcamManyCaptures(base,buffer_size = 35):
     cam = cv.VideoCapture(0)
     _, frame = cam.read()
-    fheight, fwidth, fchannel = frame.shape
-    buffer_arr = [("Warming up",[(100,200),(100,400),(200,400),(200,200)])] * buffer_size
+    frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+    avg_frame, ids = (frames_frame_based(frame))
     v = StringVar(value= "Warming up") 
     cheight, cwidth = 1080,1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
@@ -108,41 +133,7 @@ def webcamManyCaptures(base,buffer_size = 35):
     text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
 
-    def handle_currently_recognized(current_recognized,v):
-            int_form = int(current_recognized[0],5)
-            if int_form >= 0 : ## in other words the int form is a good value and we like it.
-                module_name = "puck.program_store." + program_lookup.get(str(int_form))##
-                module = importlib.import_module(module_name)##
-                if current_recognized[0] not in recognized_in_run:## Case one: We've never seen this ever before 
-                    recognized_in_run.add(current_recognized[0])
-                    graphics_storage.update({int_form:[]}) ## create an entry in the graphics storage
-                    module.on_start(graphics_storage.get(int_form),canvas, box)
-                    print("IT's A NEW PAPER")
-                else: ## Case two: We have seen this before
-                    previous = v.get()
-                    if current_recognized[0] != previous:
-                        ## if recognizing a new item, update the label.
-                        v.set(current_recognized[0])
-                    ## Okay now we need to check if it is a paper program
-                    current = v.get()
-                    print(f"Current is {current}")
-                    v.set(current)
-                    scaled = scale(cwidth = cwidth, cheight = cheight, fwidth = fwidth, fheight= fheight, coord_list=current_recognized[1])
-                    canvas.coords(box, scaled)
-                    module.on_update(graphics_storage.get(int_form),canvas, box)
-            else:
-                print("we do not have a valid program")
-                int_form = -13 ## we do not have a valid programm associated with this
-                print(current_recognized[0])
-        else:
-            # if current_recognized[0] not in recognized_in_run:## we've never seen this error, please add to the list
-                # recognized_in_run.add(current_recognized[0])
-            v.set(current_recognized[0])
-            print(current_recognized[0])
-            int_form = -12 ## this is not a paper as we recognize papers
-
-
-    def update(cam,canvas, box):
+    def update(cam, canvas, box):
         _, frame = cam.read()
         window_name = "Second Monitor Window"
         cv.namedWindow(window_name, cv.WINDOW_FREERATIO,)
@@ -150,22 +141,16 @@ def webcamManyCaptures(base,buffer_size = 35):
         cv.resizeWindow(window_name, 600, 500)
         cv.imshow(window_name, frame)
         frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-        response = single_frame(frame,calibration_colours, rad_range)
-        buffer(buffer_arr, response)
-        canvas.itemconfig(tagOrId = text_label_replace, text=v.get())
-        current_recognized = (max_freq(buffer_arr))
-        handle_currently_recognized(current_recognized,v)
+        avg_frame, ids = (frames_frame_based(frame))
+        if avg_frame != 0:
+            canvas.coords(box, frame_to_polygon_list(avg_frame))
         if cv.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
         base.after(10, update, cam, canvas, box)  # Timed Check, adding itself back onto the queue to run 20ms later
-
+        
     base.after(20,update, cam, canvas, box)
     base.mainloop()
-    print(recognized_in_run)
-    print(graphics_storage)
     cam.release()
     cv.destroyAllWindows()
 
-
-webcamManyCaptures()
-
+webcamManyCaptures(base= base)

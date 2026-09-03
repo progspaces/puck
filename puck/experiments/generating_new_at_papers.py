@@ -1,7 +1,7 @@
 import cv2 as cv
 from matplotlib import pyplot as plt
 import numpy as np
-from itertools import permutations
+from itertools import product
 
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
 
@@ -44,22 +44,24 @@ def placement(fig, scalar, code, xcoord, ycoord):
     adjustedy= marginy + ycoord*scalar*1.385
     fig.figimage(code,xo= adjustedx, yo= adjustedy, cmap="grey")
 
-def corners(fig, scalar, code_a, code_b):
-    placement(fig,scalar, code_a, 0,0)
+def corners(fig, scalar, code_a, code_b, code_c, code_d):
+    placement(fig, scalar, code_a, 0,0)
     placement(fig, scalar, code_b, 22,13.5)
+    placement(fig, scalar, code_c, 22,0)
+    placement(fig, scalar, code_d, 0,13.5)
 
-def new_paper(id_a, id_b, save_path= "generic_paper.pdf"):
+def new_paper(id_a, id_b, id_c, id_d,save_path= "generic_paper.pdf"):
     fig, _, scalar = page_setup()
     plt.axis('off')
-    corners(fig, scalar, create_codes(id = id_a, scalar = 4), create_codes(id = id_b, scalar = 4))
+    corners(fig, scalar, create_codes(id = id_a, scalar = 4), create_codes(id = id_b, scalar = 4),create_codes(id = id_c, scalar = 4),create_codes(id = id_d, scalar = 4))
     fig.savefig(save_path)
 
 ## lets get all combinations of 0 to 4 as the corner pieces
 ## we can do base 5 as the answer here.
 
 # generate and print all permutations
-id_list = [j for j in permutations([0,1,2,3,4],2)]
+id_list = [j for j in product([0,1,2,3,4],repeat= 4)]
 
-for a,b in id_list[:6]:
-    print(a,b)
-    # new_paper(a,b, save_path= f"puck/output/april_tag_papers/at_{a}_{b}.pdf")
+for a,b,c,d in id_list[:6]:
+    # print(a,b,c)
+    new_paper(a,b,c,d, save_path= f"puck/output/april_tag_papers/at_{a}_{b}_{c}_{d}.pdf")
