@@ -15,7 +15,7 @@ from json import load
 import importlib
 from matplotlib import pyplot as plt
 from collections import Counter
-
+from PIL import Image 
 
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
 
@@ -77,7 +77,13 @@ def frames_frame_based(frame):
     corners, ids, _ = detector.detectMarkers(input)
     ## grab the first two ids and their coordinates, that's all we're considering rn
     if ids is not None and len(ids)>=4:
-        print(ids)
+        for x in ids:
+            if x > 4:
+                ## SAVE WHERE IT SEES THE BAD THING
+                copy = cv.aruco.drawDetectedMarkers(input, corners, ids)
+                plt.figimage = copy
+                plt.savefig('test.png') ##??
+            # print(f"ids{ids}")
         corners_a = corners[0][0]
         corners_b = corners[1][0]
         corners_c = corners[2][0]
