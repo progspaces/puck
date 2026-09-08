@@ -107,23 +107,28 @@ def draw_loop(self, canvas):
     message_type = None
     while True:
         sender, new_message = self.read()
-        print(new_message)
+        print(f"draw loop {new_message}")
         message_type = new_message.get("type")
         if message_type == "kill":
             exit()
         elif message_type == "action":
             message_action = new_message.get("action")
             message_info = new_message.get("info")
+            print("WHY")
             if message_action == "new":
                 id = canvas.create_polygon(message_info, outline='blue',fill="white", width=2)
                 self.send_to(sender,{"type": "canvas_id", "info": id})
-                print("sent some information yayyyyyyyyyyy")
+            elif message_action == "update":
+                print("WHAT")
+                id = new_message.get("id")
+                canvas.coords(id, message_info)
+                print('should update drawing')
 
 def test_run(self, drawing_actor):
     message_type = None
     while True:
         sender, new_message = self.read()
-        print(new_message)
+        print(f"test run {new_message}")
         message_type = new_message.get("type")
         if message_type == "kill":
             exit()
@@ -131,8 +136,11 @@ def test_run(self, drawing_actor):
             message_info = new_message.get("info")
             print(f"message_info {message_info}")
             self.send_to(drawing_actor, {"type": "action", "action": "new", "info": message_info})
+            print("sent a message to the drawing actor")
         elif message_type == "canvas_id":
+            canvas_id = new_message.get("info")
             print(new_message.get("info"))
+            self.add_id(canvas_id)
 
 def handle_currently_recognized(program_encoding,current_coords, drawing_actor):
         if program_encoding is not None: ## in other words the int form is a good value and we like it.
@@ -146,6 +154,10 @@ def handle_currently_recognized(program_encoding,current_coords, drawing_actor):
             # Case two we have seen this before and the thread is running.
             else:
                 t = encoding_to_actor.get(program_encoding)
+                ids = t.get_graphics()
+                print(ids)
+                drawing_actor.read_only_message({"type": "action", "action":"update", "id": ids[0], "info": current_coords})
+
             # t.read_only_message({"type":"coordinates","info":current_coords})
 
 

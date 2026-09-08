@@ -6,6 +6,13 @@ class Actor(Thread):
     def __init__(self, target, drawing_actor:Self):
         super().__init__(target=target, args=(self, drawing_actor))
         self.unread_messages:list[tuple[Actor, dict]] = []
+        self.associated_graphics:list[object] = []
+
+    def add_id(self, id):
+        self.associated_graphics.append(id)
+
+    def get_graphics(self):
+        return self.associated_graphics
 
     def send_to(self, recipient:Self, message:dict): ## push to this queue
         recipient.unread_messages.append((self, message))
