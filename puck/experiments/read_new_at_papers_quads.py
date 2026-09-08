@@ -20,38 +20,13 @@ import time
 from actor import Actor
 
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
-program_lookup = dict()
+program_lookup = {}
+with open('puck/program_store/program_lookup.json') as f:
+    program_lookup = dict(load(f))
 encoding_to_actor = dict()
 graphics_storage = dict()
 
-def area_of_frame(frame):
-    x0 = frame[0][0]
-    x1 = frame[1][0]
-    y0 = frame[0][1]
-    y1 = frame[1][1]
-    return abs(y0-y1)* abs(x0-x1)
 
-def bigger_smaller_frame(frame_0, frame_1):
- if area_of_frame(frame_0)> area_of_frame(frame_1):
-    return (frame_0, frame_1)
- else:
-    return (frame_1, frame_0)
-
-def frame_to_polygon_list(frame):
-    x0 = int(frame[0][0])
-    x1 = int(frame[1][0])
-    x2 = int(frame[2][0])
-    x3 = int(frame[3][0])
-    y0 = int(frame[0][1])
-    y1 = int(frame[1][1])
-    y2 = int(frame[2][1])
-    y3 = int(frame[3][1])
-    return [(x0,y0),(x1,y1), (x2,y2),(x3,y3) ]
-
-
-# # outer_frame, inner_frame, ids= frames_path_based("puck/apriltag_stills/test_0.png")
-# outer_polygon = frame_to_polygon_list(outer_frame)
-# inner_polygon = frame_to_polygon_list(inner_frame)
 def average_pt(corners):
     sum_x = 0
     sum_y = 0 
@@ -60,12 +35,11 @@ def average_pt(corners):
         sum_y += pair[1]
     return (int(sum_x/4), int(sum_y/4))
 
-def frames_frame_based(frame):
+def paper_frame_based(frame):
     input = frame
     detector = cv.aruco.ArucoDetector(dictionary=DICT)
     corners, ids, _ = detector.detectMarkers(input)
-    ## grab the first two ids and their coordinates, that's all we're considering rn
-    if ids is not None and len(ids)>=4:
+    if ids is not None and len(ids)==4:
         bads = [x for x in ids if x>4]
         if len(bads) >0 :
                 ## SAVE WHERE IT SEES THE BAD THING
@@ -76,10 +50,13 @@ def frames_frame_based(frame):
         corners_b = corners[1][0]
         corners_c = corners[2][0]
         corners_d = corners[3][0]
-        average_frame = [average_pt(corners_a),average_pt(corners_b),average_pt(corners_d),average_pt(corners_c)]
-        return (average_frame, ids)
+        averaged_paper = [average_pt(corners_a),
+                          average_pt(corners_b),
+                          average_pt(corners_d),
+                          average_pt(corners_c)]
+        return [(averaged_paper, ids)]
     else:
-        return (None,None)
+        return[(None,None)]
 
 
 def buffer(buffer, input):
@@ -115,11 +92,30 @@ def scale(cwidth, cheight, fheight, fwidth, coord_list):
     return scaled_list
 
 
+def draw_loop(self, drawing_actor):
+    message_type = None
+    while True:
+        sender, new_message = self.read()
+        print(new_message)
+        message_type = new_message.get("type")
+        if message_type == "kill":
+            exit()
+        self.send_to(sender,{"type": "canvas_id", "info": 7})
+
+
+def draw_triangle(self, drawing_actor):
+    self.send_to(drawing_actor, {"action": "new", "info": [(0,0), (2,0), (1,1)]})
+    time.sleep(1)
+    __, message= self.read()
+    triangle_id = message.get("info")
+    self.send_to(drawing_actor,{"action": "update", "id": triangle_id,"info": [(0,0), (4,0), (2,2)]})
+
+
 def webcamManyCaptures(base,buffer_size = 35):
     cam = cv.VideoCapture(0)
     _, frame = cam.read()
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-    avg_frame, ids = (frames_frame_based(frame))
+    paper_frame_based(frame)
     v = StringVar(value= "Warming up") 
     cheight, cwidth = 1080,1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
@@ -127,22 +123,33 @@ def webcamManyCaptures(base,buffer_size = 35):
     text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     # box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
 
-    ## program_encoding = is unique ID
-    drawing_actor = None
+
+    drawing_actor = Actor(draw_loop, None)
+    encoding_to_actor["drawing_actor"]= drawing_actor
+    drawing_actor.start()
+    global_actor = Actor(draw_loop, None)
+    encoding_to_actor["global_actor"]= global_actor
+    global_actor.start()
+    # actor_one = Actor(draw_triangle, drawing_actor)
+    # encoding_to_actor["actor_one"]= actor_one
+    # actor_one.start()
+
     def handle_currently_recognized(program_encoding,current_coords):
             if program_encoding is not None: ## in other words the int form is a good value and we like it.
                 module_name = "puck.program_store." + program_lookup.get(str(program_encoding))##
                 module = importlib.import_module(module_name) ##
                 if program_encoding not in encoding_to_actor: ## Case one: We've never seen this ever before 
-                    t = Actor(target=module.run, args=(drawing_actor))
+                    t = Actor(draw_triangle, drawing_actor)
                     t.start()
                     encoding_to_actor[program_encoding] = t
                 # Case two we have seen this before and the thread is running.
                 ## TODO: Send message of current coords somehow 
-                t.send({"type":"coordinates","info":current_coords})
+                else:
+                    t = encoding_to_actor.get(program_encoding)
+                global_actor.send_to(t,{"type":"coordinates","info":current_coords})
 
             
-    def update(cam, canvas, box):
+    def update(cam, canvas):
         _, frame = cam.read()
         window_name = "Second Monitor Window"
         cv.namedWindow(window_name, cv.WINDOW_FREERATIO,)
@@ -150,19 +157,33 @@ def webcamManyCaptures(base,buffer_size = 35):
         cv.resizeWindow(window_name, 600, 500)
         cv.imshow(window_name, frame)
         frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+        pre_existing_encodings = set(encoding_to_actor.copy().keys())
+        for coords, ids in paper_frame_based(frame):
         ## whatever it "sees" is "in the scene" by this point. whatever it doesn't "see" should be killed off.
-        pre_existing_encodings = encoding_to_actor.keys().copy()
-        for coords, ids in frames_frame_based(frame): ## needs to return a list of tuples
-            program_encoding = int("".join(ids),4)
-            pre_existing_encodings.pop(program_encoding)
-            handle_currently_recognized(program_encoding,coords)
-            # canvas.coords(box, frame_to_polygon_list(avg_box)) ## outline of paper
+        # for coords, ids in frames_frame_based(frame): ## needs to return a list of tuples
+            if ids is not None:
+                program_encoding = int("".join(map(str, ids)),4)
+                if program_encoding == 192 or program_encoding == 48 or program_encoding == 12:
+                    program_encoding = 3
+                print(program_encoding)
+                print(coords)
+                pre_existing_encodings.discard(program_encoding) 
+                ## using discard so it doesn't throw an error when pre_existing_encodings doesn't have it
+                ## use remove to throw an error when the set of pre_existing_encordings doesn't have it.
+                handle_currently_recognized(program_encoding,coords)
+        #     # canvas.coords(box, frame_to_polygon_list(avg_box)) ## outline of paper
         for encoding in (pre_existing_encodings):
             actor = encoding_to_actor.get(encoding)
-            actor.send({"type": "kill"})
+            actor.end()
+            actor.join()
         if cv.waitKey(1) == ord('q'): ## stopping condition
+            existing_encodings = set(encoding_to_actor.copy().values())
+            for e in existing_encodings:
+                e.end()
+                e.join()
+            print("done with the joining and the exiting")
             base.quit()
-        base.after(10, update, cam, canvas, )  # Timed Check, adding itself back onto the queue to run 20ms later
+        base.after(10, update, cam, canvas)  # Timed Check, adding itself back onto the queue to run 20ms later
         
     base.after(20,update, cam, canvas)
     base.mainloop()

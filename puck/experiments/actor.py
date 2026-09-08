@@ -14,3 +14,6 @@ class Actor(Thread):
             pass
         return self.unread_messages.pop(0)
 
+    def end(self):
+        self.unread_messages.append((None, {"type": "kill"}))
+
