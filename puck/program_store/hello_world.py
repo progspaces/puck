@@ -76,3 +76,5 @@ def on_the_destruction_and_the_salting_of_the_earth(owned_graphics: list[int], c
         canvas.delete(i)
     owned_graphics = []
 
+def run():
+    print("I AM DOING THE RUNNNING THING")
