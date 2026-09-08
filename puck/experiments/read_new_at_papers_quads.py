@@ -15,9 +15,14 @@ from json import load
 import importlib
 from matplotlib import pyplot as plt
 from collections import Counter
-from PIL import Image 
+import threading 
+import time
+from actor import Actor
 
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
+program_lookup = dict()
+encoding_to_actor = dict()
+graphics_storage = dict()
 
 def area_of_frame(frame):
     x0 = frame[0][0]
@@ -44,22 +49,6 @@ def frame_to_polygon_list(frame):
     return [(x0,y0),(x1,y1), (x2,y2),(x3,y3) ]
 
 
-def frames_path_based(path):
-    input = cv.imread(path)
-    detector = cv.aruco.ArucoDetector(dictionary=DICT)
-    corners, ids, _ = detector.detectMarkers(input)
-    ## grab the first three ids and their coordinates, that's all we're considering rn
-    corners_a = corners[0][0]
-    corners_b = corners[1][0]
-    corners_c = corners[2][0]
-    print(corners_a)
-    print(corners_b)
-    print(corners_c)
-    # frame_0 = (corners_a[1], corners_b[3])
-    # frame_1 = (corners_a[3], corners_b[1])
-    # outer_frame, inner_frame = (bigger_smaller_frame(frame_0, frame_1))
-    # return (outer_frame, inner_frame, ids)
-
 # # outer_frame, inner_frame, ids= frames_path_based("puck/apriltag_stills/test_0.png")
 # outer_polygon = frame_to_polygon_list(outer_frame)
 # inner_polygon = frame_to_polygon_list(inner_frame)
@@ -77,13 +66,12 @@ def frames_frame_based(frame):
     corners, ids, _ = detector.detectMarkers(input)
     ## grab the first two ids and their coordinates, that's all we're considering rn
     if ids is not None and len(ids)>=4:
-        for x in ids:
-            if x > 4:
+        bads = [x for x in ids if x>4]
+        if len(bads) >0 :
                 ## SAVE WHERE IT SEES THE BAD THING
                 copy = cv.aruco.drawDetectedMarkers(input, corners, ids)
                 plt.figimage = copy
                 plt.savefig('test.png') ##??
-            # print(f"ids{ids}")
         corners_a = corners[0][0]
         corners_b = corners[1][0]
         corners_c = corners[2][0]
@@ -91,7 +79,7 @@ def frames_frame_based(frame):
         average_frame = [average_pt(corners_a),average_pt(corners_b),average_pt(corners_d),average_pt(corners_c)]
         return (average_frame, ids)
     else:
-        return (0,0)
+        return (None,None)
 
 
 def buffer(buffer, input):
@@ -137,8 +125,23 @@ def webcamManyCaptures(base,buffer_size = 35):
     canvas = Canvas(height= cheight, width = cwidth, background='black')
     canvas.pack()
     text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
-    box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
+    # box = canvas.create_polygon((0,0), (0,0), (0,0), (0,0), outline='blue',fill="white", width=2)
 
+    ## program_encoding = is unique ID
+    drawing_actor = None
+    def handle_currently_recognized(program_encoding,current_coords):
+            if program_encoding is not None: ## in other words the int form is a good value and we like it.
+                module_name = "puck.program_store." + program_lookup.get(str(program_encoding))##
+                module = importlib.import_module(module_name) ##
+                if program_encoding not in encoding_to_actor: ## Case one: We've never seen this ever before 
+                    t = Actor(target=module.run, args=(drawing_actor))
+                    t.start()
+                    encoding_to_actor[program_encoding] = t
+                # Case two we have seen this before and the thread is running.
+                ## TODO: Send message of current coords somehow 
+                t.send({"type":"coordinates","info":current_coords})
+
+            
     def update(cam, canvas, box):
         _, frame = cam.read()
         window_name = "Second Monitor Window"
@@ -147,14 +150,21 @@ def webcamManyCaptures(base,buffer_size = 35):
         cv.resizeWindow(window_name, 600, 500)
         cv.imshow(window_name, frame)
         frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-        avg_frame, ids = (frames_frame_based(frame))
-        if avg_frame != 0:
-            canvas.coords(box, frame_to_polygon_list(avg_frame))
+        ## whatever it "sees" is "in the scene" by this point. whatever it doesn't "see" should be killed off.
+        pre_existing_encodings = encoding_to_actor.keys().copy()
+        for coords, ids in frames_frame_based(frame): ## needs to return a list of tuples
+            program_encoding = int("".join(ids),4)
+            pre_existing_encodings.pop(program_encoding)
+            handle_currently_recognized(program_encoding,coords)
+            # canvas.coords(box, frame_to_polygon_list(avg_box)) ## outline of paper
+        for encoding in (pre_existing_encodings):
+            actor = encoding_to_actor.get(encoding)
+            actor.send({"type": "kill"})
         if cv.waitKey(1) == ord('q'): ## stopping condition
             base.quit()
-        base.after(10, update, cam, canvas, box)  # Timed Check, adding itself back onto the queue to run 20ms later
+        base.after(10, update, cam, canvas, )  # Timed Check, adding itself back onto the queue to run 20ms later
         
-    base.after(20,update, cam, canvas, box)
+    base.after(20,update, cam, canvas)
     base.mainloop()
     cam.release()
     cv.destroyAllWindows()

@@ -3,6 +3,7 @@ from tkinter import font
 import math
 from statistics import mean
 
+
 def rad2deg(value):
     return value * (180/math.pi)
 
