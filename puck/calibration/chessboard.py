@@ -13,11 +13,11 @@ def make_chessboard(
         image_size: tuple[int, int],
         num_squares: tuple[int, int] = (8, 6),
         square_size: int = 100
-) -> tuple[NDArray[np.uint8], list[Point]:
+) -> tuple[NDArray[np.uint8], list[Point]]:
 
     # unpack the parameters
     image_width, image_height = image_size
-    cols, rows = squares
+    cols, rows = num_squares
 
     # chessboard needs even dimensions
     # not sure if this is a strict requirement but makes the generation code simpler

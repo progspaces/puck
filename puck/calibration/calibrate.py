@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import NDArray
 from screeninfo import Monitor, get_monitors
 
-from .chessboard import make_chessboard
+from chessboard import make_chessboard
 
 
 # each file should have it's own logger
@@ -233,3 +233,4 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         cv2.destroyAllWindows()
 
     return CalibrationInfo(camera_to_projector_homography=homography)
+
