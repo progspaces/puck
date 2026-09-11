@@ -5,23 +5,20 @@ from queue import Queue
 class Actor(Thread):
     def __init__(self, target):
         super().__init__(target=target, args=(self,))
-        self.unread_messages:list[tuple[Self, dict]] = []
-        ## make this a threading queue
+        self.mailbox: Queue = Queue.queue()
 
-    def send_to(self, recipient:Self, message:dict): ## push to this queue
-        recipient.unread_messages.append((self, message))
+    def send(self:Self, message):
+        """
+        Sends message to the actor in actor.send()
 
-    def read(self) -> tuple[Self, dict]:  ## pop of our own
-        while len(self.unread_messages) == 0:
-            pass
-        return self.unread_messages.pop(0)
+        Args:
+            self (Self): actor
+            message (_type_): any object
+        """
+        self.mailbox.put(message)
 
-    ##switch read to .get treat unreadmessages as a queue
-    
-
-    def read_only_message(self, message):
-        self.unread_messages.append((None, message))
+    def recieve(self): 
+        return self.mailbox.get()
 
     def end(self):
-        self.read_only_message({"type": "kill"})
-
+        self.send({"type": "kill"})

@@ -118,14 +118,15 @@ def draw_loop(drawing_queue:Queue,canvas):
 
 def test_run(self):
     print("Started Test_run")
-    _, first_message= self.read()
+    _, first_message= self.recieve()
     type = first_message.get("type")
     assert type == "standard"  ## THIS IS WHAT YOU SHOULD GET
     print("before run loop")
     drawing_queue= first_message.get("drawing_queue")
     associated_canvas_ids = []
+    spawned_actors = []
     while True:
-        sender, new_message = self.read()
+        sender, new_message = self.recieve()
         print(f"test run {new_message}")
         message_type = new_message.get("type")
         if message_type == "kill":
