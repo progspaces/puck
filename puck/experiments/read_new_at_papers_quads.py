@@ -91,60 +91,62 @@ def scale(cwidth, cheight, fheight, fwidth, coord_list):
     return scaled_list
 
 
-def draw_loop(drawing_queue:Queue,canvas):
-    if drawing_queue.empty() == False:
-        sender, message = drawing_queue.get()
-        print(f"draw loop {message}")
-        message_type = message.get("type")
-        if message_type == "kill":
-            print("HM")
-        elif message_type == "action":
-            message_action = message.get("action")
-            message_info = message.get("info")
-            print("an action message has been recieved")
-            if message_action == "new":
-                id = canvas.create_polygon(message_info, outline='blue',fill="white", width=2)
-                print("a polygon should be drawn at this point")
-                ###(sender,{"type": "canvas_id", "info": id})
-            elif message_action == "update":
-                print("an update action should be taken")
-                id = message.get("id")
-                print(id)
-                print("GOT ID")
-                message.coords(id, message_info)
-                ### stopped here
-                print('should update drawing')
+
+####
+""""
+message formating
+tuple casing ((),())
+first message 
+("drawing_queue", drawing_queue)
+
+subsequent messages
+("kill")
+("new_shape", ())
+("canvas_id", ("id":id))
+("update_shape",())
+
+
+new_shape, canvas_id, update_shape
+"""
+####
 
 
 def test_run(self):
     print("Started Test_run")
-    _, first_message= self.recieve()
-    type = first_message.get("type")
-    assert type == "standard"  ## THIS IS WHAT YOU SHOULD GET
-    print("before run loop")
-    drawing_queue= first_message.get("drawing_queue")
-    associated_canvas_ids = []
-    spawned_actors = []
-    while True:
-        sender, new_message = self.recieve()
-        print(f"test run {new_message}")
-        message_type = new_message.get("type")
-        if message_type == "kill":
-            break
-        elif message_type == "new_shape":
-            message_info = new_message.get("info")
-            print(f"message_info {message_info}")
-            drawing_queue.put((self, {"type": "action", "action": "new", "info": message_info}))
-            print("sent a message to the drawing actor")
-        elif message_type == "canvas_id":
-            canvas_id = new_message.get("info")
-            associated_canvas_ids.append(canvas_id)
-        elif message_type == "update_shape":
-            message_info = new_message.get("info")
-            print(f"message_info {message_info}")
-            if len(associated_canvas_ids) > 0:
-                drawing_queue.put((self, {"type": "action", "action": "update", "id": associated_canvas_ids[0], "info": message_info}))
-    print("run function finished")
+    first_message=self.recieve()
+    assert first_message[0]=="drawing_queue"  ## THIS IS WHAT YOU SHOULD GET
+    ## local variables
+    drawing_queue= first_message[1]
+    associated_canvas_ids=[]
+    spawned_actors=[]
+    match first_message:
+        case ("kill"):
+            self.end()
+        case ("new_shape", "coordinates"):
+            pass
+        case ("update_shape", "coordinates"):
+            pass
+        case ("inform", "ids", ):
+            pass
+
+def draw_loop(drawing_queue:Queue,canvas):
+    if drawing_queue.empty() == False:
+        message = drawing_queue.get()
+        print(f"draw loop {message}")
+        match message:
+            case ("kill") | ("Kill"):
+                print('hmm, not sure yet what to do with this as I am a queue and not an actor')
+            case ("action", _ as action, ):
+                match action:
+                    case ("new", *rest):
+                        # make a new thing 
+                        sender = rest.get("sender")
+                        id = canvas.create_polygon(rest.get("coordinates"), outline='blue',fill="white", width=2)
+                        sender.send(("id",id))
+                    case ("updsate", ("id", *rest), ("coordinates", *wild)):
+                        canvas.coords(rest[0], rest[1])
+                
+
 
 def handle_currently_recognized(program_encoding,current_coords, drawing_queue):
         print("went into currently recognized")
@@ -156,12 +158,12 @@ def handle_currently_recognized(program_encoding,current_coords, drawing_queue):
                     t = Actor(target = test_run)
                     encoding_to_actor[program_encoding] = t
                     t.start()
-                    t.read_only_message({"type": "standard", "drawing_queue":drawing_queue})
-                    t.read_only_message({"type": "new_shape", "info": current_coords})
+                    t.send({"type": "standard", "drawing_queue":drawing_queue})
+                    t.send({"type": "new_shape", "info": current_coords})
                 # Case two we have seen this before and the thread is running.
                 else:
                     t = encoding_to_actor.get(program_encoding)
-                    t.read_only_message({"type": "update_shape", "info": current_coords})
+                    t.send({"type": "update_shape", "info": current_coords})
             else: # No associated program
                 print(f"There is no associated program with the encoding: {program_encoding}")
 
