@@ -1,5 +1,6 @@
 from threading import Thread
 from typing import Self
+from queue import Queue
 
 class Actor(Thread):
     def __init__(self, target):
@@ -19,3 +20,4 @@ class Actor(Thread):
 
     def end(self):
         self.read_only_message({"type": "kill"})
+

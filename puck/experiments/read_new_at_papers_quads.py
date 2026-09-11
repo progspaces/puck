@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 from collections import Counter
 import threading 
 import time
+from queue import Queue
 from actor import Actor
 
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
@@ -90,45 +91,36 @@ def scale(cwidth, cheight, fheight, fwidth, coord_list):
     return scaled_list
 
 
-def draw_loop(self):
-    print("started draw_loop")
-    _, first_message= self.read()
-    type = first_message.get("type")
-    assert type == "drawing"  ## THIS IS WHAT YOU SHOULD GET
-    canvas = first_message.get("canvas")
-    print("before draw loop")
-    while True:
-        time.sleep(.01)
-        print("in drawing loop")
-        sender, new_message = self.read()
-        print(f"draw loop {new_message}")
-        message_type = new_message.get("type")
+def draw_loop(drawing_queue:Queue,canvas):
+    if drawing_queue.empty() == False:
+        sender, message = drawing_queue.get()
+        print(f"draw loop {message}")
+        message_type = message.get("type")
         if message_type == "kill":
-            break
+            print("HM")
         elif message_type == "action":
-            message_action = new_message.get("action")
-            message_info = new_message.get("info")
+            message_action = message.get("action")
+            message_info = message.get("info")
             print("an action message has been recieved")
             if message_action == "new":
                 id = canvas.create_polygon(message_info, outline='blue',fill="white", width=2)
                 print("a polygon should be drawn at this point")
-                self.send_to(sender,{"type": "canvas_id", "info": id})
+                ###(sender,{"type": "canvas_id", "info": id})
             elif message_action == "update":
                 print("an update action should be taken")
-                id = new_message.get("id")
+                id = message.get("id")
                 print(id)
                 print("GOT ID")
-                canvas.coords(id, message_info)
+                message.coords(id, message_info)
                 ### stopped here
                 print('should update drawing')
-    print("draw loop function finished")
+
 
 def test_run(self):
     print("Started Test_run")
     _, first_message= self.read()
     type = first_message.get("type")
     assert type == "standard"  ## THIS IS WHAT YOU SHOULD GET
-    drawing_actor = first_message.get("drawing_actor")
     print("before run loop")
     associated_canvas_ids = []
     while True:
@@ -140,7 +132,7 @@ def test_run(self):
         elif message_type == "new_shape":
             message_info = new_message.get("info")
             print(f"message_info {message_info}")
-            self.send_to(drawing_actor, {"type": "action", "action": "new", "info": message_info})
+            # self.send_to(drawing_actor, {"type": "action", "action": "new", "info": message_info})
             print("sent a message to the drawing actor")
         elif message_type == "canvas_id":
             canvas_id = new_message.get("info")
@@ -150,10 +142,11 @@ def test_run(self):
             message_info = new_message.get("info")
             print(f"message_info {message_info}")
             if len(associated_canvas_ids) > 0:
-                self.send_to(drawing_actor, {"type": "action", "action": "update", "id": associated_canvas_ids[0], "info": message_info})
+                pass
+                # self.send_to(drawing_actor, {"type": "action", "action": "update", "id": associated_canvas_ids[0], "info": message_info})
     print("run function finished")
 
-def handle_currently_recognized(program_encoding,current_coords, drawing_actor):
+def handle_currently_recognized(program_encoding,current_coords, drawing_queue):
         if program_encoding is not None: ## in other words the int form is a good value and we like it.
             if program_lookup.get(str(program_encoding)) is not None:
                 module_name = "puck.program_store." + program_lookup.get(str(program_encoding))##
@@ -162,7 +155,7 @@ def handle_currently_recognized(program_encoding,current_coords, drawing_actor):
                     t = Actor(target = test_run)
                     encoding_to_actor[program_encoding] = t
                     t.start()
-                    t.read_only_message({"type": "standard", "drawing_actor":drawing_actor})
+                    t.read_only_message({"type": "standard", "drawing_queue":drawing_queue})
                     t.read_only_message({"type": "new_shape", "info": current_coords})
                 # Case two we have seen this before and the thread is running.
                 else:
@@ -172,13 +165,13 @@ def handle_currently_recognized(program_encoding,current_coords, drawing_actor):
                 print(f"There is no associated program with the encoding: {program_encoding}")
 
 
-def handle_raw_ids(ids,coords,drawing_actor):
+def handle_raw_ids(ids,coords,drawing_queue):
     if ids is not None:
         program_encoding = int("".join(map(str, ids)),4)
         if program_encoding == 192 or program_encoding == 48 or program_encoding == 12:
             program_encoding = 3
         print(program_encoding)
-        handle_currently_recognized(program_encoding,coords,drawing_actor)
+        handle_currently_recognized(program_encoding,coords,drawing_queue)
         return program_encoding
     else:
         return None
@@ -186,40 +179,35 @@ def handle_raw_ids(ids,coords,drawing_actor):
 def webcamManyCaptures(base,buffer_size = 35):
     cheight, cwidth = 1080,1920
     canvas = Canvas(height= cheight, width = cwidth, background='black')
-    v = StringVar(value= "FOR NOW") 
-    text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
+    # v = StringVar(value= "FOR NOW") 
+    # text_label_replace = canvas.create_text((200,50),text=v.get(),font=("Helvetica", 50), fill= "White")
     
     canvas.pack()
 
-    drawing_actor = Actor(target = draw_loop)
-    encoding_to_actor["drawing_actor"]= drawing_actor
-    drawing_actor.start()
-    drawing_actor.read_only_message({"type": "drawing", "canvas": canvas})
-    canvas = None # lose ownership
+    drawing_queue = Queue()
 
     cam = cv.VideoCapture(0)
     _, frame = cam.read()
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
     papers_and_ids = paper_frame_based(frame)
     for paper, id, in papers_and_ids:
-        program_encoding = handle_raw_ids(id, paper, drawing_actor)
+        program_encoding = handle_raw_ids(id, paper, drawing_queue)
     # v = StringVar(value= str(program_encoding)) 
     
     def update(cam):
+        print("entered update")
         _, frame = cam.read()
         window_name = "Second Monitor Window"
         cv.namedWindow(window_name, cv.WINDOW_FREERATIO,)
         cv.moveWindow(window_name, 0, 300)
         cv.resizeWindow(window_name, 600, 500)
         cv.imshow(window_name, frame)
-        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-        pre_existing_encodings = set(encoding_to_actor.copy().keys())
-        pre_existing_encodings.remove("drawing_actor") ## we do not want to be rid of the drawing actor unless q is pressed
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)## we do not want to be rid of the drawing actor unless q is pressed
         for coords, ids in paper_frame_based(frame):
         ## whatever it "sees" is "in the scene" by this point. whatever it doesn't "see" should be killed off.
         # for coords, ids in frames_frame_based(frame): ## needs to return a list of tuples
-            program_encoding = handle_raw_ids(ids, coords, drawing_actor)
-            if program_encoding is not None: pre_existing_encodings.discard(program_encoding) 
+            program_encoding = handle_raw_ids(ids, coords, drawing_queue)
+   
                 ## using discard so it doesn't throw an error when pre_existing_encodings doesn't have it
                 ## use remove to throw an error when the set of pre_existing_encordings doesn't have it.
         #     # canvas.coords(box, frame_to_polygon_list(avg_box)) ## outline of paper
@@ -228,6 +216,8 @@ def webcamManyCaptures(base,buffer_size = 35):
         #     assert False
         #     actor.end()
         #     encoding_to_actor.pop(encoding)
+        print('got to draw loop')
+        draw_loop(drawing_queue=drawing_queue, canvas= canvas)
         if cv.waitKey(1) == ord('q'): ## stopping condition
             print("WE ARE STARTING TO STOP THE ENDING CONDITION PLEASE YES")
             for encoding,a in encoding_to_actor.items():
