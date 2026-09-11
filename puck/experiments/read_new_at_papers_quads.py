@@ -122,6 +122,7 @@ def test_run(self):
     type = first_message.get("type")
     assert type == "standard"  ## THIS IS WHAT YOU SHOULD GET
     print("before run loop")
+    drawing_queue= first_message.get("drawing_queue")
     associated_canvas_ids = []
     while True:
         sender, new_message = self.read()
@@ -132,21 +133,20 @@ def test_run(self):
         elif message_type == "new_shape":
             message_info = new_message.get("info")
             print(f"message_info {message_info}")
-            # self.send_to(drawing_actor, {"type": "action", "action": "new", "info": message_info})
+            drawing_queue.put((self, {"type": "action", "action": "new", "info": message_info}))
             print("sent a message to the drawing actor")
         elif message_type == "canvas_id":
             canvas_id = new_message.get("info")
-            print(new_message.get("info"))
             associated_canvas_ids.append(canvas_id)
         elif message_type == "update_shape":
             message_info = new_message.get("info")
             print(f"message_info {message_info}")
             if len(associated_canvas_ids) > 0:
-                pass
-                # self.send_to(drawing_actor, {"type": "action", "action": "update", "id": associated_canvas_ids[0], "info": message_info})
+                drawing_queue.put((self, {"type": "action", "action": "update", "id": associated_canvas_ids[0], "info": message_info}))
     print("run function finished")
 
 def handle_currently_recognized(program_encoding,current_coords, drawing_queue):
+        print("went into currently recognized")
         if program_encoding is not None: ## in other words the int form is a good value and we like it.
             if program_lookup.get(str(program_encoding)) is not None:
                 module_name = "puck.program_store." + program_lookup.get(str(program_encoding))##
@@ -192,6 +192,7 @@ def webcamManyCaptures(base,buffer_size = 35):
     papers_and_ids = paper_frame_based(frame)
     for paper, id, in papers_and_ids:
         program_encoding = handle_raw_ids(id, paper, drawing_queue)
+        print(program_encoding)
     # v = StringVar(value= str(program_encoding)) 
     
     def update(cam):
@@ -207,6 +208,7 @@ def webcamManyCaptures(base,buffer_size = 35):
         ## whatever it "sees" is "in the scene" by this point. whatever it doesn't "see" should be killed off.
         # for coords, ids in frames_frame_based(frame): ## needs to return a list of tuples
             program_encoding = handle_raw_ids(ids, coords, drawing_queue)
+            print(program_encoding)
    
                 ## using discard so it doesn't throw an error when pre_existing_encodings doesn't have it
                 ## use remove to throw an error when the set of pre_existing_encordings doesn't have it.
@@ -227,7 +229,7 @@ def webcamManyCaptures(base,buffer_size = 35):
                 a.join()
             print("done with the joining and the exiting")
             base.quit()
-        base.after(10, update, cam)  # Timed Check, adding itself back onto the queue to run 20ms later
+        base.after(200, update, cam)  # Timed Check, adding itself back onto the queue to run 20ms later
         
     base.after(20, update, cam)
     print("pre mainloop")

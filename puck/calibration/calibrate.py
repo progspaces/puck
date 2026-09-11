@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import NDArray
 from screeninfo import Monitor, get_monitors
 
-from chessboard import make_chessboard
+from .chessboard import make_chessboard
 
 
 # each file should have it's own logger
@@ -35,7 +35,7 @@ class CalibrationInfo:
     @classmethod
     def load(cls, path: Path) -> "CalibrationInfo":
         mat = np.loadtxt(path)
-        return CalibrationInfo(camera_to_projector_homography=mat)
+        return cls(camera_to_projector_homography=mat)
 
 
 # -----------------------------------------------------------------------------
@@ -139,6 +139,21 @@ def capture_average(
 # Exported functionality
 # -----------------------------------------------------------------------------
 def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
+    """Calibrate the camera to projector transform matrix.
+
+    Args:
+        projector_id (int): The id of the projector (normally 1).
+        camera_id (int): the id of the camera (normally 0).
+
+    Raises:
+        RuntimeError: _description_
+        RuntimeError: _description_
+        RuntimeError: _description_
+
+    Returns:
+        CalibrationInfo: Information about the calibration.
+    """
+
     logger.info("Calibrating system ...")
 
     PROJECTOR_WINDOW_NAME = "projector"
@@ -233,4 +248,3 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         cv2.destroyAllWindows()
 
     return CalibrationInfo(camera_to_projector_homography=homography)
-

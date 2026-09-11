@@ -6,6 +6,7 @@ class Actor(Thread):
     def __init__(self, target):
         super().__init__(target=target, args=(self,))
         self.unread_messages:list[tuple[Self, dict]] = []
+        ## make this a threading queue
 
     def send_to(self, recipient:Self, message:dict): ## push to this queue
         recipient.unread_messages.append((self, message))
@@ -14,6 +15,9 @@ class Actor(Thread):
         while len(self.unread_messages) == 0:
             pass
         return self.unread_messages.pop(0)
+
+    ##switch read to .get treat unreadmessages as a queue
+    
 
     def read_only_message(self, message):
         self.unread_messages.append((None, message))

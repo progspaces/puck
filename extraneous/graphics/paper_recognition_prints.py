@@ -1,4 +1,4 @@
-import puck.graphics.graphics_test as graphics_functions
+import extraneous.graphics.graphics_test as graphics_functions
 # from tkinter import Tk; 
 # from tkinter import *
 # from tkinter import ttk
