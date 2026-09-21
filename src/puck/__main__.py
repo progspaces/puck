@@ -50,9 +50,9 @@ def canvas_setup(base: Tk) -> Canvas:
     canvas.pack()
     return canvas
 
-def camera_setup() -> cv.VideoCapture:
+def camera_setup(camera_id: int) -> cv.VideoCapture:
     # Create camera
-    cam = cv.VideoCapture(0)
+    cam = cv.VideoCapture(camera_id)
 
     # Get one frame to verify (will throw if broken)
     _, frame = cam.read()
@@ -206,7 +206,7 @@ def update(cam: cv.VideoCapture, encoding_to_actor: dict[str, Actor], program_lo
     base.after(16, update, cam, encoding_to_actor, program_lookup, drawing_queue, canvas, window_name)
 
 
-def start_puck(log: bool = False, log_level: int = 0) -> None:
+def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> None:
     print("Hello from puck!")
     logging_setup(log, log_level)
     tk_setup()
@@ -214,7 +214,7 @@ def start_puck(log: bool = False, log_level: int = 0) -> None:
     encoding_to_actor: dict[str, Actor] = {}
     canvas = canvas_setup(base)
     drawing_queue: Queue = Queue()
-    cam = camera_setup()
+    cam = camera_setup(camera_id)
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
     base.after(16, update, cam, encoding_to_actor, program_lookup, drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME)
     base.mainloop()
