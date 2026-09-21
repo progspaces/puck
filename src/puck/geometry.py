@@ -1,10 +1,11 @@
 import math
 
+
 def angle_to(p, q):
     """Angle in radians from p to q, clockwise from horizontal right."""
     if p == q:
         raise ValueError("no angle from a point to itself")
-    
+
     px, py = p
     qx, qy = q
 
@@ -13,11 +14,11 @@ def angle_to(p, q):
 
     if dx == 0:
         if dy > 0:
-            angle = math.pi /2
+            angle = math.pi / 2
         else:
             angle = -math.pi / 2
     else:
-        angle = math.atan(dy/dx)
+        angle = math.atan(dy / dx)
 
     if dx < 0:
         angle += math.pi
@@ -57,4 +58,3 @@ def order_no_color_rectangle(point_list, reference):
     assert ordered[1] != ordered[2]
     assert ordered[0] != ordered[2]
     return ordered
-
