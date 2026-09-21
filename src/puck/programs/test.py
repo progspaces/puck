@@ -1,6 +1,6 @@
 import logging
 
-from actor import Actor
+from ..actor import Actor
 
 logger = logging.getLogger(__name__)
 

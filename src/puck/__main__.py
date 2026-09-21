@@ -3,15 +3,20 @@ from tkinter import * # TODO: avoid *
 base = Tk()
 
 # Standard packages
+import importlib
+import json
 import logging
 from queue import Queue
 
 # External packages
 import cv2 as cv
+import numpy as np
+import matplotlib.pyplot as plt
 import typer
 
 # Local packages and modules
-from actor import Actor
+from . import geometry
+from .actor import Actor
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -37,7 +42,7 @@ def tk_setup() -> None:
 
 def load_program_store(filename: str) -> dict[str, str]:
     with open(filename) as f:
-        return dict(load(f))
+        return dict(json.load(f))
 
 
 def canvas_setup(base: Tk) -> Canvas:
@@ -62,7 +67,16 @@ def camera_perspective_window_setup(window_name: str):
     cv.resizeWindow(window_name, 600, 500)
 
 
-def detect_paper_tags(frame: np.array) -> list[tuple[list[tuple[int, int]] | None, list[int] | None]]:  # TODO: sort out this type nightmare
+def average_pt(corners: list[tuple[int, int]]) -> tuple[int, int]:
+    sum_x = 0
+    sum_y = 0 
+    for pair in corners:
+        sum_x += pair[0]
+        sum_y += pair[1]
+    return (int(sum_x/4), int(sum_y/4))
+
+
+def detect_paper_tags(frame: np.array) -> list[tuple[list[tuple[int, int]], list[int]]]:  # TODO: sort out this type nightmare
     input = frame
     detector = cv.aruco.ArucoDetector(dictionary=DICT)
     corners, ids, _ = detector.detectMarkers(input)
@@ -83,7 +97,7 @@ def detect_paper_tags(frame: np.array) -> list[tuple[list[tuple[int, int]] | Non
                           average_pt(corners_c)]
         return [(averaged_paper, ids)]
     else:
-        return [(None,None)]
+        return []
 
 
 def tags_to_pid(tags):
@@ -101,28 +115,29 @@ def tags_to_pid(tags):
 def clockwise_coordinates(coords: list[tuple[int, int]]) -> list[tuple[int, int]]:
     """Returns a reordered list of these coordinates, to help make a convex hull."""
     starting_point = coords[0]
-    ordered = clockwise_dots.order_no_color_rectangle(coords, starting_point)
+    ordered = geometry.order_no_color_rectangle(coords, starting_point)
     ordered.insert(0, starting_point)
     return ordered
 
 
-def create_and_update_actors(program_encoding: int, current_coords: list[tuple[int, int]], drawing_queue: Queue) -> None:
+def create_and_update_actors(program_encoding: int, current_coords: list[tuple[int, int]], encoding_to_actor: dict[str, Actor], program_lookup: dict[str, str], drawing_queue: Queue) -> None:
+    # TODO: program_encoding should have ints, not strs in the json file
     if str(program_encoding) not in program_lookup:
         print(f"There is no associated program with the encoding: {program_encoding}")
         return
 
     # TODO: use this to load modules dynamically
-    module_name = "puck.programs." + program_lookup.get(str(program_encoding))
+    module_name = "puck.programs." + program_lookup[str(program_encoding)]
     module = importlib.import_module(module_name)
 
-    if t := encoding_to_actor.get(program_encoding):
+    if t := encoding_to_actor.get(str(program_encoding)):
         # This program is already running
         # TODO: the id isn't used at the moment
         t.send(("update_shape", ("id", 0), ("coordinates", current_coords)))
     else:
         # This program is not yet running
         t = Actor(target=module.run)
-        encoding_to_actor[program_encoding] = t
+        encoding_to_actor[str(program_encoding)] = t
         t.start()
         t.send(("drawing_queue", drawing_queue)) # TODO: pass as environment on construction instead
         t.send(("new_shape", ("type", "rectangle"), ("coordinates", current_coords)))
@@ -158,7 +173,7 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
     canvas.pack()
 
 
-def update(cam: cv.VideoCapture, window_name: str) -> None:
+def update(cam: cv.VideoCapture, encoding_to_actor: dict[str, Actor], program_lookup: dict[str, str], drawing_queue: Queue, canvas: Canvas, window_name: str) -> None:
     logger.log(level=19, msg="Called the Update Function")
 
     # Get a frame
@@ -172,7 +187,7 @@ def update(cam: cv.VideoCapture, window_name: str) -> None:
         if program_encoding:
             logger.log(level = 18, msg = f"Saw program encoding, {program_encoding}")
             coords = clockwise_coordinates(coords)
-            create_and_update_actors(program_encoding, coords, drawing_queue)
+            create_and_update_actors(program_encoding, coords, encoding_to_actor, program_lookup, drawing_queue)
 
     draw(drawing_queue, canvas)
 
@@ -185,12 +200,10 @@ def update(cam: cv.VideoCapture, window_name: str) -> None:
             logger.log(level = 16, msg = "Got past the end, onto Join now")
             a.join()
         logger.log(level=17, msg = "finished the joining and ending")
-        logger.log(level=17, msg = f"The initial number of objects in the canvas was {initial_number}" )
-        logger.log(level=17, msg = f"The number of objects in the canvas is {len(canvas.find_all())}" )
         base.quit()
 
     # Tell event loop to run this again in 16ms
-    base.after(16, update, cam)
+    base.after(16, update, cam, encoding_to_actor, program_lookup, drawing_queue, canvas, window_name)
 
 
 def start_puck(log: bool = False, log_level: int = 0) -> None:
@@ -200,10 +213,10 @@ def start_puck(log: bool = False, log_level: int = 0) -> None:
     program_lookup = load_program_store(PROGRAM_LOOKUP_FILE)
     encoding_to_actor: dict[str, Actor] = {}
     canvas = canvas_setup(base)
-    drawing_queue = Queue()
+    drawing_queue: Queue = Queue()
     cam = camera_setup()
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
-    base.after(16, update, cam, CAMERA_PERSPECTIVE_WINDOW_NAME)
+    base.after(16, update, cam, encoding_to_actor, program_lookup, drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME)
     base.mainloop()
     cam.release()
     cv.destroyAllWindows()
