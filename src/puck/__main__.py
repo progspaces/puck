@@ -4,6 +4,7 @@ base = Tk()
 
 # Standard packages
 import logging
+from queue import Queue
 
 # External packages
 import cv2 as cv
@@ -14,9 +15,9 @@ from actor import Actor
 
 # Global variables
 logger = logging.getLogger(__name__)
-PROGRAM_LOOKUP_FILE = 'puck/program_store/program_lookup.json' # TODO
+PROGRAM_LOOKUP_FILE = "data/program_lookup.json" # TODO: make configurable
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
-C_HEIGHT, C_WIDTH = 1080, 1920
+CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
 CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
 
 def logging_setup(log: bool, log_level: int) -> None:
@@ -40,7 +41,7 @@ def load_program_store(filename: str) -> dict[str, str]:
 
 
 def canvas_setup(base: Tk) -> Canvas:
-    canvas = Canvas(base, height=C_HEIGHT, width=C_WIDTH, background='black')
+    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background='black')
     canvas.pack()
     return canvas
 
@@ -61,7 +62,7 @@ def camera_perspective_window_setup(window_name: str):
     cv.resizeWindow(window_name, 600, 500)
 
 
-def detect_paper_tags(frame: np.array) -> list[tuple[list[tuple[int, int]], list[int]]]:  # TODO: sort out this type nightmare
+def detect_paper_tags(frame: np.array) -> list[tuple[list[tuple[int, int]] | None, list[int] | None]]:  # TODO: sort out this type nightmare
     input = frame
     detector = cv.aruco.ArucoDetector(dictionary=DICT)
     corners, ids, _ = detector.detectMarkers(input)
@@ -97,6 +98,66 @@ def tags_to_pid(tags):
         return None
 
 
+def clockwise_coordinates(coords: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Returns a reordered list of these coordinates, to help make a convex hull."""
+    starting_point = coords[0]
+    ordered = clockwise_dots.order_no_color_rectangle(coords, starting_point)
+    ordered.insert(0, starting_point)
+    return ordered
+
+
+def create_and_update_actors(program_encoding: int, current_coords: list[tuple[int, int]], drawing_queue: Queue) -> None:
+    if str(program_encoding) not in program_lookup:
+        print(f"There is no associated program with the encoding: {program_encoding}")
+        return
+
+    # TODO: use this to load modules dynamically
+    module_name = "puck.programs." + program_lookup.get(str(program_encoding))
+    module = importlib.import_module(module_name)
+
+    if t := encoding_to_actor.get(program_encoding):
+        # This program is already running
+        # TODO: the id isn't used at the moment
+        t.send(("update_shape", ("id", 0), ("coordinates", current_coords)))
+    else:
+        # This program is not yet running
+        t = Actor(target=module.run)
+        encoding_to_actor[program_encoding] = t
+        t.start()
+        t.send(("drawing_queue", drawing_queue)) # TODO: pass as environment on construction instead
+        t.send(("new_shape", ("type", "rectangle"), ("coordinates", current_coords)))
+
+
+def draw(drawing_queue: Queue, canvas: Canvas) -> None:
+    if not drawing_queue.empty(): # TODO: change to 'while'
+        message = drawing_queue.get()
+        logger.log(level = 17, msg = f"draw loop got message {message}")
+
+        assert message != "kill"
+        match message:
+            case ("action", _ as action, ):
+                match action:
+                    case (("new", ("type", type), ("sender", sender), ("coordinates", coordinates))):
+                        assert type == "rectangle" or type == "polygon"
+                        outline = "blue"
+                        fill = "white"
+                        width = 2
+                        id = canvas.create_polygon(coordinates,fill=fill, outline=outline, width=width )
+                        sender.send(("information", ("add_ids", [id])))
+                    case ("new", *invalid_new):
+                        print(f"You have provided me this message, {invalid_new}," \
+                            "to create a new graphical object, but I'm not sure what type of object. \n " \
+                            "It would help if you specified the type of object you want to add.")
+                    case ("update", ("id", id), ("coordinates", coordinates), *further_info):
+                        canvas.coords(id, coordinates)
+                    case _ as invalid_action:
+                        print(f"You have provided an invalid action message, '{invalid_action}' is not an action I understand")
+            case _ as invalid_message: 
+                print(f"You have provided an invalid message, '{invalid_message}' is not a message I understand")
+        logger.log(level = 17, msg = f"drawing loop has been reached its end")
+    canvas.pack()
+
+
 def update(cam: cv.VideoCapture, window_name: str) -> None:
     logger.log(level=19, msg="Called the Update Function")
 
@@ -108,23 +169,28 @@ def update(cam: cv.VideoCapture, window_name: str) -> None:
     # Recognise and execute papers
     for coords, tags in detect_paper_tags(frame):
         program_encoding = tags_to_pid(tags)
-        logger.log(level = 18, msg = f"Saw program encoding, {program_encoding}")
-        coords = order_coordinates_to_avoid_x(coords=coords)
-        handle_currently_recognized(program_encoding, coords, drawing_queue)
+        if program_encoding:
+            logger.log(level = 18, msg = f"Saw program encoding, {program_encoding}")
+            coords = clockwise_coordinates(coords)
+            create_and_update_actors(program_encoding, coords, drawing_queue)
 
-    draw_loop(drawing_queue=drawing_queue, canvas= canvas)
-    if cv.waitKey(1) == ord('q'): ## stopping condition
-        logger.log(level = 17, msg = f"In the stopping condition")
-        for encoding,a in encoding_to_actor.items():
+    draw(drawing_queue, canvas)
+
+    # Handle quitting
+    if cv.waitKey(1) == ord('q'):
+        logger.log(level=17, msg = "In the stopping condition")
+        for encoding, a in encoding_to_actor.items():
             a.end()
             logger.log(level = 16, msg = f"encoding asscoiated is : {encoding}")
             logger.log(level = 16, msg = "Got past the end, onto Join now")
             a.join()
-        logger.log(level = 17, msg = f"finished the joining and ending")
-        logger.log(level = 17, msg = f"The initial number of objects in the canvas was {initial_number}" )
-        logger.log(level = 17, msg = f"The number of objects in the canvas is {len(canvas.find_all())}" )
+        logger.log(level=17, msg = "finished the joining and ending")
+        logger.log(level=17, msg = f"The initial number of objects in the canvas was {initial_number}" )
+        logger.log(level=17, msg = f"The number of objects in the canvas is {len(canvas.find_all())}" )
         base.quit()
-    base.after(16, update, cam)  # Timed Check, adding itself back onto the queue to run 20ms later
+
+    # Tell event loop to run this again in 16ms
+    base.after(16, update, cam)
 
 
 def start_puck(log: bool = False, log_level: int = 0) -> None:
@@ -137,7 +203,10 @@ def start_puck(log: bool = False, log_level: int = 0) -> None:
     drawing_queue = Queue()
     cam = camera_setup()
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
-
+    base.after(16, update, cam, CAMERA_PERSPECTIVE_WINDOW_NAME)
+    base.mainloop()
+    cam.release()
+    cv.destroyAllWindows()
 
 
 def main() -> None:
