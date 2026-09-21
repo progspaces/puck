@@ -5,7 +5,7 @@ from ..actor import Actor
 logger = logging.getLogger(__name__)
 
 def run(self: Actor):
-    logger.log(level = 17, msg = f"test_run has been called sucessfully")
+    logger.info("test_run has been called sucessfully")
     first_message=self.recieve()
     assert first_message[0]=="drawing_queue"
     drawing_queue= first_message[1]
@@ -13,7 +13,7 @@ def run(self: Actor):
     spawned_actors=[]
     while True:
         message = self.recieve()
-        logger.log(level = 17, msg = f"test_run has been gotten {message}")
+        logger.debug("test_run has been gotten {message}")
         match message:
             case ("kill"):
                 self.end()
@@ -24,7 +24,7 @@ def run(self: Actor):
                 if associated_canvas_ids:
                     drawing_queue.put(("action", ("update", ("id", associated_canvas_ids[0]), ("coordinates", coordinates))))
                 else:
-                    logger.log(level = 20, msg = f"We have no associated canvas ids yet so we cannot update.")
+                    logger.error("We have no associated canvas ids yet so we cannot update.")
             case ("information", *info):
                 match info[0]:
                     case ("add_ids", id_list):
@@ -34,4 +34,4 @@ def run(self: Actor):
             case _ as undefined:
                 print(f"Youv'e given me this message: {undefined} \n" \
                       "I do not know what to do with it as I do not have a match case....")
-    logger.log(level = 17, msg = f"test_run has ended...")
+    logger.info("test_run finished")

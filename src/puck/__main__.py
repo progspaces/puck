@@ -28,7 +28,7 @@ CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
 def logging_setup(log: bool, log_level: int) -> None:
     if log:
         logging.basicConfig(level=log_level)
-        logger.log(level=logging.INFO, msg= f"Logging working at level {log_level}")
+        logger.info(f"Logging working at level {log_level}")
 
 
 def tk_setup() -> None:
@@ -106,7 +106,7 @@ def tags_to_pid(tags):
         program_encoding = int("".join(map(str, filtered)),4)
         if program_encoding == 192 or program_encoding == 48 or program_encoding == 12:
             program_encoding = 3
-        logger.log(level = 16, msg = f"Raw id: {tags} to interpreted id: {program_encoding}")
+        logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
         return program_encoding
     else:
         return None
@@ -146,7 +146,7 @@ def create_and_update_actors(program_encoding: int, current_coords: list[tuple[i
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
     if not drawing_queue.empty(): # TODO: change to 'while'
         message = drawing_queue.get()
-        logger.log(level = 17, msg = f"draw loop got message {message}")
+        logger.debug(f"draw loop got message {message}")
 
         assert message != "kill"
         match message:
@@ -169,12 +169,12 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
                         print(f"You have provided an invalid action message, '{invalid_action}' is not an action I understand")
             case _ as invalid_message: 
                 print(f"You have provided an invalid message, '{invalid_message}' is not a message I understand")
-        logger.log(level = 17, msg = f"drawing loop has been reached its end")
+        logger.debug("drawing loop finished")
     canvas.pack()
 
 
 def update(cam: cv.VideoCapture, encoding_to_actor: dict[str, Actor], program_lookup: dict[str, str], drawing_queue: Queue, canvas: Canvas, window_name: str) -> None:
-    logger.log(level=19, msg="Called the Update Function")
+    logger.debug("Called the Update Function")
 
     # Get a frame
     _, frame = cam.read()
@@ -185,7 +185,7 @@ def update(cam: cv.VideoCapture, encoding_to_actor: dict[str, Actor], program_lo
     for coords, tags in detect_paper_tags(frame):
         program_encoding = tags_to_pid(tags)
         if program_encoding:
-            logger.log(level = 18, msg = f"Saw program encoding, {program_encoding}")
+            logger.debug(f"Saw program encoding, {program_encoding}")
             coords = clockwise_coordinates(coords)
             create_and_update_actors(program_encoding, coords, encoding_to_actor, program_lookup, drawing_queue)
 
@@ -193,13 +193,13 @@ def update(cam: cv.VideoCapture, encoding_to_actor: dict[str, Actor], program_lo
 
     # Handle quitting
     if cv.waitKey(1) == ord('q'):
-        logger.log(level=17, msg = "In the stopping condition")
+        logger.info("In the stopping condition")
         for encoding, a in encoding_to_actor.items():
             a.end()
-            logger.log(level = 16, msg = f"encoding asscoiated is : {encoding}")
-            logger.log(level = 16, msg = "Got past the end, onto Join now")
+            logger.info(f"encoding asscoiated is : {encoding}")
+            logger.info("Got past the end, onto Join now")
             a.join()
-        logger.log(level=17, msg = "finished the joining and ending")
+        logger.info("finished the joining and ending")
         base.quit()
 
     # Tell event loop to run this again in 16ms
