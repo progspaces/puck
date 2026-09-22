@@ -28,12 +28,20 @@ CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
 
 
 def logging_setup(log: bool, log_level: int) -> None:
+    """Sets up the logging object and the level at which we are logging for different approaches, info vs debug.
+
+    Args:
+        log (bool): To log or not to log that is the question. (Turns on logging)
+        log_level (int): Level of logging you wish to have outputted.
+    """
     if log:
         logging.basicConfig(level=log_level)
         logger.info(f"Logging working at level {log_level}")
 
 
 def tk_setup() -> None:
+    """Sets up the tkinter window where it will draw graphics.
+    """
     base.tk.call("tk", "scaling", 2.0)
     base.title("Tkinter Widget Size")
     base.wm_attributes("-fullscreen", True)
@@ -43,17 +51,41 @@ def tk_setup() -> None:
 
 
 def load_program_store(filename: str) -> dict[str, str]:
+    """Loads in a .json dictionary for looking up what string is associated with what program name
+
+    Args:
+        filename (str): the file name of the .json dictionary
+
+    Returns:
+        dict[str, str]: the dictionary loaded as a dicionary object.
+    """
     with open(filename) as f:
         return dict(json.load(f))
 
 
 def canvas_setup(base: Tk) -> Canvas:
-    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black")
-    canvas.pack()
+    """Set up the tk canvas object on the tk base object.
+
+    Args:
+        base (Tk): The basic Tk object that everything is built off of
+
+    Returns:
+        Canvas: A tk canvas on which we can draw graphical objects.
+    """
+    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") # Creation.
+    canvas.pack() # Laying it out.
     return canvas
 
 
 def camera_setup(camera_id: int) -> cv.VideoCapture:
+    """Set up your camera to get a videofeed input.
+
+    Args:
+        camera_id (int): camera id, typically 0 or 1
+
+    Returns:
+        cv.VideoCapture: video feed
+    """
     # Create camera
     cam = cv.VideoCapture(camera_id)
 
@@ -65,6 +97,13 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
 
 
 def camera_perspective_window_setup(window_name: str):
+    """Set up a window that will show you what the camera is seeing. 
+    Oddly here the name of the window will be used to refer to it later on so it acts 
+    less like a random tidbit on the cv window and closer to an identifier.
+
+    Args:
+        window_name (str): Name of the window that shows up.
+    """
     cv.namedWindow(
         window_name,
         cv.WINDOW_FREERATIO,
@@ -74,6 +113,14 @@ def camera_perspective_window_setup(window_name: str):
 
 
 def average_pt(corners: list[tuple[int, int]]) -> tuple[int, int]:
+    """Takes in all four corners of the april tag and finds the middle point.
+
+    Args:
+        corners (list[tuple[int, int]]): the corners of an april tag
+
+    Returns:
+        tuple[int, int]: the middle point of an april tag.
+    """
     sum_x = 0
     sum_y = 0
     for pair in corners:
@@ -87,16 +134,24 @@ def detect_paper_tags(
 ) -> list[
     tuple[list[tuple[int, int]], list[int]]
 ]:  # TODO: sort out this type nightmare
-    input = frame
-    detector = cv.aruco.ArucoDetector(dictionary=DICT)
-    corners, ids, _ = detector.detectMarkers(input)
-    if ids is not None and len(ids) == 4:
-        bads = [x for x in ids if x > 4]
-        if len(bads) > 0:
+    """Takes in a frame of the video and determines what papers are wtihin it.
+    Currently we are just looking for one paper at a time, this needs to be increased in newer implementations.
+
+    Args:
+        frame (np.array): a frame of the video feed.
+
+    Returns:
+        list[ tuple[list[tuple[int, int]], list[int]] ]: A list of tuples each tuple holds a list that holds the corners of an april tag and the id found in the april tag.
+    """
+    detector = cv.aruco.ArucoDetector(dictionary=DICT) # Create a cv detector to find the appropriate Apriltags
+    corners, ids, _ = detector.detectMarkers(frame) # Return the corners and ids found in the image.
+    if ids is not None and len(ids) == 4: # If there are ids, and only 4 of them then ->
+        bads = [x for x in ids if x > 4] # If any of the ids are greater than 4, then we cannot do a base 4 transformation we have misrecognized an AprilTag
+        if len(bads) > 0: # There are ids that we shouldn't be recognizing so we should take down the problematic frame
             ## SAVE WHERE IT SEES THE BAD THING
-            copy = cv.aruco.drawDetectedMarkers(input, corners, ids)
+            copy = cv.aruco.drawDetectedMarkers(frame, corners, ids)
             plt.figimage = copy
-            plt.savefig("test.png")  ##??
+            plt.savefig("problematic_frame.png")  # we could come up with a better name for it, but if this shows up in your file system at least you know something has gone wrong.
         corners_a = corners[0][0]
         corners_b = corners[1][0]
         corners_c = corners[2][0]
@@ -107,12 +162,20 @@ def detect_paper_tags(
             average_pt(corners_d),
             average_pt(corners_c),
         ]
-        return [(averaged_paper, ids)]
+        return [(averaged_paper, ids)] # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
     else:
         return []
 
 
 def tags_to_pid(tags):
+    """Takes in all the scene apriltags and transforms them into a single integer which is the id of the paper.
+
+    Args:
+        tags list[int]: a list of the ids given
+
+    Returns:
+        int: the program encoding as an integer, if this is supposed to be 3, it returns 3.
+    """
     if tags is not None:
         filtered = [id for id in tags if id < 5][0:5]
         program_encoding = int("".join(map(str, filtered)), 4)
@@ -131,6 +194,15 @@ def create_and_update_actors(
     program_lookup: dict[str, str],
     drawing_queue: Queue,
 ) -> None:
+    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors 
+
+    Args:
+        program_encoding (int): the program identifier
+        current_coords (list[tuple[int, int]]): a list of the coordinates of the paper.
+        encoding_to_actor (dict[str, Actor]): a dictionary storing the encoding of the program (int as str) to the actor it starts
+        program_lookup (dict[str, str]): a dictionary storing the encoding of the program (int as a str) to the program name
+        drawing_queue (Queue): a universal queue that can only be used by the main thread to create graphics objects
+    """
     # TODO: program_encoding should have ints, not strs in the json file
     if str(program_encoding) not in program_lookup:
         print(f"There is no associated program with the encoding: {program_encoding}")
@@ -155,6 +227,12 @@ def create_and_update_actors(
 
 
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
+    """Draws what is on the drawing queue onto the canvas.
+
+    Args:
+        drawing_queue (Queue): the queue that all the actors and main thread can access
+        canvas (Canvas): the tkinter graphical space.
+    """
     if not drawing_queue.empty():  # TODO: change to 'while'
         message = drawing_queue.get()
         logger.debug(f"draw loop got message {message}")
@@ -213,6 +291,17 @@ def update(
     canvas: Canvas,
     window_name: str,
 ) -> None:
+    """Update the system with input from the camera.
+    Recursively adds itself onto the event loop for base.mainloop() using the .after() call.
+
+    Args:
+        cam (cv.VideoCapture): videofeed
+        encoding_to_actor (dict[str, Actor]): a dictionary tying the program encoding to the actor that it spawns
+        program_lookup (dict[str, str]): a dictionary tying the program encoding (int as a str) to the name of the program it is assocaited with.
+        drawing_queue (Queue): the universal drawing queue that all actors and the main thread can access
+        canvas (Canvas): the tkinter canvas
+        window_name (str): the name of the window that shows the camera feed
+    """
     logger.debug("Called the Update Function")
 
     # Get a frame
@@ -240,7 +329,7 @@ def update(
     if cv.waitKey(1) == ord("q"):
         logger.info("In the stopping condition")
         for encoding, a in encoding_to_actor.items():
-            a.end()
+            a.end() 
             logger.info(f"encoding asscoiated is : {encoding}")
             logger.info("Got past the end, onto Join now")
             a.join()
@@ -261,15 +350,22 @@ def update(
 
 
 def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> None:
-    print("Hello from puck!")
-    logging_setup(log, log_level)
-    tk_setup()
-    program_lookup = load_program_store(PROGRAM_LOOKUP_FILE)
-    encoding_to_actor: dict[str, Actor] = {}
-    canvas = canvas_setup(base)
-    drawing_queue: Queue = Queue()
-    cam = camera_setup(camera_id)
-    camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
+    """Runs the puck recognition system
+
+    Args:
+        log (bool, optional): Whether or not you are logging information about this run. Defaults to False.
+        log_level (int, optional): If you are logging at what level of detail are you logging information. Defaults to 0.
+        camera_id (int, optional): The id of the camera that is looking at the scene. Defaults to 0.
+    """
+    print("Hello from puck!") ## Generic print to make sure that everything is working
+    logging_setup(log, log_level) ## Setup the logger using the command line arguments
+    tk_setup() ## Set up the tkinter windows 
+    program_lookup = load_program_store(PROGRAM_LOOKUP_FILE) # Load the dictionary of programs 
+    encoding_to_actor: dict[str, Actor] = {} # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
+    canvas = canvas_setup(base) # Set up the canvas using 'base' a global tkinter variable set up at the beginning, required for all graphical commands in this implementation 
+    drawing_queue: Queue = Queue() # Drawing queue created here so that all actors can access it as well as the main thread.
+    cam = camera_setup(camera_id) # Cv2 camera set up so that we can get input from the real physical scene.
+    camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME) # using that camera to create a window that shows us what the camera is seeing.
     base.after(
         16,
         update,
@@ -279,11 +375,13 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> Non
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
-    )
-    base.mainloop()
-    cam.release()
-    cv.destroyAllWindows()
+    ) # Add a call to 'update' onto the base event loop with the arguments (cam, encoding_to_actor,program_lookup,drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME,)
+    base.mainloop() # Start the event loop, it will hang out here until stopping condition is met.
+    cam.release() # Get rid of the camera.
+    cv.destroyAllWindows() # destroy all cv windows.
 
 
 def main() -> None:
+    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments.
+    """
     typer.run(start_puck)
