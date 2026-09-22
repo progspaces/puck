@@ -124,14 +124,6 @@ def tags_to_pid(tags):
         return None
 
 
-def clockwise_coordinates(coords: list[tuple[int, int]]) -> list[tuple[int, int]]:
-    """Returns a reordered list of these coordinates, to help make a convex hull."""
-    starting_point = coords[0]
-    ordered = geometry.order_no_color_rectangle(coords, starting_point)
-    ordered.insert(0, starting_point)
-    return ordered
-
-
 def create_and_update_actors(
     program_encoding: int,
     current_coords: list[tuple[int, int]],
@@ -233,7 +225,7 @@ def update(
         program_encoding = tags_to_pid(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
-            coords = clockwise_coordinates(coords)
+            coords =  geometry.ordered_rectangle(coords, coords[0])
             create_and_update_actors(
                 program_encoding,
                 coords,
