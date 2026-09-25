@@ -4,80 +4,82 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 
+
 @dataclass
 class Point:
     x: int
     y: int
 
+
 def make_chessboard(
-        image_size: tuple[int, int],
-        num_squares: tuple[int, int] = (8, 6),
-        square_size: int = 100
-) -> tuple[NDArray[np.uint8], list[Point]]:
+    image_size: tuple[int, int] = (1920, 1080),
+    squares: tuple[int, int] = (8, 6),
+    square_size: int = 100,
+) -> tuple[NDArray[np.uint8], list[tuple[int, int]]]:
+    """Create a centred chessboard calibration pattern.
 
-    # unpack the parameters
+    Args:
+        image_size:
+            Image dimensions as (width, height).
+        squares:
+            Number of chessboard squares as (columns, rows).
+        square_size:
+            Width and height of each square in pixels.
+
+    Returns:
+        A tuple containing:
+        - The generated BGR image.
+        - The projector coordinates of the internal chessboard corners.
+    """
     image_width, image_height = image_size
-    cols, rows = num_squares
+    cols, rows = squares
 
-    # chessboard needs even dimensions
-    # not sure if this is a strict requirement but makes the generation code simpler
-    assert cols % 2 == 0, f"Chessboard generation issue: number of columns should be even, got {cols}."
-    assert rows % 2 == 0, f"Chessboard generation issue: number of rows should be even, got {rows}."
+    # assert col % 2 == 0, "Chessboard "
 
-    # create a target image to draw the board onto
-    # normally this is the size of the fullscreen projector
-    # so this is the full image that will be displayed
-    # on the projector
-    image = np.zeros(
-        (image_width, image_height, 3),
-        dtype=np.uint8
-    )
-
-    # compute the board sizes in pixels
     board_width = cols * square_size
     board_height = rows * square_size
 
-    # the OpenCV chessboard deteactor requires are light
-    # border around the chessboard.
-    border = square_size // 2
-
-    # work out the place to start drawing the board from
-    # this is the top-left corner
     offset_x = (image_width - board_width) // 2
     offset_y = (image_height - board_height) // 2
 
-    # draw a white background
-    assert offset_x - border, "Chessboard generation issue: border must be inside the target image."
-    assert offset_y - border, "Chessboard generation issue: border must be inside the target image."
-    top_left = (offset_x - border, offset_y - border)
-    bottom_right = (offset_x + image_width + border, 
-                    offset_y + image_height + border)
-    cv2.rectangle(
-        image,
-        top_left,
-        bottom_right,
-        (255, 255, 255),
-        thickness=-1
+    image: NDArray[np.uint8] = np.zeros(
+        (image_height, image_width, 3),
+        dtype=np.uint8,
     )
 
-    # draw the black chessboard squares
+    # Chessboard detectors need a light border around the pattern. Without it,
+    # black edge squares merge into the black projection background and the
+    # contour-based detector cannot identify the board reliably.
+    border = square_size // 2
+    cv2.rectangle(
+        image,
+        (max(0, offset_x - border), max(0, offset_y - border)),
+        (
+            min(image_width - 1, offset_x + board_width + border),
+            min(image_height - 1, offset_y + board_height + border),
+        ),
+        (255, 255, 255),
+        thickness=-1,
+    )
+
+    # Draw the black chessboard squares on the light backing.
     for row in range(rows):
         for col in range(cols):
-            # think of the squares on a line
-            # if we have an even number of cols this works
-            if (row + col) % 2:
+            if (row + col) % 2 == 0:
                 x = offset_x + col * square_size
                 y = offset_y + row * square_size
+
                 cv2.rectangle(
                     image,
                     (x, y),
                     (x + square_size, y + square_size),
-                    (0, 0, 0),  # black
+                    (0, 0, 0),
                     thickness=-1,
                 )
 
-    # generate points for the internal corners
+    # Internal corners only.
     points: list[tuple[int, int]] = []
+
     for row in range(1, rows):
         for col in range(1, cols):
             x = offset_x + col * square_size

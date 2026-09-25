@@ -11,13 +11,14 @@ from queue import Queue
 
 # External packages
 import cv2 as cv
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import typer
 
 # Local packages and modules
 from . import geometry
 from .actor import Actor
+from .calibration import calibrate
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -40,8 +41,7 @@ def logging_setup(log: bool, log_level: int) -> None:
 
 
 def tk_setup() -> None:
-    """Sets up the tkinter window where it will draw graphics.
-    """
+    """Sets up the tkinter window where it will draw graphics."""
     base.tk.call("tk", "scaling", 2.0)
     base.title("Tkinter Widget Size")
     base.wm_attributes("-fullscreen", True)
@@ -72,8 +72,10 @@ def canvas_setup(base: Tk) -> Canvas:
     Returns:
         Canvas: A tk canvas on which we can draw graphical objects.
     """
-    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") # Creation.
-    canvas.pack() # Laying it out.
+    canvas = Canvas(
+        base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black"
+    )  # Creation.
+    canvas.pack()  # Laying it out.
     return canvas
 
 
@@ -97,8 +99,8 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
 
 
 def camera_perspective_window_setup(window_name: str):
-    """Set up a window that will show you what the camera is seeing. 
-    Oddly here the name of the window will be used to refer to it later on so it acts 
+    """Set up a window that will show you what the camera is seeing.
+    Oddly here the name of the window will be used to refer to it later on so it acts
     less like a random tidbit on the cv window and closer to an identifier.
 
     Args:
@@ -130,7 +132,7 @@ def average_pt(corners: list[tuple[int, int]]) -> tuple[int, int]:
 
 
 def detect_paper_tags(
-    frame: np.array,
+    frame: np.typing.ArrayLike,
 ) -> list[
     tuple[list[tuple[int, int]], list[int]]
 ]:  # TODO: sort out this type nightmare
@@ -143,15 +145,27 @@ def detect_paper_tags(
     Returns:
         list[ tuple[list[tuple[int, int]], list[int]] ]: A list of tuples each tuple holds a list that holds the corners of an april tag and the id found in the april tag.
     """
-    detector = cv.aruco.ArucoDetector(dictionary=DICT) # Create a cv detector to find the appropriate Apriltags
-    corners, ids, _ = detector.detectMarkers(frame) # Return the corners and ids found in the image.
-    if ids is not None and len(ids) == 4: # If there are ids, and only 4 of them then ->
-        bads = [x for x in ids if x > 4] # If any of the ids are greater than 4, then we cannot do a base 4 transformation we have misrecognized an AprilTag
-        if len(bads) > 0: # There are ids that we shouldn't be recognizing so we should take down the problematic frame
+    detector = cv.aruco.ArucoDetector(
+        dictionary=DICT
+    )  # Create a cv detector to find the appropriate Apriltags
+    corners, ids, _ = detector.detectMarkers(
+        frame
+    )  # Return the corners and ids found in the image.
+    if (
+        ids is not None and len(ids) == 4
+    ):  # If there are ids, and only 4 of them then ->
+        bads = [
+            x for x in ids if x > 4
+        ]  # If any of the ids are greater than 4, then we cannot do a base 4 transformation we have misrecognized an AprilTag
+        if (
+            len(bads) > 0
+        ):  # There are ids that we shouldn't be recognizing so we should take down the problematic frame
             ## SAVE WHERE IT SEES THE BAD THING
             copy = cv.aruco.drawDetectedMarkers(frame, corners, ids)
             plt.figimage = copy
-            plt.savefig("problematic_frame.png")  # we could come up with a better name for it, but if this shows up in your file system at least you know something has gone wrong.
+            plt.savefig(
+                "problematic_frame.png"
+            )  # we could come up with a better name for it, but if this shows up in your file system at least you know something has gone wrong.
         corners_a = corners[0][0]
         corners_b = corners[1][0]
         corners_c = corners[2][0]
@@ -162,7 +176,9 @@ def detect_paper_tags(
             average_pt(corners_d),
             average_pt(corners_c),
         ]
-        return [(averaged_paper, ids)] # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
+        return [
+            (averaged_paper, ids)
+        ]  # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
     else:
         return []
 
@@ -194,7 +210,7 @@ def create_and_update_actors(
     program_lookup: dict[str, str],
     drawing_queue: Queue,
 ) -> None:
-    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors 
+    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors
 
     Args:
         program_encoding (int): the program identifier
@@ -314,7 +330,7 @@ def update(
         program_encoding = tags_to_pid(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
-            coords =  geometry.ordered_rectangle(coords, coords[0])
+            coords = geometry.ordered_rectangle(coords, coords[0])
             create_and_update_actors(
                 program_encoding,
                 coords,
@@ -329,7 +345,7 @@ def update(
     if cv.waitKey(1) == ord("q"):
         logger.info("In the stopping condition")
         for encoding, a in encoding_to_actor.items():
-            a.end() 
+            a.end()
             logger.info(f"encoding asscoiated is : {encoding}")
             logger.info("Got past the end, onto Join now")
             a.join()
@@ -357,15 +373,29 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> Non
         log_level (int, optional): If you are logging at what level of detail are you logging information. Defaults to 0.
         camera_id (int, optional): The id of the camera that is looking at the scene. Defaults to 0.
     """
-    print("Hello from puck!") ## Generic print to make sure that everything is working
-    logging_setup(log, log_level) ## Setup the logger using the command line arguments
-    tk_setup() ## Set up the tkinter windows 
-    program_lookup = load_program_store(PROGRAM_LOOKUP_FILE) # Load the dictionary of programs 
-    encoding_to_actor: dict[str, Actor] = {} # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
-    canvas = canvas_setup(base) # Set up the canvas using 'base' a global tkinter variable set up at the beginning, required for all graphical commands in this implementation 
-    drawing_queue: Queue = Queue() # Drawing queue created here so that all actors can access it as well as the main thread.
-    cam = camera_setup(camera_id) # Cv2 camera set up so that we can get input from the real physical scene.
-    camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME) # using that camera to create a window that shows us what the camera is seeing.
+    print("Hello from puck!")  ## Generic print to make sure that everything is working
+    logging_setup(log, log_level)  ## Setup the logger using the command line arguments
+
+    # run the calibration
+    calibration_info = calibrate(projector_id=0, camera_id=0)
+
+    tk_setup()  ## Set up the tkinter windows
+    program_lookup = load_program_store(
+        PROGRAM_LOOKUP_FILE
+    )  # Load the dictionary of programs
+    encoding_to_actor: dict[
+        str, Actor
+    ] = {}  # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
+    canvas = canvas_setup(
+        base
+    )  # Set up the canvas using 'base' a global tkinter variable set up at the beginning, required for all graphical commands in this implementation
+    drawing_queue: Queue = Queue()  # Drawing queue created here so that all actors can access it as well as the main thread.
+    cam = camera_setup(
+        camera_id
+    )  # Cv2 camera set up so that we can get input from the real physical scene.
+    camera_perspective_window_setup(
+        CAMERA_PERSPECTIVE_WINDOW_NAME
+    )  # using that camera to create a window that shows us what the camera is seeing.
     base.after(
         16,
         update,
@@ -375,13 +405,12 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> Non
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
-    ) # Add a call to 'update' onto the base event loop with the arguments (cam, encoding_to_actor,program_lookup,drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME,)
-    base.mainloop() # Start the event loop, it will hang out here until stopping condition is met.
-    cam.release() # Get rid of the camera.
-    cv.destroyAllWindows() # destroy all cv windows.
+    )  # Add a call to 'update' onto the base event loop with the arguments (cam, encoding_to_actor,program_lookup,drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME,)
+    base.mainloop()  # Start the event loop, it will hang out here until stopping condition is met.
+    cam.release()  # Get rid of the camera.
+    cv.destroyAllWindows()  # destroy all cv windows.
 
 
 def main() -> None:
-    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments.
-    """
+    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments."""
     typer.run(start_puck)

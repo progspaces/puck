@@ -162,7 +162,7 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
     projector = get_projector(projector_id)
 
     # generate the chessboard
-    board_shape = (8,6)
+    board_shape = (8, 6)
     board_size = (projector.width, projector.height)
     board_image, board_points = make_chessboard(board_size, board_shape)
 
