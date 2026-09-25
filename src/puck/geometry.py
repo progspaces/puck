@@ -1,17 +1,46 @@
 import math
+from dataclasses import dataclass
 
-def angle_to(p, q):
-    """Get the angle from p to q in radians from horizontal right.
+@dataclass
+class Point:
+    x: int
+    y: int
+    def __iter__(self):
+        return iter((self.x, self.y))
 
-    Args:
-        p (tuple[int,int]): starting point
-        q (tuple[int,int]): ending point
+    def __hash__(self):
+        return hash((self.x,self.y))
 
+    def dist_to(self:Point, other:Point) -> float:
+        dx = (self.x - other.x)
+        dy = (self.y - other.y)
+        return math.sqrt(dy**2 + dx**2)
+
+    
+@dataclass
+class Polygon:
+    points: list[Point]
+    def __getitem__(self, key):
+        return self.points[key]
+
+    def __iter__(self):
+        return iter(self.points)
+
+    def unwrap(self) -> list[tuple[int,int]]:
+        return [(x,y) for x,y in self.points]
+
+    @classmethod
+    def from_array(cls, array):
+        points = [Point(int(item[0]), int(item[1])) for item in array]
+        return cls(points)
+    
+
+
+
+def angle_to(p: Point, q: Point) -> float:
+    """Get the angle in radians from p to q from horizontal right.
     Raises:
         ValueError: There is no angle to return if the points are identical.
-
-    Returns:
-        int: angle in radians from p to q clockwise from horizontal right.
     """
     if p == q:
         raise ValueError("no angle from a point to itself")
@@ -44,20 +73,12 @@ def angle_to(p, q):
     return angle
 
 
-def clockwise_pt(points, reference):
-    """
-    Gets you the point that is the next clockwise point from reference point, 
+def clockwise_pt(rectangle: Polygon, reference: Point) -> Point:
+    """Gets you the point that is the next clockwise point from reference point, 
     in a rectangle formed by four points.
-
-    Args:
-        points list[tuple[int,int]]: All the points in the rectangle other than the reference point
-        reference tuple[int,int]: The point that you're using to decide where to go next from.
-
-    Returns:
-        tuple[int, int]: Clockwise point in rectangle from given reference.
     """
-    other_corners = [pt for pt in points if pt != reference] # get rid of the refernce point
-    dists_to_corners = [math.dist(reference, q) for q in other_corners] # find out how far away every other point is from the reference 
+    other_corners = [pt for pt in rectangle if pt != reference] # get rid of the refernce point
+    dists_to_corners = [reference.dist_to(q) for q in other_corners] # find out how far away every other point is from the reference 
     furthest = max(dists_to_corners) # find out the furthest point from the point you have (ought to be the diagonal)
     opposite_corner = other_corners[dists_to_corners.index(furthest)]
 
@@ -77,22 +98,16 @@ def clockwise_pt(points, reference):
     return clockwise_pt
 
 
-def ordered_rectangle(point_list, reference):
-    """ Orders a list of points that make up a rectangle by going clockwise through them, 
+def ordered_rectangle(rectangle: Polygon, reference: Point) -> Polygon:
+    """Orders the points that make up a rectangle by going clockwise through them, 
     starting with the given reference point.
-
-    Args:
-        point_list list[tuple[int,int]]: A list of four points.
-        reference tuple[int,int]: The starting point to order the rectangle from.
-    Returns:
-        list[tuple[int,int]]: A list of four points ordered clockwise from the reference point.
     """
     ordered = []
     # Walk clockwise through the ordered list.
-    ordered.insert(0, clockwise_pt(point_list, reference))
-    ordered.insert(1,clockwise_pt(point_list, ordered[0]))
-    ordered.insert(2,clockwise_pt(point_list, ordered[1]))
+    ordered.insert(0, clockwise_pt(rectangle, reference))
+    ordered.insert(1,clockwise_pt(rectangle, ordered[0]))
+    ordered.insert(2,clockwise_pt(rectangle, ordered[1]))
     ordered.insert(0, reference)
     ## Double check we haven't assigned the same point multiple times.....
     assert len(set(ordered)) == 4
-    return ordered
+    return Polygon(ordered)

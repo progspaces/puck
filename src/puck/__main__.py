@@ -1,5 +1,5 @@
 # Setup tkinter early (necessary on MacOS).
-from tkinter import *  # TODO: avoid *
+from tkinter import Tk, Canvas
 
 base = Tk()
 
@@ -16,12 +16,12 @@ import matplotlib.pyplot as plt
 import typer
 
 # Local packages and modules
-from . import geometry
+from .geometry import Point, Polygon, ordered_rectangle
 from .actor import Actor
+from .calibration import calibrate
 
 # Global variables
 logger = logging.getLogger(__name__)
-PROGRAM_LOOKUP_FILE = "data/program_lookup.json"  # TODO: make configurable
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
 CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
 CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
@@ -112,28 +112,17 @@ def camera_perspective_window_setup(window_name: str):
     cv.resizeWindow(window_name, 600, 500)
 
 
-def average_pt(corners: list[tuple[int, int]]) -> tuple[int, int]:
-    """Takes in all four corners of the april tag and finds the middle point.
-
-    Args:
-        corners (list[tuple[int, int]]): the corners of an april tag
-
-    Returns:
-        tuple[int, int]: the middle point of an april tag.
-    """
+def average_pt(tag: Polygon) -> Point:
+    """Takes the AprilTag shape and finds the middle point."""
     sum_x = 0
     sum_y = 0
-    for pair in corners:
-        sum_x += pair[0]
-        sum_y += pair[1]
-    return (int(sum_x / 4), int(sum_y / 4))
+    for x, y in tag:
+        sum_x += x
+        sum_y += y
+    return Point(int(sum_x / 4), int(sum_y / 4))
 
 
-def detect_paper_tags(
-    frame: np.array,
-) -> list[
-    tuple[list[tuple[int, int]], list[int]]
-]:  # TODO: sort out this type nightmare
+def detect_paper_tags(frame: np.array) -> list[tuple[Polygon, list[int]]]:  
     """Takes in a frame of the video and determines what papers are wtihin it.
     Currently we are just looking for one paper at a time, this needs to be increased in newer implementations.
 
@@ -141,33 +130,25 @@ def detect_paper_tags(
         frame (np.array): a frame of the video feed.
 
     Returns:
-        list[ tuple[list[tuple[int, int]], list[int]] ]: A list of tuples each tuple holds a list that holds the corners of an april tag and the id found in the april tag.
+        A list of papers and their associated list of four tags
     """
     detector = cv.aruco.ArucoDetector(dictionary=DICT) # Create a cv detector to find the appropriate Apriltags
-    corners, ids, _ = detector.detectMarkers(frame) # Return the corners and ids found in the image.
+    tags, ids, _ = detector.detectMarkers(frame) # Return the corners and ids found in the image.
+    tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
     if ids is not None and len(ids) == 4: # If there are ids, and only 4 of them then ->
         bads = [x for x in ids if x > 4] # If any of the ids are greater than 4, then we cannot do a base 4 transformation we have misrecognized an AprilTag
         if len(bads) > 0: # There are ids that we shouldn't be recognizing so we should take down the problematic frame
             ## SAVE WHERE IT SEES THE BAD THING
-            copy = cv.aruco.drawDetectedMarkers(frame, corners, ids)
+            copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
             plt.figimage = copy
             plt.savefig("problematic_frame.png")  # we could come up with a better name for it, but if this shows up in your file system at least you know something has gone wrong.
-        corners_a = corners[0][0]
-        corners_b = corners[1][0]
-        corners_c = corners[2][0]
-        corners_d = corners[3][0]
-        averaged_paper = [
-            average_pt(corners_a),
-            average_pt(corners_b),
-            average_pt(corners_d),
-            average_pt(corners_c),
-        ]
+        averaged_paper = Polygon([ average_pt(shape) for shape in tag_shapes])
         return [(averaged_paper, ids)] # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
     else:
         return []
 
 
-def tags_to_pid(tags):
+def tags_to_pid(tags: list[int]) -> int | None:
     """Takes in all the scene apriltags and transforms them into a single integer which is the id of the paper.
 
     Args:
@@ -189,7 +170,7 @@ def tags_to_pid(tags):
 
 def create_and_update_actors(
     program_encoding: int,
-    current_coords: list[tuple[int, int]],
+    current_coords: Polygon,
     encoding_to_actor: dict[str, Actor],
     program_lookup: dict[str, str],
     drawing_queue: Queue,
@@ -198,7 +179,7 @@ def create_and_update_actors(
 
     Args:
         program_encoding (int): the program identifier
-        current_coords (list[tuple[int, int]]): a list of the coordinates of the paper.
+        current_coords (Polygon): a list of the coordinates of the paper.
         encoding_to_actor (dict[str, Actor]): a dictionary storing the encoding of the program (int as str) to the actor it starts
         program_lookup (dict[str, str]): a dictionary storing the encoding of the program (int as a str) to the program name
         drawing_queue (Queue): a universal queue that can only be used by the main thread to create graphics objects
@@ -255,7 +236,7 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
                         fill = "white"
                         width = 2
                         id = canvas.create_polygon(
-                            coordinates, fill=fill, outline=outline, width=width
+                            coordinates.unwrap(), fill=fill, outline=outline, width=width
                         )
                         sender.send(("information", ("add_ids", [id])))
                     case ("new", *invalid_new):
@@ -270,7 +251,7 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
                         ("coordinates", coordinates),
                         *further_info,
                     ):
-                        canvas.coords(id, coordinates)
+                        canvas.coords(id, coordinates.unwrap())
                     case _ as invalid_action:
                         print(
                             f"You have provided an invalid action message, '{invalid_action}' is not an action I understand"
@@ -314,7 +295,7 @@ def update(
         program_encoding = tags_to_pid(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
-            coords =  geometry.ordered_rectangle(coords, coords[0])
+            coords =  ordered_rectangle(coords, coords[0])
             create_and_update_actors(
                 program_encoding,
                 coords,
@@ -349,7 +330,7 @@ def update(
     )
 
 
-def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> None:
+def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, program_lookup_file: str = "data/program_lookup.json") -> None:
     """Runs the puck recognition system
 
     Args:
@@ -359,8 +340,10 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0) -> Non
     """
     print("Hello from puck!") ## Generic print to make sure that everything is working
     logging_setup(log, log_level) ## Setup the logger using the command line arguments
+    # calibration_info = calibrate(projector_id=0, camera_id=0) ## Returns homology matrix
+    # calibration_info.camera_to_projector_homography # To deal with later
     tk_setup() ## Set up the tkinter windows 
-    program_lookup = load_program_store(PROGRAM_LOOKUP_FILE) # Load the dictionary of programs 
+    program_lookup = load_program_store(program_lookup_file) # Load the dictionary of programs 
     encoding_to_actor: dict[str, Actor] = {} # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
     canvas = canvas_setup(base) # Set up the canvas using 'base' a global tkinter variable set up at the beginning, required for all graphical commands in this implementation 
     drawing_queue: Queue = Queue() # Drawing queue created here so that all actors can access it as well as the main thread.
