@@ -122,7 +122,7 @@ def average_pt(tag: Polygon) -> Point:
     return Point(int(sum_x / 4), int(sum_y / 4))
 
 
-def detect_paper_tags(frame: np.array) -> list[tuple[Polygon, list[int]]]:  
+def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[int]]]:  
     """Takes in a frame of the video and determines what papers are wtihin it.
     Currently we are just looking for one paper at a time, this needs to be increased in newer implementations.
 
@@ -340,8 +340,10 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
     """
     print("Hello from puck!") ## Generic print to make sure that everything is working
     logging_setup(log, log_level) ## Setup the logger using the command line arguments
-    # calibration_info = calibrate(projector_id=0, camera_id=0) ## Returns homology matrix
-    # calibration_info.camera_to_projector_homography # To deal with later
+
+    # run the calibration
+    calibration_info = calibrate(projector_id=0, camera_id=0)
+
     tk_setup() ## Set up the tkinter windows 
     program_lookup = load_program_store(program_lookup_file) # Load the dictionary of programs 
     encoding_to_actor: dict[str, Actor] = {} # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
