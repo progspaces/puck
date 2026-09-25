@@ -9,6 +9,7 @@ base.title("Tkinter Widget Size")
 base.wm_attributes("-fullscreen", True)
 CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
 from actor import Actor
+from messages import Dialogue, Monologue, Contents, DrawingContents
 
 
 canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") 
@@ -18,148 +19,77 @@ fill = "white"
 outline = "blue"
 width = 3
 
-## In dictionary form, to be added to the drawing queue
-dict_message = {"canvas_call": "create_polygon","coordinates":coordinates, "arguments": {"fill": fill, "outline": outline, "width": width}}
-
-## In tuple form, to be added to the drawing queue
-tuple_message = (("canvas_call", "create_polygon"), ("arguments", (("coordinates",coordinates),{"fill": fill, "outline": outline, "width": width})))
-
-
-class Message():
+def test_run():
     pass
 
-class DrawingMessage(Message):
-    def __init__(self, canvas_call, sender, arguments):
-        super().__init__()
-        self.canvas_call = canvas_call
-        self.arguments = arguments
-        self.sender = sender
+test_contents = DrawingContents(canvas_call = "create_polygon", 
+                                args =coordinates, 
+                                kwargs = {"fill": fill, "outline": outline, "width": width})
 
-class InfoMessage(Message):
-    def __init__(self, info):
-        super().__init__()
-        self.info = info
+test_actor = Actor(target = test_run)
+test_message = Dialogue(contents = test_contents, sender = test_actor)
 
 
-def draw_dict(drawing_queue: Queue, canvas: Canvas) -> None:
-    """Draws what is on the drawing queue onto the canvas.
-
-    Args:
-        drawing_queue (Queue): the queue that all the actors and main thread can access
-        canvas (Canvas): the tkinter graphical space.
-    """
-    while not drawing_queue.empty():
-        print("dequeued")
-        m = drawing_queue.get()
-        id = getattr(canvas, m["canvas_call"])(m["coordinates"], m["arguments"])
-        m["sender"].send({"info":id})
-    print("empty queue")
-
-def draw_tuple(drawing_queue: Queue, canvas: Canvas) -> None:
-    """Draws what is on the drawing queue onto the canvas.
-
-    Args:
-        drawing_queue (Queue): the queue that all the actors and main thread can access
-        canvas (Canvas): the tkinter graphical space.
-    """
-    while not drawing_queue.empty():
-        message = drawing_queue.get()
-        match message:
-            case (("canvas_call", canvas_call), ("sender", sender), ("arguments", arguments)):
-                match arguments:
-                    case (("coordinates", coordinates), *otherarguments):
-                        id = getattr(canvas, canvas_call)(coordinates, otherarguments)
-                        sender.send(("id", id))
-        canvas.pack()
-    print("empty queue")
-
-
-# obj_message = DrawingMessage(canvas_call = "create_polygon", arguments = {"coordinates": coordinates, "draw_args": {"fill": fill, "outline": outline, "width": width}})
-
-def draw_obj(drawing_queue: Queue, canvas: Canvas) -> None:
-    """Draws what is on the drawing queue onto the canvas.
-
-    Args:
-        drawing_queue (Queue): the queue that all the actors and main thread can access
-        canvas (Canvas): the tkinter graphical space.
-    """
-    while not drawing_queue.empty():
-        message = drawing_queue.get()
-        print(type(message))
-        match message:
-            case DrawingMessage():
-                id = getattr(canvas,message.canvas_call)(message.arguments["coordinates"], message.arguments["draw_args"])
-                id_message = InfoMessage(info=id)
-                message.sender.send(id_message)
-        canvas.pack()
-    print("empty queue")
-
-
-def run_dict(self):
-    first = self.recieve()
-    drawing_queue = first["drawing_queue"]
-    drawing_queue.put({"canvas_call": "create_polygon","coordinates":coordinates, "sender":self,"arguments": {"fill": fill, "outline": outline, "width": width}})
-    print(self.mailbox)
-    while True:
-        message = self.recieve()
-        print(message)
-        if message["info"]:
-            print(f"A graphical id I have is: {message["info"]}")
-
-
-def run_tuple(self):
-    first = self.recieve()
-    drawing_queue = first["drawing_queue"]
-    drawing_queue.put( (("canvas_call", "create_polygon"), ("sender", self), ("arguments", (("coordinates",coordinates),{"fill": fill, "outline": outline, "width": width}))))
-    while True:
-            message = self.recieve()
-            print(message)
+def test_read(drawing_queue: Queue, canvas: Canvas) -> None:
+   while not drawing_queue.empty():
+            message = drawing_queue.get()
             match message:
-                case ("id", id):
-                    print(f"A graphical id I have is: {id}")
+                case Dialogue(contents=DrawingContents(canvas_call = call, args = args, kwargs = kwargs), sender = sender):
+                    id = getattr(canvas,call)(args,kwargs)
+                    sender.send( Monologue(contents = Contents(content = id)))
+                case Monologue(contents = contents):
+                    print("this is a monologue, we do not respond to")
+                case _ as unknown:
+                    print(f"You have given me an unknown message, I do not know how to handle {unknown}")
 
 
-def run_obj(self):
-    first = self.recieve()
-    drawing_queue = first["drawing_queue"]
-    obj_message = DrawingMessage(canvas_call = "create_polygon", sender = self, arguments = {"coordinates": coordinates, "draw_args": {"fill": fill, "outline": outline, "width": width}})
-    drawing_queue.put(obj_message)
-    while True:
-        message = self.recieve()
-        match message:
-            case InfoMessage():
-                print(f"A graphical id I have is: {message.info}")
+canvas.create_polygon()(args, kwargs)
 
 drawing_queue = Queue()
+drawing_queue.put(test_message)
+test_read(drawing_queue=drawing_queue, canvas=canvas)
 
-thisbe = Actor(run_dict)
-thisbe.send({"drawing_queue": drawing_queue})
-# thisbe.start()
-# draw_dict(drawing_queue=drawing_queue, canvas = canvas)
+# def draw_obj(drawing_queue: Queue, canvas: Canvas) -> None:
+#     """Draws what is on the drawing queue onto the canvas.
 
-
-pyramus = Actor(run_tuple)
-pyramus.send({"drawing_queue": drawing_queue})
-# pyramus.start()
-# draw_tuple(drawing_queue=drawing_queue, canvas = canvas)
-
-lion = Actor(run_obj)
-lion.send({"drawing_queue": drawing_queue})
-lion.start()
-draw_obj(drawing_queue=drawing_queue, canvas = canvas)
-
-## Dictionary attempt:
-# drawing_queue.put(dict_message)
-
-
-## Tuple attempt:
-# drawing_queue.put(tuple_message)
-# draw_tuple(drawing_queue=drawing_queue, canvas = canvas)
+#     Args:
+#         drawing_queue (Queue): the queue that all the actors and main thread can access
+#         canvas (Canvas): the tkinter graphical space.
+#     """
+#     while not drawing_queue.empty():
+#         message = drawing_queue.get()
+#         print(type(message))
+#         match message:
+#             case Dialogue():
+#                 id = getattr(canvas, message.canvas_call)(message.arguments["coordinates"], message.arguments["draw_args"])
+#                 id_message = m.InfoMessage(info=id)
+#                 message.sender.send(id_message)
+#         canvas.pack()
+#     print("empty queue")
 
 
-## Object attempt:
-# drawing_queue.put(obj_message)
+
+
+# def run_obj(self):
+#     first = self.recieve()
+#     drawing_queue = first["drawing_queue"]
+#     obj_message = m.DrawingMessage(canvas_call = "create_polygon", 
+#                                  sender = self, 
+#                                  arguments = {"coordinates": coordinates, "draw_args": {"fill": fill, "outline": outline, "width": width}})
+#     drawing_queue.put(obj_message)
+#     while True:
+#         message = self.recieve()
+#         match message:
+#             case m.InfoMessage():
+#                 print(f"A graphical id I have is: {message.info}")
+
+# # drawing_queue = Queue()
+
+
+# lion = Actor(run_obj)
+# lion.send({"drawing_queue": drawing_queue})
+# lion.start()
 # draw_obj(drawing_queue=drawing_queue, canvas = canvas)
 
-canvas.pack()
-base.mainloop()
+# canvas.pack()
+# base.mainloop()
