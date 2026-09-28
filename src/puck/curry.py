@@ -1,6 +1,6 @@
 # Setup tkinter early (
 # necessary on MacOS).
-from tkinter import *  
+from tkinter import Tk, Canvas 
 base = Tk()
 
 from queue import Queue
@@ -15,16 +15,12 @@ coordinates = [(300, 200), (100,200,), (100,100), (300,100)]
 fill = "white"
 outline = "blue"
 width = 3
-from messages import DrawingContents, Monologue
+from messages import Monologue
+from contents import FunctionContents
 
 
-## FUNCTOOLS - > Partial 
-## COmpose function into partial
 
-
-test_contents = DrawingContents(canvas_call = Canvas.create_polygon, 
-                                args =coordinates, 
-                                kwargs = {"fill": fill, "outline": outline, "width": width})
+test_contents = FunctionContents(function_call= Canvas.create_polygon, args = coordinates,kwargs={"fill": fill, "outline": outline, "width": width})
 
 test_message= Monologue(contents = test_contents)
 
@@ -32,11 +28,18 @@ test_message= Monologue(contents = test_contents)
 def test_read(drawing_queue: Queue, canvas: Canvas) -> None:
     message = drawing_queue.get()
     match message:
-        case Monologue(contents = DrawingContents(canvas_call = call, args = args, kwargs = kwargs)):
+        case Monologue(contents = contents):
             print("reached monologue")
-            id = call(canvas, args, kwargs)
-            print(id)
-        # case 
+            match contents:
+                case FunctionContents(function_call):
+                    print("reached functionContents")
+                    print(function_call)
+                    id = function_call(canvas)
+                    # print(id)
+                case _ as other:
+                    print(other)
+                    # print(other.function_call)
+        # case  
 
 drawing_queue = Queue()
 drawing_queue.put(test_message)
