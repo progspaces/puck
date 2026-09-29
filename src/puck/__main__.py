@@ -342,7 +342,7 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
     logging_setup(log, log_level) ## Setup the logger using the command line arguments
 
     # run the calibration
-    calibration_info = calibrate(projector_id=0, camera_id=0)
+    # calibration_info = calibrate(projector_id=0, camera_id=0)
 
     tk_setup() ## Set up the tkinter windows 
     program_lookup = load_program_store(program_lookup_file) # Load the dictionary of programs 
