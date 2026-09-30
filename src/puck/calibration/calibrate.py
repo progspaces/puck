@@ -13,6 +13,7 @@ from .chessboard import make_chessboard
 # each file should have it's own logger
 logger = logging.getLogger(__name__)
 
+WINDOW_PROJECTOR = "projector"
 
 # -----------------------------------------------------------------------------
 # Calibration Information
@@ -28,6 +29,8 @@ class CalibrationInfo:
     """
 
     camera_to_projector_homography: np.ndarray
+    background_frame: NDArray[np.uint8]
+
 
     def save(self, path: Path) -> None:
         np.savetxt(path, self.camera_to_projector_homography)
@@ -125,14 +128,46 @@ def read_frames(
     return frames
 
 
+
 def capture_average(
     camera: cv2.VideoCapture,
-    count: int = 5,
-) -> NDArray[np.uint8]:
-    frames = read_frames(camera, count)
-    frames = [frame.astype(np.float32) for frame in frames]
-    average = np.mean(frames, axis=0)
+    count: int = 10,
+) -> np.ndarray:
+    """
+    capture several frames and return their pixel-wise average.
+    averaging suppresses random sensor noise.
+    """
+    frames = []
+
+    for _ in range(count):
+        ok, frame = camera.read()
+
+        if not ok:
+            raise RuntimeError("Could not read camera frame")
+
+        frames.append(frame.astype(np.float32))
+
+    average = np.mean(
+        frames,
+        axis=0,
+    )
+
     return average.astype(np.uint8)
+
+
+
+def show_image_on_projector_and_wait(
+    window_name: str,
+    image: np.ndarray,
+    settle_ms: int = 200,
+) -> None:
+    """
+    display an image on the projector and allow some time for the display to settle.
+    """
+    cv2.imshow(window_name, image)
+    cv2.waitKey(settle_ms)
+
+
 
 
 # -----------------------------------------------------------------------------
@@ -156,6 +191,8 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
 
     logger.info("Calibrating system ...")
 
+    homeography= None
+
     PROJECTOR_WINDOW_NAME = "projector"
 
     # get the projector information
@@ -165,6 +202,7 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
     board_shape = (8, 6)
     board_size = (projector.width, projector.height)
     board_image, board_points = make_chessboard(board_size, board_shape)
+    black_screen = np.zeros((projector.height, projector.width, 3), dtype=np.uint8)
 
     # create a fullscreen window for the projector to draw to
     create_fullscreen_window(PROJECTOR_WINDOW_NAME, projector)
@@ -176,13 +214,15 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
             raise RuntimeError("Calibration Error: cannot open camera")
 
         # capture the background
+        show_image_on_projector_and_wait(WINDOW_PROJECTOR, black_screen)
         read_frames(camera, count=5)  # discard 5 frames
         background_frame = capture_average(camera, count=10)
 
         # project the chessboard
-        cv2.imshow(PROJECTOR_WINDOW_NAME, board_image)
-        cv2.waitKey(100)
+        # cv2.imshow(PROJECTOR_WINDOW_NAME, board_image)
+        # cv2.waitKey(100)
 
+        show_image_on_projector_and_wait(WINDOW_PROJECTOR, board_image)
         # capture the chessboard
         read_frames(camera, count=5)  # discard 5 frames
         chessboard_frame = capture_average(camera, count=10)
@@ -194,11 +234,11 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
 
         # normalise the difference image then OTSU threshold
         # norm makes for better OTSU threshold
-        difference = cv2.normalize(
-            difference, None, alpha=0, beta=0, norm_type=cv2.NORM_MINMAX
+        difference_normalised = cv2.normalize(
+            difference, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX
         )
         thesh, mask = cv2.threshold(
-            difference, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU
+            difference_normalised, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU
         )
 
         # now we have the mask, we can detect the chessboard
@@ -207,19 +247,21 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
             board_shape[0] - 1,
             board_shape[1] - 1,
         )
+        print(difference_normalised)
         detector_flags = (
             cv2.CALIB_CB_NORMALIZE_IMAGE
             | cv2.CALIB_CB_EXHAUSTIVE
             | cv2.CALIB_CB_ACCURACY
         )
         found, corners = cv2.findChessboardCornersSB(
-            gray_chessboard,
+            difference_normalised,
             corner_shape,
             flags=detector_flags,
         )
-
+      
         # if we can't find the chessboard then raise an exception
         if not found:
+            print(found, corners)
             raise RuntimeError("Cannot find chessboard!")
 
         # compute the mapping from the camera-image coords to the projector coords
@@ -227,7 +269,7 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         # e.g. [[x1,y1],[x2,y2]]
         # the chessboard is symmetric under 180-degree rotation and the detector may return
         # the corners in reverse order
-        camera_points = corners.reshape(-1, 2).astype(np.flaot32)
+        camera_points = corners.reshape(-1, 2).astype(np.float32)
         if camera_points[0].sum() > camera_points[-1].sum():
             camera_points = camera_points[::-1].copy()
 
@@ -248,4 +290,4 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         camera.release()
         cv2.destroyAllWindows()
 
-    return CalibrationInfo(camera_to_projector_homography=homography)
+    return CalibrationInfo(camera_to_projector_homography=homography, background_frame= background_frame)
