@@ -51,7 +51,7 @@ def tk_setup() -> None:
     base.geometry("1920x1080+0+-1080")
 
 
-def load_program_store(filename: str) -> dict[str, str]:
+def load_program_store(filename: str) -> list[str]:
     """Loads in a .json dictionary for looking up what string is associated with what program name
 
     Args:
@@ -61,7 +61,7 @@ def load_program_store(filename: str) -> dict[str, str]:
         dict[str, str]: the dictionary loaded as a dicionary object.
     """
     with open(filename) as f:
-        return dict(json.load(f))
+        return json.load(f)
 
 
 def canvas_setup(base: Tk) -> Canvas:
@@ -194,7 +194,7 @@ def create_and_update_actors(
     program_encoding: int,
     current_coords: Polygon,
     encoding_to_actor: dict[str, Actor],
-    program_lookup: dict[str, str],
+    program_lookup: list[str],
     drawing_queue: Queue,
 ) -> None:
     """Takes in a program encoding and the coordinates of the paper associated with it and creates actors
@@ -203,18 +203,17 @@ def create_and_update_actors(
         program_encoding (int): the program identifier
         current_coords (Polygon): a list of the coordinates of the paper.
         encoding_to_actor (dict[str, Actor]): a dictionary storing the encoding of the program (int as str) to the actor it starts
-        program_lookup (dict[str, str]): a dictionary storing the encoding of the program (int as a str) to the program name
+        program_lookup (list[str]): a dictionary storing the encoding of the program (int as a str) to the program name
         drawing_queue (Queue): a universal queue that can only be used by the main thread to create graphics objects
     """
-    # TODO: program_encoding should have ints, not strs in the json file
-    if str(program_encoding) not in program_lookup:
+    if program_encoding >= len(program_lookup) or program_encoding < 0:
         print(
             f"There is no associated program with the encoding: {program_encoding}"
         )
         return
 
     # TODO: use this to load modules dynamically
-    module_name = "puck.programs." + program_lookup[str(program_encoding)]
+    module_name = "puck.programs." + program_lookup[program_encoding]
     module = importlib.import_module(module_name)
 
     if t := encoding_to_actor.get(str(program_encoding)):
@@ -300,7 +299,7 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
 def update(
     cam: cv.VideoCapture,
     encoding_to_actor: dict[str, Actor],
-    program_lookup: dict[str, str],
+    program_lookup: list[str],
     drawing_queue: Queue,
     canvas: Canvas,
     window_name: str,
@@ -311,7 +310,7 @@ def update(
     Args:
         cam (cv.VideoCapture): videofeeds
         encoding_to_actor (dict[str, Actor]): a dictionary tying the program encoding to the actor that it spawns
-        program_lookup (dict[str, str]): a dictionary tying the program encoding (int as a str) to the name of the program it is assocaited with.
+        program_lookup (list[str]): a dictionary tying the program encoding (int as a str) to the name of the program it is assocaited with.
         drawing_queue (Queue): the universal drawing queue that all actors and the main thread can access
         canvas (Canvas): the tkinter canvas
         window_name (str): the name of the window that shows the camera feed
