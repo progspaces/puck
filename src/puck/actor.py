@@ -3,13 +3,9 @@ from typing import Self
 from queue import Queue
 
 class Actor(Thread):
-    """ For every program in Puck there is an associated actor which runs the program in its own thread.
-    This allows programs to be encapsulated and run concurently along side each other.
-    Each actor has a 'mailbox' which it uses to recieve communication from other actors and the main thread.
-    By using 'recieve' it can read messages from the mailbox and using 'send' can address messages to other actors' mailboxes.
-    It can use 'end' depending on the target function implementation to trigger joining the thread to main thread.
+    """ 
     """
-
+    
     def __init__(self, target):
         """ Initialises an actor.
         Args:

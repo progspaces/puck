@@ -72,8 +72,10 @@ def canvas_setup(base: Tk) -> Canvas:
     Returns:
         Canvas: A tk canvas on which we can draw graphical objects.
     """
-    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") # Creation.
-    canvas.pack() # Laying it out.
+    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") 
+
+    # Allows canvas to be seen by the user. 
+    canvas.pack() 
     return canvas
 
 
@@ -89,7 +91,7 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
     # Create camera
     cam = cv.VideoCapture(camera_id)
 
-    # Get one frame to verify (will throw if broken)
+    # Get one frame to verify camera is working (will throw if broken)
     _, frame = cam.read()
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
@@ -132,18 +134,24 @@ def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[in
     Returns:
         A list of papers and their associated list of four tags
     """
-    detector = cv.aruco.ArucoDetector(dictionary=DICT) # Create a cv detector to find the appropriate Apriltags
-    tags, ids, _ = detector.detectMarkers(frame) # Return the corners and ids found in the image.
+    april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
+    tags, ids, _ = april_tag_detector.detectMarkers(frame)
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
-    if ids is not None and len(ids) == 4: # If there are ids, and only 4 of them then ->
-        bads = [x for x in ids if x > 4] # If any of the ids are greater than 4, then we cannot do a base 4 transformation we have misrecognized an AprilTag
-        if len(bads) > 0: # There are ids that we shouldn't be recognizing so we should take down the problematic frame
-            ## SAVE WHERE IT SEES THE BAD THING
+    if ids is not None and len(ids) == 4: 
+        # Check for invalid/bad ids
+        bads = [x for x in ids if x > 4] 
+
+        # Saves problematic frame
+        if len(bads) > 0: 
             copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
             plt.figimage = copy
-            plt.savefig("problematic_frame.png")  # we could come up with a better name for it, but if this shows up in your file system at least you know something has gone wrong.
+
+            # TODO: a more informative name
+            plt.savefig("problematic_frame.png")  
         averaged_paper = Polygon([ average_pt(shape) for shape in tag_shapes])
-        return [(averaged_paper, ids)] # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
+
+         # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
+        return [(averaged_paper, ids)]
     else:
         return []
 
@@ -317,7 +325,7 @@ def update(
         logger.info("finished the joining and ending")
         base.quit()
 
-    # Tell event loop to run this again in 16ms
+    # Puts a call to update() onto the event loop queue to run this again in 16ms
     base.after(
         16,
         update,
@@ -338,19 +346,23 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
         log_level (int, optional): If you are logging at what level of detail are you logging information. Defaults to 0.
         camera_id (int, optional): The id of the camera that is looking at the scene. Defaults to 0.
     """
-    print("Hello from puck!") ## Generic print to make sure that everything is working
-    logging_setup(log, log_level) ## Setup the logger using the command line arguments
+     
+     # Generic print to make sure that everything is working
+    print("Hello from puck!")
+    logging_setup(log, log_level) 
 
     # run the calibration
     calibration_info = calibrate(projector_id=0, camera_id=0)
 
-    tk_setup() ## Set up the tkinter windows 
-    program_lookup = load_program_store(program_lookup_file) # Load the dictionary of programs 
-    encoding_to_actor: dict[str, Actor] = {} # Create an empty dictionary of strings to actors (probably will update to integer to Actor)
-    canvas = canvas_setup(base) # Set up the canvas using 'base' a global tkinter variable set up at the beginning, required for all graphical commands in this implementation 
-    drawing_queue: Queue = Queue() # Drawing queue created here so that all actors can access it as well as the main thread.
-    cam = camera_setup(camera_id) # Cv2 camera set up so that we can get input from the real physical scene.
-    camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME) # using that camera to create a window that shows us what the camera is seeing.
+    tk_setup() 
+    program_lookup = load_program_store(program_lookup_file) 
+    encoding_to_actor: dict[str, Actor] = {}
+    canvas = canvas_setup(base)
+    drawing_queue: Queue = Queue()
+    cam = camera_setup(camera_id)
+    camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
+
+    # After 16ms, runs update() on the main graphics event loop
     base.after(
         16,
         update,
@@ -360,10 +372,12 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
-    ) # Add a call to 'update' onto the base event loop with the arguments (cam, encoding_to_actor,program_lookup,drawing_queue, canvas, CAMERA_PERSPECTIVE_WINDOW_NAME,)
-    base.mainloop() # Start the event loop, it will hang out here until stopping condition is met.
-    cam.release() # Get rid of the camera.
-    cv.destroyAllWindows() # destroy all cv windows.
+    ) 
+
+    # Start the event loop, the main thread will hang out here until stopping condition is met
+    base.mainloop() 
+    cam.release() 
+    cv.destroyAllWindows()
 
 
 def main() -> None:
