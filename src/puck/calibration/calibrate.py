@@ -88,7 +88,9 @@ def create_fullscreen_window(window_name: str, monitor: Monitor) -> None:
 
     # full screen the window
     cv2.moveWindow(window_name, monitor.x, monitor.y)
-    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cv2.setWindowProperty(
+        window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
+    )
 
     # Refresh after changing the native window style. Some backends otherwise
     # defer fullscreen until the next frame is rendered.

@@ -42,8 +42,7 @@ def logging_setup(log: bool, log_level: int) -> None:
 
 
 def tk_setup() -> None:
-    """Sets up the tkinter window where it will draw graphics.
-    """
+    """Sets up the tkinter window where it will draw graphics."""
     base.tk.call("tk", "scaling", 2.0)
     base.title("Tkinter Widget Size")
     base.wm_attributes("-fullscreen", True)
@@ -74,10 +73,12 @@ def canvas_setup(base: Tk) -> Canvas:
     Returns:
         Canvas: A tk canvas on which we can draw graphical objects.
     """
-    canvas = Canvas(base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black") 
+    canvas = Canvas(
+        base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black"
+    )
 
-    # Allows canvas to be seen by the user. 
-    canvas.pack() 
+    # Allows canvas to be seen by the user.
+    canvas.pack()
     return canvas
 
 
@@ -100,8 +101,8 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
 
 
 def camera_perspective_window_setup(window_name: str):
-    """Set up a window that will show you what the camera is seeing. 
-    Oddly here the name of the window will be used to refer to it later on so it acts 
+    """Set up a window that will show you what the camera is seeing.
+    Oddly here the name of the window will be used to refer to it later on so it acts
     less like a random tidbit on the cv window and closer to an identifier.
 
     Args:
@@ -125,7 +126,9 @@ def average_pt(tag: Polygon) -> Point:
     return Point(int(sum_x / 4), int(sum_y / 4))
 
 
-def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[int]]]:  
+def detect_paper_tags(
+    frame: np.typing.ArrayLike,
+) -> list[tuple[Polygon, list[int]]]:
     """Takes in a frame of the video and determines what papers are wtihin it.
     Currently we are just looking for one paper at a time, this needs to be increased in newer implementations.
 
@@ -138,18 +141,18 @@ def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[in
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
-    if ids is not None and len(ids) == 4: 
+    if ids is not None and len(ids) == 4:
         # Check for invalid/bad ids
-        bads = [x for x in ids if x > 4] 
+        bads = [x for x in ids if x > 4]
 
         # Saves problematic frame
-        if len(bads) > 0: 
+        if len(bads) > 0:
             copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
             plt.figimage = copy
 
             # TODO: a more informative name
-            plt.savefig("problematic_frame.png")  
-        averaged_paper = Polygon([ average_pt(shape) for shape in tag_shapes])
+            plt.savefig("problematic_frame.png")
+        averaged_paper = Polygon([average_pt(shape) for shape in tag_shapes])
 
         # TODO: Allow for multiple papers.
         return [(averaged_paper, ids)]
@@ -174,10 +177,12 @@ def tags_to_pid(tags: list[int]) -> int | None:
 
         # Reorder based on the position of the APRIL_LIMIT tag
         pos = filtered.index(APRIL_LIMIT)
-        ordered_tags = filtered[pos + 1:] + filtered[:pos]
+        ordered_tags = filtered[pos + 1 :] + filtered[:pos]
 
         # Convert into int by using tags as base-APRIL_LIMIT digits
-        program_encoding = sum(tag * APRIL_LIMIT ** i for i, tag in enumerate(ordered_tags))
+        program_encoding = sum(
+            tag * APRIL_LIMIT**i for i, tag in enumerate(ordered_tags)
+        )
 
         logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
         return program_encoding
@@ -192,7 +197,7 @@ def create_and_update_actors(
     program_lookup: dict[str, str],
     drawing_queue: Queue,
 ) -> None:
-    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors 
+    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors
 
     Args:
         program_encoding (int): the program identifier
@@ -203,7 +208,9 @@ def create_and_update_actors(
     """
     # TODO: program_encoding should have ints, not strs in the json file
     if str(program_encoding) not in program_lookup:
-        print(f"There is no associated program with the encoding: {program_encoding}")
+        print(
+            f"There is no associated program with the encoding: {program_encoding}"
+        )
         return
 
     # TODO: use this to load modules dynamically
@@ -221,7 +228,13 @@ def create_and_update_actors(
         t.start()
         # TODO: pass as environment on construction instead
         t.send(("drawing_queue", drawing_queue))
-        t.send(("new_shape", ("type", "rectangle"), ("coordinates", current_coords)))
+        t.send(
+            (
+                "new_shape",
+                ("type", "rectangle"),
+                ("coordinates", current_coords),
+            )
+        )
 
 
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
@@ -253,7 +266,10 @@ def draw(drawing_queue: Queue, canvas: Canvas) -> None:
                         fill = "white"
                         width = 2
                         id = canvas.create_polygon(
-                            coordinates.unwrap(), fill=fill, outline=outline, width=width
+                            coordinates.unwrap(),
+                            fill=fill,
+                            outline=outline,
+                            width=width,
                         )
                         sender.send(("information", ("add_ids", [id])))
                     case ("new", *invalid_new):
@@ -312,7 +328,7 @@ def update(
         program_encoding = tags_to_pid(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
-            coords =  ordered_rectangle(coords, coords[0])
+            coords = ordered_rectangle(coords, coords[0])
             create_and_update_actors(
                 program_encoding,
                 coords,
@@ -327,7 +343,7 @@ def update(
     if cv.waitKey(1) == ord("q"):
         logger.info("In the stopping condition")
         for encoding, a in encoding_to_actor.items():
-            a.end() 
+            a.end()
             logger.info(f"encoding asscoiated is : {encoding}")
             logger.info("Got past the end, onto Join now")
             a.join()
@@ -347,7 +363,12 @@ def update(
     )
 
 
-def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, program_lookup_file: str = "data/program_lookup.json") -> None:
+def start_puck(
+    log: bool = False,
+    log_level: int = 0,
+    camera_id: int = 0,
+    program_lookup_file: str = "data/program_lookup.json",
+) -> None:
     """Runs the puck recognition system
 
     Args:
@@ -355,16 +376,16 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
         log_level (int, optional): If you are logging at what level of detail are you logging information. Defaults to 0.
         camera_id (int, optional): The id of the camera that is looking at the scene. Defaults to 0.
     """
-     
-     # Generic print to make sure that everything is working
+
+    # Generic print to make sure that everything is working
     print("Hello from puck!")
-    logging_setup(log, log_level) 
+    logging_setup(log, log_level)
 
     # Run the calibration
     calibration_info = calibrate(projector_id=0, camera_id=0)
 
-    tk_setup() 
-    program_lookup = load_program_store(program_lookup_file) 
+    tk_setup()
+    program_lookup = load_program_store(program_lookup_file)
     encoding_to_actor: dict[str, Actor] = {}
     canvas = canvas_setup(base)
     drawing_queue: Queue = Queue()
@@ -381,16 +402,15 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
-    ) 
+    )
 
     # Start the event loop
     # Blocks until stopping condition is met
-    base.mainloop() 
-    cam.release() 
+    base.mainloop()
+    cam.release()
     cv.destroyAllWindows()
 
 
 def main() -> None:
-    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments.
-    """
+    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments."""
     typer.run(start_puck)

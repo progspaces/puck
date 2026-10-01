@@ -20,13 +20,13 @@ def run(self: Actor):
     first_message = self.recieve()
     assert first_message[0] == "drawing_queue"
     drawing_queue = first_message[1]
-    
+
     # These are lists that are for this actor to hold onto whatever graphical objects and actors it spawns off.
     associated_canvas_ids = []
     spawned_actors = []
-    
+
     # This is an infinite loop to constantly be reading the mailbox in its thread.
-    # It uses a match-case structure to figure out what each message is telling us. 
+    # It uses a match-case structure to figure out what each message is telling us.
     # This likely/may change in future implementations and you can change this depending on what messages you wish to send to your programs.abs
     while True:
         message = self.recieve()
@@ -65,7 +65,7 @@ def run(self: Actor):
                         )
                     )
                 else:
-                # If there is nothing in the associated_canvas_ids list we must assume there are no graphical objects to update.
+                    # If there is nothing in the associated_canvas_ids list we must assume there are no graphical objects to update.
                     logger.error(
                         "We have no associated_canvas_ids yet so we cannot update."
                     )

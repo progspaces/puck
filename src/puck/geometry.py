@@ -1,40 +1,41 @@
 import math
 from dataclasses import dataclass
 
+
 @dataclass
 class Point:
     x: int
     y: int
+
     def __iter__(self):
         return iter((self.x, self.y))
 
     def __hash__(self):
-        return hash((self.x,self.y))
+        return hash((self.x, self.y))
 
-    def dist_to(self:Point, other:Point) -> float:
-        dx = (self.x - other.x)
-        dy = (self.y - other.y)
+    def dist_to(self: Point, other: Point) -> float:
+        dx = self.x - other.x
+        dy = self.y - other.y
         return math.sqrt(dy**2 + dx**2)
 
-    
+
 @dataclass
 class Polygon:
     points: list[Point]
+
     def __getitem__(self, key):
         return self.points[key]
 
     def __iter__(self):
         return iter(self.points)
 
-    def unwrap(self) -> list[tuple[int,int]]:
-        return [(x,y) for x,y in self.points]
+    def unwrap(self) -> list[tuple[int, int]]:
+        return [(x, y) for x, y in self.points]
 
     @classmethod
     def from_array(cls, array):
         points = [Point(int(item[0]), int(item[1])) for item in array]
         return cls(points)
-    
-
 
 
 def angle_to(p: Point, q: Point) -> float:
@@ -47,14 +48,14 @@ def angle_to(p: Point, q: Point) -> float:
         raise ValueError("no angle from a point to itself")
 
     # Decompose points into their x and y components
-    px, py = p 
+    px, py = p
     qx, qy = q
 
     # Find the dx and dy between the points.
     dx = qx - px
     dy = qy - py
 
-    # if dx is 0, then we are looking at an angle of pi/2 
+    # if dx is 0, then we are looking at an angle of pi/2
     # depending on if the ending point is above or below the starting point.
     # If one imagines a clock, this is the angle from 3:00 to 12:00 or to 6:00.
     if dx == 0:
@@ -74,7 +75,7 @@ def angle_to(p: Point, q: Point) -> float:
 
 
 def clockwise_pt(rectangle: Polygon, reference: Point) -> Point:
-    """Gets you the point that is the next clockwise point from reference point, 
+    """Gets you the point that is the next clockwise point from reference point,
     in a rectangle formed by four points.
     """
     other_corners = [pt for pt in rectangle if pt != reference]
@@ -99,17 +100,17 @@ def clockwise_pt(rectangle: Polygon, reference: Point) -> Point:
 
 
 def ordered_rectangle(rectangle: Polygon, reference: Point) -> Polygon:
-    """Orders the points that make up a rectangle by going clockwise through them, 
+    """Orders the points that make up a rectangle by going clockwise through them,
     starting with the given reference point.
     """
     ordered = []
-    
+
     # Walk clockwise through the ordered list.
     ordered.insert(0, clockwise_pt(rectangle, reference))
-    ordered.insert(1,clockwise_pt(rectangle, ordered[0]))
-    ordered.insert(2,clockwise_pt(rectangle, ordered[1]))
+    ordered.insert(1, clockwise_pt(rectangle, ordered[0]))
+    ordered.insert(2, clockwise_pt(rectangle, ordered[1]))
     ordered.insert(0, reference)
-    
+
     # Double check we haven't assigned the same point multiple times
     assert len(set(ordered)) == 4
     return Polygon(ordered)
