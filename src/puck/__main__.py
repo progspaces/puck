@@ -14,6 +14,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import typer
+from datetime import datetime
 
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
@@ -143,15 +144,14 @@ def detect_paper_tags(
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
     if ids is not None and len(ids) == 4:
         # Check for invalid/bad ids
-        bads = [x for x in ids if x > 4]
+        bads = [x for x in ids if x > APRIL_LIMIT]
 
         # Saves problematic frame
         if len(bads) > 0:
             copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
             plt.figimage = copy
-
-            # TODO: a more informative name
-            plt.savefig("problematic_frame.png")
+            logger.warning(f"Invalid AprilTag Value(s): {bads} detected")
+            plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
         averaged_paper = Polygon([average_pt(shape) for shape in tag_shapes])
 
         # TODO: Allow for multiple papers.
@@ -170,25 +170,25 @@ def tags_to_pid(tags: list[int]) -> int | None:
         int: the program encoding as an integer
 
     """
-    if tags is not None:
-        filtered = [id for id in tags if id < APRIL_LIMIT][:4]
-
-        # TODO: check APRIL_LIMIT is present
-
-        # Reorder based on the position of the APRIL_LIMIT tag
-        pos = filtered.index(APRIL_LIMIT)
-        ordered_tags = filtered[pos + 1 :] + filtered[:pos]
-
-        # Convert into int by using tags as base-APRIL_LIMIT digits
-        program_encoding = sum(
-            tag * APRIL_LIMIT**i for i, tag in enumerate(ordered_tags)
-        )
-
-        logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
-        return program_encoding
-    else:
+    if len(tags) != 4:
+        logger.warning(f"{tags} length is not 4")
         return None
 
+    if APRIL_LIMIT not in tags:
+        logger.warning(f"{APRIL_LIMIT} not found in {tags}")
+        return None
+
+    # Reorder based on the position of the APRIL_LIMIT tag
+    pos = tags.index(APRIL_LIMIT)
+    ordered_tags = tags[pos + 1 :] + tags[:pos]
+
+    # Convert into int by using tags as base-APRIL_LIMIT digits
+    program_encoding = sum(
+        tag * APRIL_LIMIT**i for i, tag in enumerate(ordered_tags)
+    )
+
+    logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
+    return program_encoding
 
 def create_and_update_actors(
     program_encoding: int,
