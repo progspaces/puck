@@ -151,7 +151,7 @@ def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[in
             plt.savefig("problematic_frame.png")  
         averaged_paper = Polygon([ average_pt(shape) for shape in tag_shapes])
 
-         # Currently only returns one entry in the list, this should be many tuples in an updated implementation.
+        # TODO: Allow for multiple papers.
         return [(averaged_paper, ids)]
     else:
         return []
@@ -293,7 +293,7 @@ def update(
     Recursively adds itself onto the event loop for base.mainloop() using the .after() call.
 
     Args:
-        cam (cv.VideoCapture): videofeed
+        cam (cv.VideoCapture): videofeeds
         encoding_to_actor (dict[str, Actor]): a dictionary tying the program encoding to the actor that it spawns
         program_lookup (dict[str, str]): a dictionary tying the program encoding (int as a str) to the name of the program it is assocaited with.
         drawing_queue (Queue): the universal drawing queue that all actors and the main thread can access
