@@ -39,6 +39,7 @@ class Polygon:
 
 def angle_to(p: Point, q: Point) -> float:
     """Get the angle in radians from p to q from horizontal right.
+
     Raises:
         ValueError: There is no angle to return if the points are identical.
     """
@@ -65,8 +66,7 @@ def angle_to(p: Point, q: Point) -> float:
     else:
         angle = math.atan(dy / dx)
 
-    # If the dx is negative, 
-    # you must add a pi to the radian calculation get the right result.
+    # If the dx is negative, add pi to the result.
     if dx < 0:
         angle += math.pi
 
@@ -77,10 +77,10 @@ def clockwise_pt(rectangle: Polygon, reference: Point) -> Point:
     """Gets you the point that is the next clockwise point from reference point, 
     in a rectangle formed by four points.
     """
-    other_corners = [pt for pt in rectangle if pt != reference] # get rid of the refernce point
-    dists_to_corners = [reference.dist_to(q) for q in other_corners] # find out how far away every other point is from the reference 
-    furthest = max(dists_to_corners) # find out the furthest point from the point you have (ought to be the diagonal)
-    opposite_corner = other_corners[dists_to_corners.index(furthest)]
+    other_corners = [pt for pt in rectangle if pt != reference]
+    dists_to_corners = [reference.dist_to(q) for q in other_corners]
+    diagonal = max(dists_to_corners)
+    opposite_corner = other_corners[dists_to_corners.index(diagonal)]
 
     adjacent_corners = [pt for pt in other_corners if pt != opposite_corner]
     angles_to_corners = [angle_to(reference, q) for q in adjacent_corners]
@@ -103,11 +103,13 @@ def ordered_rectangle(rectangle: Polygon, reference: Point) -> Polygon:
     starting with the given reference point.
     """
     ordered = []
+    
     # Walk clockwise through the ordered list.
     ordered.insert(0, clockwise_pt(rectangle, reference))
     ordered.insert(1,clockwise_pt(rectangle, ordered[0]))
     ordered.insert(2,clockwise_pt(rectangle, ordered[1]))
     ordered.insert(0, reference)
-    ## Double check we haven't assigned the same point multiple times.....
+    
+    # Double check we haven't assigned the same point multiple times
     assert len(set(ordered)) == 4
     return Polygon(ordered)

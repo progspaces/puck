@@ -3,9 +3,6 @@ from typing import Self
 from queue import Queue
 
 class Actor(Thread):
-    """ 
-    """
-    
     def __init__(self, target):
         """ Initialises an actor.
         Args:

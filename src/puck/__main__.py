@@ -23,6 +23,8 @@ from .calibration import calibrate
 # Global variables
 logger = logging.getLogger(__name__)
 DICT = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_APRILTAG_16H5)
+APRIL_LIMIT = 4
+TICK_LENGTH = 16
 CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
 CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
 
@@ -88,12 +90,11 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
     Returns:
         cv.VideoCapture: video feed
     """
-    # Create camera
     cam = cv.VideoCapture(camera_id)
 
     # Get one frame to verify camera is working (will throw if broken)
     _, frame = cam.read()
-    frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+    cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
     return cam
 
@@ -157,19 +158,27 @@ def detect_paper_tags(frame: np.typing.ArrayLike) -> list[tuple[Polygon, list[in
 
 
 def tags_to_pid(tags: list[int]) -> int | None:
-    """Takes in all the scene apriltags and transforms them into a single integer which is the id of the paper.
+    """Transforms the AprilTags from the corners of one paper into the paper's id.
 
     Args:
         tags list[int]: a list of the ids given
 
     Returns:
-        int: the program encoding as an integer, if this is supposed to be 3, it returns 3.
+        int: the program encoding as an integer
+
     """
     if tags is not None:
-        filtered = [id for id in tags if id < 5][0:5]
-        program_encoding = int("".join(map(str, filtered)), 4)
-        if program_encoding == 192 or program_encoding == 48 or program_encoding == 12:
-            program_encoding = 3
+        filtered = [id for id in tags if id < APRIL_LIMIT][:4]
+
+        # TODO: check APRIL_LIMIT is present
+
+        # Reorder based on the position of the APRIL_LIMIT tag
+        pos = filtered.index(APRIL_LIMIT)
+        ordered_tags = filtered[pos + 1:] + filtered[:pos]
+
+        # Convert into int by using tags as base-APRIL_LIMIT digits
+        program_encoding = sum(tag * APRIL_LIMIT ** i for i, tag in enumerate(ordered_tags))
+
         logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
         return program_encoding
     else:
@@ -325,9 +334,9 @@ def update(
         logger.info("finished the joining and ending")
         base.quit()
 
-    # Puts a call to update() onto the event loop queue to run this again in 16ms
+    # Run this function again shortly
     base.after(
-        16,
+        TICK_LENGTH,
         update,
         cam,
         encoding_to_actor,
@@ -351,7 +360,7 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
     print("Hello from puck!")
     logging_setup(log, log_level) 
 
-    # run the calibration
+    # Run the calibration
     calibration_info = calibrate(projector_id=0, camera_id=0)
 
     tk_setup() 
@@ -362,9 +371,9 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
     cam = camera_setup(camera_id)
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
 
-    # After 16ms, runs update() on the main graphics event loop
+    # Start the main update loop soon
     base.after(
-        16,
+        TICK_LENGTH,
         update,
         cam,
         encoding_to_actor,
@@ -374,7 +383,8 @@ def start_puck(log: bool = False, log_level: int = 0, camera_id: int = 0, progra
         CAMERA_PERSPECTIVE_WINDOW_NAME,
     ) 
 
-    # Start the event loop, the main thread will hang out here until stopping condition is met
+    # Start the event loop
+    # Blocks until stopping condition is met
     base.mainloop() 
     cam.release() 
     cv.destroyAllWindows()
