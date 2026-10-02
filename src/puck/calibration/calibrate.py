@@ -229,7 +229,7 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         # e.g. [[x1,y1],[x2,y2]]
         # the chessboard is symmetric under 180-degree rotation and the detector may return
         # the corners in reverse order
-        camera_points = corners.reshape(-1, 2).astype(np.flaot32)
+        camera_points = corners.reshape(-1, 2).astype(np.float32)
         if camera_points[0].sum() > camera_points[-1].sum():
             camera_points = camera_points[::-1].copy()
 

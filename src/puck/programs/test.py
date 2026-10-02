@@ -7,7 +7,7 @@ from ..actor import Actor
 logger = logging.getLogger(__name__)
 
 
-def run(self: Actor):
+def run(self: Actor) -> None:
     """Target function for an actor that just tracks a paper on the webcam.
 
     Args:
@@ -22,8 +22,8 @@ def run(self: Actor):
     drawing_queue = first_message[1]
 
     # These are lists that are for this actor to hold onto whatever graphical objects and actors it spawns off.
-    associated_canvas_ids = []
-    spawned_actors = []
+    associated_canvas_ids: list[int] = []
+    spawned_actors: list[Actor] = []
 
     # This is an infinite loop to constantly be reading the mailbox in its thread.
     # It uses a match-case structure to figure out what each message is telling us.

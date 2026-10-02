@@ -1,5 +1,7 @@
 import math
+import numpy as np
 from dataclasses import dataclass
+from collections.abc import Iterator
 
 
 @dataclass
@@ -7,10 +9,10 @@ class Point:
     x: int
     y: int
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[int]:
         return iter((self.x, self.y))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.x, self.y))
 
     def dist_to(self: Point, other: Point) -> float:
@@ -23,17 +25,17 @@ class Point:
 class Polygon:
     points: list[Point]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> Point:
         return self.points[key]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Point]:
         return iter(self.points)
 
     def unwrap(self) -> list[tuple[int, int]]:
         return [(x, y) for x, y in self.points]
 
     @classmethod
-    def from_array(cls, array):
+    def from_array(cls, array: np.ndarray) -> Polygon:
         points = [Point(int(item[0]), int(item[1])) for item in array]
         return cls(points)
 
@@ -103,7 +105,7 @@ def ordered_rectangle(rectangle: Polygon, reference: Point) -> Polygon:
     """Orders the points that make up a rectangle by going clockwise through them,
     starting with the given reference point.
     """
-    ordered = []
+    ordered: list[Point] = []
 
     # Walk clockwise through the ordered list.
     ordered.insert(0, clockwise_pt(rectangle, reference))

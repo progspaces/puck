@@ -62,7 +62,10 @@ def load_program_store(filename: str) -> list[str]:
         dict[str, str]: the dictionary loaded as a dicionary object.
     """
     with open(filename) as f:
-        return json.load(f)
+        programs = json.load(f)
+    assert type(programs) is list
+    assert all(type(p) is str for p in programs)
+    return programs
 
 
 def canvas_setup(base: Tk) -> Canvas:
@@ -101,7 +104,7 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
     return cam
 
 
-def camera_perspective_window_setup(window_name: str):
+def camera_perspective_window_setup(window_name: str) -> None:
     """Set up a window that will show you what the camera is seeing.
     Oddly here the name of the window will be used to refer to it later on so it acts
     less like a random tidbit on the cv window and closer to an identifier.
@@ -186,9 +189,11 @@ def tags_to_pid(tags: list[int]) -> int | None:
     program_encoding = sum(
         tag * APRIL_LIMIT**i for i, tag in enumerate(ordered_tags)
     )
+    assert type(program_encoding) is int
 
     logger.debug(f"Raw id: {tags} to interpreted id: {program_encoding}")
     return program_encoding
+
 
 def create_and_update_actors(
     program_encoding: int,
