@@ -196,14 +196,6 @@ def create_and_update_actors(
     drawing_queue: Queue,
 ) -> None:
     """Creates or updates Actors associated with a given program encoding
-
-    # TODO: Shorten these args appropriately.
-    Args:
-        program_encoding (int): the program identifier
-        current_coords (Polygon): a list of the coordinates of the paper.
-        encoding_to_actor (dict[str, Actor]): a dictionary storing the encoding of the program (int as str) to the actor it starts
-        program_lookup (list[str]): a dictionary storing the encoding of the program (int as a str) to the program name
-        drawing_queue (Queue): a universal queue that can only be used by the main thread to create graphics objects
     """
     if program_encoding >= len(program_lookup) or program_encoding < 0:
         print(
