@@ -31,11 +31,11 @@ CAMERA_PERSPECTIVE_WINDOW_NAME = "Camera perspective"
 
 
 def logging_setup(log: bool, log_level: int) -> None:
-    """Sets up the logging object and the level at which we are logging for different approaches, info vs debug.
+    """Configure the logger.
 
     Args:
-        log (bool): To log or not to log that is the question. (Turns on logging)
-        log_level (int): Level of logging you wish to have outputted.
+        log: To log or not to log that is the question. (Turns on logging)
+        log_level: log level to use with the logging package.
     """
     if log:
         logging.basicConfig(level=log_level)
@@ -52,14 +52,13 @@ def tk_setup() -> None:
     base.geometry("1920x1080+0+-1080")
 
 
-def load_program_store(filename: str) -> list[str]:
-    """Loads in a .json dictionary for looking up what string is associated with what program name
+def load_program_names(filename: str) -> list[str]:
+    """Loads and returns a list of the names of existing programs.
+     
+    This list is ordered such that a program can be indexed by its encoding.
 
     Args:
-        filename (str): the file name of the .json dictionary
-
-    Returns:
-        dict[str, str]: the dictionary loaded as a dicionary object.
+        filename: Filename to load from.
     """
     with open(filename) as f:
         programs = json.load(f)
@@ -69,13 +68,10 @@ def load_program_store(filename: str) -> list[str]:
 
 
 def canvas_setup(base: Tk) -> Canvas:
-    """Set up the tk canvas object on the tk base object.
+    """Set up a Tk.Canvas object on the base object.
 
     Args:
-        base (Tk): The basic Tk object that everything is built off of
-
-    Returns:
-        Canvas: A tk canvas on which we can draw graphical objects.
+        base: an instance of Tk(), also commonly referred to as "root".
     """
     canvas = Canvas(
         base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black"
@@ -106,11 +102,6 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
 
 def camera_perspective_window_setup(window_name: str) -> None:
     """Set up a window that will show you what the camera is seeing.
-    Oddly here the name of the window will be used to refer to it later on so it acts
-    less like a random tidbit on the cv window and closer to an identifier.
-
-    Args:
-        window_name (str): Name of the window that shows up.
     """
     cv.namedWindow(
         window_name,
@@ -121,7 +112,7 @@ def camera_perspective_window_setup(window_name: str) -> None:
 
 
 def average_pt(tag: Polygon) -> Point:
-    """Takes the AprilTag shape and finds the middle point."""
+    """Takes the AprilTag shape and finds a point in the middle of it."""
     sum_x = 0
     sum_y = 0
     for x, y in tag:
@@ -133,8 +124,10 @@ def average_pt(tag: Polygon) -> Point:
 def detect_paper_tags(
     frame: np.typing.ArrayLike,
 ) -> list[tuple[Polygon, list[int]]]:
-    """Takes in a frame of the video and determines what papers are wtihin it.
-    Currently we are just looking for one paper at a time, this needs to be increased in newer implementations.
+    """Takes in a frame of the video and determines what papers are within it.
+
+    Currently we are just looking for one paper at a time.
+    This needs to be increased in newer implementations.
 
     Args:
         frame (np.array): a frame of the video feed.
@@ -163,11 +156,11 @@ def detect_paper_tags(
         return []
 
 
-def tags_to_pid(tags: list[int]) -> int | None:
-    """Transforms the AprilTags from the corners of one paper into the paper's id.
+def tags_to_paper_encoding(tags: list[int]) -> int | None:
+    """Transforms the 4 AprilTags IDs on a paper into that paper's encoding.
 
     Args:
-        tags list[int]: a list of the ids given
+        tags list[int]: a list of the April Tag ids given
 
     Returns:
         int: the program encoding as an integer
@@ -202,8 +195,9 @@ def create_and_update_actors(
     program_lookup: list[str],
     drawing_queue: Queue,
 ) -> None:
-    """Takes in a program encoding and the coordinates of the paper associated with it and creates actors
+    """Creates or updates Actors associated with a given program encoding
 
+    # TODO: Shorten these args appropriately.
     Args:
         program_encoding (int): the program identifier
         current_coords (Polygon): a list of the coordinates of the paper.
@@ -242,11 +236,7 @@ def create_and_update_actors(
 
 
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
-    """Draws what is on the drawing queue onto the canvas.
-
-    Args:
-        drawing_queue (Queue): the queue that all the actors and main thread can access
-        canvas (Canvas): the tkinter graphical space.
+    """Draws the commands on the drawing queue onto the canvas.
     """
     if not drawing_queue.empty():  # TODO: change to 'while'
         message = drawing_queue.get()
@@ -309,16 +299,7 @@ def update(
     canvas: Canvas,
     window_name: str,
 ) -> None:
-    """Update the system with input from the camera.
-    Recursively adds itself onto the event loop for base.mainloop() using the .after() call.
-
-    Args:
-        cam (cv.VideoCapture): videofeeds
-        encoding_to_actor (dict[str, Actor]): a dictionary tying the program encoding to the actor that it spawns
-        program_lookup (list[str]): a dictionary tying the program encoding (int as a str) to the name of the program it is assocaited with.
-        drawing_queue (Queue): the universal drawing queue that all actors and the main thread can access
-        canvas (Canvas): the tkinter canvas
-        window_name (str): the name of the window that shows the camera feed
+    """Updates the system with event using visual input from the camera.
     """
     logger.debug("Called the Update Function")
 
@@ -329,7 +310,7 @@ def update(
 
     # Recognise and execute papers
     for coords, tags in detect_paper_tags(frame):
-        program_encoding = tags_to_pid(tags)
+        program_encoding = tags_to_paper_encoding(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
             coords = ordered_rectangle(coords, coords[0])
@@ -373,13 +354,7 @@ def start_puck(
     camera_id: int = 0,
     program_lookup_file: str = "data/program_lookup.json",
 ) -> None:
-    """Runs the puck recognition system
-
-    Args:
-        log (bool, optional): Whether or not you are logging information about this run. Defaults to False.
-        log_level (int, optional): If you are logging at what level of detail are you logging information. Defaults to 0.
-        camera_id (int, optional): The id of the camera that is looking at the scene. Defaults to 0.
-    """
+    """Runs the puck recognition system"""
 
     # Generic print to make sure that everything is working
     print("Hello from puck!")
@@ -389,7 +364,7 @@ def start_puck(
     calibration_info = calibrate(projector_id=0, camera_id=0)
 
     tk_setup()
-    program_lookup = load_program_store(program_lookup_file)
+    program_lookup = load_program_names(program_lookup_file)
     encoding_to_actor: dict[str, Actor] = {}
     canvas = canvas_setup(base)
     drawing_queue: Queue = Queue()
@@ -416,5 +391,7 @@ def start_puck(
 
 
 def main() -> None:
-    """Runs the 'start_puck' function, wrapped up in typer.run so it can act as a command line tool and take in command arguments."""
+    """Runs the 'start_puck' function.
+    
+    Wrapped up in typer.run so it can act as a CLI and take in CL args."""
     typer.run(start_puck)
