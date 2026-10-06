@@ -9,7 +9,7 @@ import logging
 # External packages
 import typer
 
-from calibrate import calibrate
+from .calibrate import calibrate
 
 # Global variables
 logger = logging.getLogger(__name__)
