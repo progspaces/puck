@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from screeninfo import Monitor, get_monitors
 
-from pcal.chessboard import make_chessboard
+from .chessboard import make_chessboard
 
 
 logger = logging.getLogger(__name__)

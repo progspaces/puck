@@ -121,8 +121,23 @@ def average_pt(tag: Polygon) -> Point:
     return Point(int(sum_x / 4), int(sum_y / 4))
 
 
+def transform_point(point:Point, homography_matrix: np.ndarray) -> Point:
+    """Transforms point from a detected point to a point in projection space.
+    """
+    return Point(cv.perspectiveTransform(point.astype(np.float32),
+                                         homography_matrix))
+
+
+def transform_shape(shape:Polygon, homography_matrix) -> Polygon:
+    """Transforms a shapes points from detected to projected.
+    """
+    points = []
+    for point in shape:
+        points.append(transform_point(point, homography_matrix))
+    return Polygon(points)
+
 def detect_paper_tags(
-    frame: np.typing.ArrayLike,
+    frame: np.typing.ArrayLike,homography_matrix: np.ndarray
 ) -> list[tuple[Polygon, list[int]]]:
     """Takes in a frame of the video and determines what papers are within it.
 
@@ -138,6 +153,8 @@ def detect_paper_tags(
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
+    transformed_tag_shapes = [transform_shape(shape, homography_matrix) 
+                              for shape in tag_shapes]
     if ids is not None and len(ids) == 4:
         # Check for invalid/bad ids
         bads = [x for x in ids if x > APRIL_LIMIT]
@@ -148,7 +165,8 @@ def detect_paper_tags(
             plt.figimage = copy
             logger.warning(f"Invalid AprilTag Value(s): {bads} detected")
             plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
-        averaged_paper = Polygon([average_pt(shape) for shape in tag_shapes])
+        averaged_paper = Polygon([average_pt(shape) 
+                                  for shape in transformed_tag_shapes])
 
         # TODO: Allow for multiple papers.
         return [(averaged_paper, ids)]
@@ -290,6 +308,7 @@ def update(
     drawing_queue: Queue,
     canvas: Canvas,
     window_name: str,
+    homography_matrix: np.ndarray, 
 ) -> None:
     """Updates the system with event using visual input from the camera.
     """
@@ -301,7 +320,7 @@ def update(
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
     # Recognise and execute papers
-    for coords, tags in detect_paper_tags(frame):
+    for coords, tags in detect_paper_tags(frame,homography_matrix):
         program_encoding = tags_to_paper_encoding(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
@@ -337,6 +356,7 @@ def update(
         drawing_queue,
         canvas,
         window_name,
+        homography_matrix
     )
 
 
@@ -344,7 +364,7 @@ def start_puck(
     log: bool = False,
     log_level: int = 0,
     camera_id: int = 0,
-    program_lookup_file: str = "data/program_lookup.json",
+    program_lookup_file: str = "data/program_losokup.json",
 ) -> None:
     """Runs the puck recognition system"""
 
@@ -362,8 +382,13 @@ def start_puck(
     drawing_queue: Queue = Queue()
     cam = camera_setup(camera_id)
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
+    calibration_info = calibrate()
+    homography_matrix = calibration_info.camera_to_projector_homography
+    if homography_matrix == None:
+        logger.fatal(msg = "Homography Matrix failed to generate, " \
+        "nothing will work.")
 
-    # Start the main update loop soon
+    # Start the main update loop soons
     base.after(
         TICK_LENGTH,
         update,
@@ -373,6 +398,7 @@ def start_puck(
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
+        homography_matrix
     )
 
     # Start the event loop
