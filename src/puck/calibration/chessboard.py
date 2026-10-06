@@ -1,14 +1,7 @@
-from dataclasses import dataclass
-
 import cv2
 import numpy as np
+
 from numpy.typing import NDArray
-
-
-@dataclass
-class Point:
-    x: int
-    y: int
 
 
 def make_chessboard(
@@ -47,7 +40,7 @@ def make_chessboard(
         dtype=np.uint8,
     )
 
-    # Chessboard detectors need a light border around the pattern. Without it,
+    # chessboard detectors need a light border around the pattern. Without it,
     # black edge squares merge into the black projection background and the
     # contour-based detector cannot identify the board reliably.
     border = square_size // 2
@@ -62,7 +55,7 @@ def make_chessboard(
         thickness=-1,
     )
 
-    # Draw the black chessboard squares on the light backing.
+    # draw the black chessboard squares on the light backing.
     for row in range(rows):
         for col in range(cols):
             if (row + col) % 2 == 0:
@@ -77,7 +70,7 @@ def make_chessboard(
                     thickness=-1,
                 )
 
-    # Internal corners only.
+    # internal corners only.
     points: list[tuple[int, int]] = []
 
     for row in range(1, rows):

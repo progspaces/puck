@@ -1,192 +1,185 @@
 from dataclasses import dataclass
 import logging
-from pathlib import Path
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 from screeninfo import Monitor, get_monitors
 
-from .chessboard import make_chessboard
+from pcal.chessboard import make_chessboard
 
 
-# each file should have it's own logger
 logger = logging.getLogger(__name__)
 
-
-# -----------------------------------------------------------------------------
-# Calibration Information
-# -----------------------------------------------------------------------------
+WINDOW_PROJECTOR = "projector"
+WINDOW_BACKGROUND = "background"
+WINDOW_CHESSBOARD = "chessboard"
+WINDOW_DIFFERENCE = "difference"
+WINDOW_MASK = "mask"
 
 
 @dataclass
 class CalibrationInfo:
-    """
-    A container for any and all results of the calibration process.
-    This class can be saved after calibration and loaded at the the
-    start of future sessions.
-    """
-
     camera_to_projector_homography: np.ndarray
-
-    def save(self, path: Path) -> None:
-        np.savetxt(path, self.camera_to_projector_homography)
-
-    @classmethod
-    def load(cls, path: Path) -> "CalibrationInfo":
-        mat = np.loadtxt(path)
-        return cls(camera_to_projector_homography=mat)
+    background_frame: NDArray[np.uint8]
 
 
-# -----------------------------------------------------------------------------
-# Helper functions - projector
-# -----------------------------------------------------------------------------
-
-
-def log_monitors_info() -> None:
-    """
-    Use the screeninfo package to print the current monitors.
-    Useful for debugging
-    """
+def get_projector() -> Monitor:
     monitors = get_monitors()
-    for idx, m in enumerate(monitors):
-        info = f"Monitor {idx}. w:{m.width}, h:{m.height}, x:{m.x}, y:{m.y}."
-        logger.info(info)
+
+    for i, monitor in enumerate(monitors):
+        logger.info(
+            "Monitor %d: %dx%d at (%d, %d)",
+            i,
+            monitor.width,
+            monitor.height,
+            monitor.x,
+            monitor.y,
+        )
+
+    if len(monitors) < 2:
+        raise RuntimeError("No second monitor/projector found")
+
+    return monitors[0]
 
 
-def get_projector(id: int) -> Monitor:
-    """
-    Get information about the projector.
-
-    Args:
-        id (int): The id of the projector (normally 0 or 1).
-
-    Returns:
-        Monitor: A screeninfo Monitor object with info about the projector.
-    """
-    monitors = get_monitors()
-    return monitors[id]
-
-
-def create_fullscreen_window(window_name: str, monitor: Monitor) -> None:
-    """
-    Reliably create a fullscreen window on the given monitor,
-
-    Args:
-        window_name (str): The name to give the window so you can draw to it.
-        monitor (Monitor): The information about the monitor.
-    """
+def make_fullscreen_projector_window(
+    window_name: str,
+    projector: Monitor,
+) -> None:
+    """Create and show a fullscreen black window on the projector display."""
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.moveWindow(window_name, monitor.x, monitor.y)
-    cv2.resizeWindow(window_name, monitor.width, monitor.height)
 
-    # opencv does not create native windows until the first image is shown
-    screen_shape = (monitor.height, monitor.width, 3)
-    screen_sized_image = np.zeros(screen_shape, np.uint8)
-    cv2.imshow(window_name, screen_sized_image)
-    cv2.waitKey(100)  # give it a moment to create the native window
-
-    # full screen the window
-    cv2.moveWindow(window_name, monitor.x, monitor.y)
-    cv2.setWindowProperty(
-        window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
+    # OpenCV does not reliably create the native window until the first image
+    # is shown and GUI events have been processed. Materialise it before asking
+    # the window manager to make it fullscreen.
+    black_screen = np.zeros(
+        (projector.height, projector.width, 3),
+        dtype=np.uint8,
     )
+    cv2.moveWindow(window_name, projector.x, projector.y)
+    cv2.resizeWindow(window_name, projector.width, projector.height)
+    cv2.imshow(window_name, black_screen)
+    cv2.waitKey(100)
 
+    # Move once more now that the native window exists, then fullscreen it on
+    # the display containing that position.
+    cv2.moveWindow(window_name, projector.x, projector.y)
+    cv2.setWindowProperty(
+        window_name,
+        cv2.WND_PROP_FULLSCREEN,
+        cv2.WINDOW_FULLSCREEN,
+    )
     # Refresh after changing the native window style. Some backends otherwise
     # defer fullscreen until the next frame is rendered.
-    cv2.imshow(window_name, screen_sized_image)
-    cv2.waitKey(100)  # give it a moment to create the native window
+    cv2.imshow(window_name, black_screen)
+    cv2.waitKey(250)
 
 
-# -----------------------------------------------------------------------------
-# Helper functions - camera
-# -----------------------------------------------------------------------------
-
-
-def read_frames(
+def discard_frames(
     camera: cv2.VideoCapture,
     count: int = 5,
-) -> list[NDArray[np.uint8]]:
-    """Read count frames from the camera.
-
-    Args:
-        camera (cv2.VideoCapture): The camera.
-        count (int, optional): The number of frames to drop. Defaults to 5.
-
-    Raises:
-        RuntimeError: The camera might fail (unplugged etc).
+) -> None:
     """
-    frames: list[NDArray[np.uint8]] = []
+    Discard several frames from the camera.
+
+    This is useful after changing the projector image because
+    camera/video pipelines may contain buffered frames.
+    """
+    for _ in range(count):
+        ok, _ = camera.read()
+
+        if not ok:
+            raise RuntimeError("Could not read camera frame")
+
+
+def capture_average(
+    camera: cv2.VideoCapture,
+    count: int = 10,
+) -> np.ndarray:
+    """
+    capture several frames and return their pixel-wise average.
+    averaging suppresses random sensor noise.
+    """
+    frames = []
+
     for _ in range(count):
         ok, frame = camera.read()
 
         if not ok:
             raise RuntimeError("Could not read camera frame")
 
-        frames.append(frame)
-    return frames
+        frames.append(frame.astype(np.float32))
 
+    average = np.mean(
+        frames,
+        axis=0,
+    )
 
-def capture_average(
-    camera: cv2.VideoCapture,
-    count: int = 5,
-) -> NDArray[np.uint8]:
-    frames = read_frames(camera, count)
-    frames = [frame.astype(np.float32) for frame in frames]
-    average = np.mean(frames, axis=0)
     return average.astype(np.uint8)
 
 
-# -----------------------------------------------------------------------------
-# Exported functionality
-# -----------------------------------------------------------------------------
-def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
-    """Calibrate the camera to projector transform matrix.
+def show_image_on_projector_and_wait(
+    window_name: str,
+    image: np.ndarray,
+    settle_ms: int = 200,
+) -> None:
+    """
+    display an image on the projector and allow some time for the display to settle.
+    """
+    cv2.imshow(window_name, image)
+    cv2.waitKey(settle_ms)
+
+
+def calibrate(debug: bool = True) -> CalibrationInfo:
+    """Calibrate the camera-to-projector mapping.
 
     Args:
-        projector_id (int): The id of the projector (normally 1).
-        camera_id (int): the id of the camera (normally 0).
-
-    Raises:
-        RuntimeError: _description_
-        RuntimeError: _description_
-        RuntimeError: _description_
-
-    Returns:
-        CalibrationInfo: Information about the calibration.
+        debug: Show intermediate capture and detection windows when true.
+            The projector window is always shown because it is required for
+            calibration.
     """
+    logger.info("Running calibration tool")
 
-    logger.info("Calibrating system ...")
+    homography = None
 
-    PROJECTOR_WINDOW_NAME = "projector"
+    # Projector
+    logger.info("Setting up projector")
+    projector = get_projector()
 
-    # get the projector information
-    projector = get_projector(projector_id)
+    make_fullscreen_projector_window(
+        WINDOW_PROJECTOR,
+        projector,
+    )
 
-    # generate the chessboard
-    board_shape = (8, 6)
+    # The fullscreen helper initially displays black.
+    black_screen = np.zeros((projector.height, projector.width, 3), dtype=np.uint8)
+
+    # camera
+    logger.info("Setting up camera")
+    camera = cv2.VideoCapture(0)
+    if not camera.isOpened():
+        raise RuntimeError("Could not open camera")
+
+    # make the chessboard
+    logger.info("Generating calibration board")
     board_size = (projector.width, projector.height)
-    board_image, board_points = make_chessboard(board_size, board_shape)
-
-    # create a fullscreen window for the projector to draw to
-    create_fullscreen_window(PROJECTOR_WINDOW_NAME, projector)
+    board_shape = (8, 6)
+    board, board_points = make_chessboard(board_size, board_shape)
+    logger.info(
+        "Generated calibration chessboard with %d calibration points",
+        len(board_points),
+    )
 
     try:
-        # set up the camera
-        camera = cv2.VideoCapture(camera_id)
-        if not camera.isOpened():
-            raise RuntimeError("Calibration Error: cannot open camera")
-
-        # capture the background
-        read_frames(camera, count=5)  # discard 5 frames
+        logger.info("Capturing background")
+        show_image_on_projector_and_wait(WINDOW_PROJECTOR, black_screen)
+        discard_frames(camera, count=5)
         background_frame = capture_average(camera, count=10)
 
-        # project the chessboard
-        cv2.imshow(PROJECTOR_WINDOW_NAME, board_image)
-        cv2.waitKey(100)
-
-        # capture the chessboard
-        read_frames(camera, count=5)  # discard 5 frames
+        logger.info("Capturing projected chessboard")
+        show_image_on_projector_and_wait(WINDOW_PROJECTOR, board)
+        discard_frames(camera, count=5)
         chessboard_frame = capture_average(camera, count=10)
 
         # compute the grayscale difference image
@@ -194,60 +187,140 @@ def calibrate(projector_id: int, camera_id: int) -> CalibrationInfo:
         gray_chessboard = cv2.cvtColor(chessboard_frame, cv2.COLOR_BGR2GRAY)
         difference = cv2.subtract(gray_chessboard, gray_background)
 
-        # normalise the difference image then OTSU threshold
-        # norm makes for better OTSU threshold
-        difference = cv2.normalize(
-            difference, None, alpha=0, beta=0, norm_type=cv2.NORM_MINMAX
+        # Stretch the projected-light signal to the full display range. Camera
+        # exposure, projector brightness, and surface reflectance make a fixed
+        # threshold unreliable across different hardware.
+        difference_normalized = cv2.normalize(
+            difference,
+            None,
+            alpha=0,
+            beta=255,
+            norm_type=cv2.NORM_MINMAX,
         )
-        thesh, mask = cv2.threshold(
-            difference, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU
+        threshold_value, mask = cv2.threshold(
+            difference_normalized,
+            0,
+            255,
+            cv2.THRESH_BINARY | cv2.THRESH_OTSU,
         )
 
-        # now we have the mask, we can detect the chessboard
-        # note - we could fallback to the non-thesholded image it that fails
+        if debug:
+            cv2.imshow(WINDOW_BACKGROUND, gray_background)
+            cv2.imshow(WINDOW_DIFFERENCE, difference_normalized)
+            cv2.imshow(WINDOW_MASK, mask)
+
         corner_shape = (
             board_shape[0] - 1,
             board_shape[1] - 1,
         )
+        print(difference_normalized)
         detector_flags = (
             cv2.CALIB_CB_NORMALIZE_IMAGE
             | cv2.CALIB_CB_EXHAUSTIVE
             | cv2.CALIB_CB_ACCURACY
         )
-        found, corners = cv2.findChessboardCornersSB(
-            gray_chessboard,
-            corner_shape,
-            flags=detector_flags,
+        # The raw camera frame contains the surface and ambient scene. Detect on
+        # the background-subtracted projection first, with the raw frame only as
+        # a fallback.
+        ret = False
+        corners = None
+        detection_source = "none"
+        detector_inputs = (
+            ("background difference", difference_normalized),
+            ("Otsu mask", mask),
+            ("raw camera frame", gray_chessboard),
         )
-
-        # if we can't find the chessboard then raise an exception
-        if not found:
-            raise RuntimeError("Cannot find chessboard!")
-
-        # compute the mapping from the camera-image coords to the projector coords
-        # both arrays need to be row-major order https://en.wikipedia.org/wiki/Row-_and_column-major_order
-        # e.g. [[x1,y1],[x2,y2]]
-        # the chessboard is symmetric under 180-degree rotation and the detector may return
-        # the corners in reverse order
-        camera_points = corners.reshape(-1, 2).astype(np.float32)
-        if camera_points[0].sum() > camera_points[-1].sum():
-            camera_points = camera_points[::-1].copy()
-
-        projector_points = np.asarray(board_points, dtype=np.float32)
-        homography, inlier_mask = cv2.findHomography(
-            camera_points,
-            projector_points,
-            method=cv2.RANSAC,
-            ransacReprojThreshold=5.0,
-        )
-
-        if homography is None or inlier_mask is None:
-            raise RuntimeError(
-                "Could not compute the camera-to-projector homography matrix."
+        for source_name, detector_image in detector_inputs:
+            found, candidate_corners = cv2.findChessboardCornersSB(
+                detector_image,
+                corner_shape,
+                flags=detector_flags,
             )
+            logger.info("Detection using %s: %s", source_name, found)
+            if found:
+                ret = True
+                corners = candidate_corners
+                detection_source = source_name
+                break
+
+        percentiles = np.percentile(difference, (50, 90, 99))
+        logger.info(
+            "Projection difference percentiles (50/90/99%%): %s",
+            ", ".join(f"{value:.1f}" for value in percentiles),
+        )
+        logger.info("Automatic threshold: %.1f", threshold_value)
+        logger.info("Detect captured board: %s", ret)
+        logger.info("Detection source: %s", detection_source)
+        logger.info("Expected corners: %s", corner_shape)
+        logger.info("Detected: %d", 0 if corners is None else len(corners))
+        logger.info("Board points: %d", len(board_points))
+
+        # if found, add object points, image points (after refining them)
+        if ret and corners is not None:
+            # findChessboardCornersSB already returns sub-pixel corner positions.
+            if debug:
+                display_image = gray_chessboard.copy()
+                cv2.drawChessboardCorners(display_image, corner_shape, corners, ret)
+                cv2.imshow(WINDOW_CHESSBOARD, display_image)
+
+            # Compute a mapping from camera-image coordinates to projector
+            # coocalrdinates. Both arrays must use the same row-major corner order.
+            camera_points = corners.reshape(-1, 2).astype(np.float32)
+            if camera_points[0].sum() > camera_points[-1].sum():
+                # A chessboard is symmetric under a 180-degree rotation, so the
+                # detector may return its corners in reverse order. Anchor the
+                # first corner at the camera image's top-left to match the
+                # projector point ordering produced by make_chessboard().
+                camera_points = camera_points[::-1].copy()
+            projector_points = np.asarray(board_points, dtype=np.float32)
+            homography, inlier_mask = cv2.findHomography(
+                camera_points,
+                projector_points,
+                method=cv2.RANSAC,
+                ransacReprojThreshold=5.0,
+            )
+
+            if homography is None or inlier_mask is None:
+                raise RuntimeError(
+                    "Could not compute the camera-to-projector homography"
+                )
+
+            mapped_points = cv2.perspectiveTransform(
+                camera_points.reshape(-1, 1, 2),
+                homography,
+            ).reshape(-1, 2)
+            reprojection_errors = np.linalg.norm(
+                mapped_points - projector_points,
+                axis=1,
+            )
+            inliers = inlier_mask.ravel().astype(bool)
+
+            logger.info(
+                "Camera-to-projector homography:\n%s",
+                np.array2string(homography, precision=8, suppress_small=True),
+            )
+            logger.info("Homography inliers: %d/%d", inliers.sum(), len(inliers))
+            logger.info(
+                "Mean inlier reprojection error: %.3f projector pixels",
+                reprojection_errors[inliers].mean(),
+            )
+            logger.info(
+                "Maximum inlier reprojection error: %.3f projector pixels",
+                reprojection_errors[inliers].max(),
+            )
+
+        if debug:
+            logger.info("Press q to close the debug windows")
+            while True:
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q"):
+                    break
 
     finally:
         camera.release()
         cv2.destroyAllWindows()
 
-    return CalibrationInfo(camera_to_projector_homography=homography)
+    return CalibrationInfo(
+        camera_to_projector_homography=homography,
+        background_frame=background_frame,
+    )
