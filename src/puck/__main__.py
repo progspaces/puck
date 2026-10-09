@@ -147,19 +147,21 @@ def transform_shape(shape: Polygon, homography_matrix) -> Polygon:
 def detect_paper_tags(
     frame: np.typing.ArrayLike, homography_matrix: np.ndarray
 ) -> list[tuple[Polygon, list[int]]]:
-    """Takes in a frame of the video and determines what papers are within it.
+    """Determines what papers are within a frame of video.
 
     Currently we are just looking for one paper at a time.
     This needs to be increased in newer implementations.
 
     Args:
-        frame (np.array): a frame of the video feed.
+        frame: a frame of the video feed.
+        homography_matrix: a matrix to account for image distortion
 
     Returns:
         A list of papers and their associated list of four tags
     """
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
+    assert type(ids) is list, "detectMarkers should always return lists"
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
     transformed_tag_shapes = [
         transform_shape(shape, homography_matrix) for shape in tag_shapes
