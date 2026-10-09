@@ -29,9 +29,6 @@ class Point:
         dy = self.y - other.y
         return math.sqrt(dy**2 + dx**2)
 
-    def decompose(self: Point)-> list[float, float]:
-        return [self.x, self.y]
-
 
 @dataclass
 class Polygon:
