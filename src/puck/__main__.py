@@ -136,7 +136,7 @@ def transform_point(point: Point, homography_matrix: np.ndarray) -> Point:
     return Point(transformed_coords[0], transformed_coords[1])
 
 
-def transform_shape(shape: Polygon, homography_matrix) -> Polygon:
+def transform_shape(shape: Polygon, homography_matrix: np.ndarray) -> Polygon:
     """Transforms a shapes points from detected to projected."""
     points = []
     for point in shape:
@@ -145,7 +145,7 @@ def transform_shape(shape: Polygon, homography_matrix) -> Polygon:
 
 
 def detect_paper_tags(
-    frame: np.typing.ArrayLike, homography_matrix: np.ndarray
+    frame: np.ndarray, homography_matrix: np.ndarray
 ) -> list[tuple[Polygon, list[int]]]:
     """Determines what papers are within a frame of video.
 
@@ -161,7 +161,7 @@ def detect_paper_tags(
     """
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
-    assert type(ids) is list, "detectMarkers should always return lists"
+    assert ids is not None
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
     transformed_tag_shapes = [
         transform_shape(shape, homography_matrix) for shape in tag_shapes

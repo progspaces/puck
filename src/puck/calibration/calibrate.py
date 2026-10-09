@@ -139,6 +139,8 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
             The projector window is always shown because it is required for
             calibration.
     """
+    # TODO: refactor to handle exceptions and return types more gracefully. Possibility of returning None?
+    
     logger.info("Running calibration tool")
 
     homography = None
@@ -192,9 +194,10 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
         # Stretch the projected-light signal to the full display range. Camera
         # exposure, projector brightness, and surface reflectance make a fixed
         # threshold unreliable across different hardware.
+        difference_normalized = np.zeros(shape=difference.shape, dtype=difference.dtype)
         difference_normalized = cv2.normalize(
             difference,
-            None,
+            difference_normalized,
             alpha=0,
             beta=255,
             norm_type=cv2.NORM_MINMAX,
@@ -326,7 +329,8 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
         camera.release()
         cv2.destroyAllWindows()
 
+    # TODO: homography might be None, which is invalid
     return CalibrationInfo(
-        camera_to_projector_homography=homography,
+        camera_to_projector_homography=homography, 
         background_frame=background_frame,
     )
