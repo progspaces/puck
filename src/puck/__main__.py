@@ -12,7 +12,6 @@ from queue import Queue
 # External packages
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
 import typer
 from datetime import datetime
 from numpy.typing import NDArray
@@ -162,33 +161,36 @@ def detect_paper_tags(
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
     assert ids is not None
-    tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
-    transformed_tag_shapes = [
-        transform_shape(shape, homography_matrix) for shape in tag_shapes
-    ]
 
     # Check for invalid/bad ids
     bad_indices = [i for i in range(len(ids)) if ids[i] > APRIL_LIMIT]
     if len(bad_indices) > 0:
         # Save problematic frame
         bad_ids = [ids[i] for i in bad_indices]
-        copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
-        plt.figimage = copy
         logger.warning(f"Invalid AprilTag Value(s): {bad_ids} detected")
-        plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
+        copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
+        cv.imwrite(f"invalid_AprilTag_{datetime.now().isoformat()}.png", copy)
 
-        # Filter out the bad items
-        tags = [tags[i] for i in range(len(tags)) if i not in bad_indices]
-        ids = [ids[i] for i in range(len(ids)) if i not in bad_indices]
+    # Assemble required data in lists, filtering out any bad IDs
+    ids_list = [int(ids[i]) for i in range(len(ids)) if i not in bad_indices]
+    tag_shapes: list[Polygon] = [
+        Polygon.from_array(tags[i][0])
+        for i in range(len(tag_shapes))
+        if i not in bad_indices
+    ]
+    transformed_tag_shapes = [
+        transform_shape(shape, homography_matrix) for shape in tag_shapes
+    ]
+    assert len(ids_list) == len(transformed_tag_shapes)
 
-    if len(ids) == 4:
+    if len(ids_list) == 4:
         averaged_paper = Polygon(
             [average_pt(shape) for shape in transformed_tag_shapes]
         )
 
         # TODO: Allow for multiple papers.
-        list_ids = [int(i) for i in list(ids)]
-        return [(averaged_paper, list_ids)]
+        ids_list = [int(i) for i in list(ids)]
+        return [(averaged_paper, ids_list)]
     else:
         return []
 
