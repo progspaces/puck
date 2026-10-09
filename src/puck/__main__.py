@@ -15,11 +15,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import typer
 from datetime import datetime
+from numpy.typing import NDArray
+
 
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
 from .actor import Actor
-from .calibration import calibrate
+from .calibration.calibrate import calibrate
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -40,7 +42,6 @@ def logging_setup(log: bool, log_level: int) -> None:
     if log:
         logging.basicConfig(level=log_level)
         logger.info(f"Logging working at level {log_level}")
-
 
 def tk_setup() -> None:
     """Sets up the tkinter window where it will draw graphics."""
@@ -124,8 +125,13 @@ def average_pt(tag: Polygon) -> Point:
 def transform_point(point:Point, homography_matrix: np.ndarray) -> Point:
     """Transforms point from a detected point to a point in projection space.
     """
-    return Point(cv.perspectiveTransform(point.astype(np.float32),
+    array1  = np.ndarray([point.x, point.y], dtype= np.float32)
+    print(array1)
+    print(array1.shape)
+    print(homography_matrix.shape)
+    return Point(cv.perspectiveTransform(array1,
                                          homography_matrix))
+
 
 
 def transform_shape(shape:Polygon, homography_matrix) -> Polygon:
@@ -364,7 +370,7 @@ def start_puck(
     log: bool = False,
     log_level: int = 0,
     camera_id: int = 0,
-    program_lookup_file: str = "data/program_losokup.json",
+    program_lookup_file: str = "data/program_lookup.json",
 ) -> None:
     """Runs the puck recognition system"""
 
@@ -372,8 +378,6 @@ def start_puck(
     print("Hello from puck!")
     logging_setup(log, log_level)
 
-    # Run the calibration
-    calibration_info = calibrate(projector_id=0, camera_id=0)
 
     tk_setup()
     program_lookup = load_program_names(program_lookup_file)
@@ -384,7 +388,7 @@ def start_puck(
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
     calibration_info = calibrate()
     homography_matrix = calibration_info.camera_to_projector_homography
-    if homography_matrix == None:
+    if homography_matrix.all() == None:
         logger.fatal(msg = "Homography Matrix failed to generate, " \
         "nothing will work.")
 

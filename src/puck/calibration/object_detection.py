@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from .calibrate import calibrate
+from puck.calibration import calibrate
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +135,12 @@ def get_projector_space_object_bounds(
 
     bounds: list[NDArray[np.float32]] = []
     for contour in contours:
+        print("contours")
+        print(contour)
+        print(contour.astype(np.float32))
+        print("shapes")
+        print(contour.shape)
+        print(homography.shape)
         projector_contour = cv2.perspectiveTransform(
             contour.astype(np.float32),
             homography,
@@ -214,5 +220,6 @@ def object_detection():
         cv2.imshow("demo", output)
 
 
-def main() -> None:
-    object_detection()
+# def main() -> None:
+print('hello')
+object_detection()

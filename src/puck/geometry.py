@@ -1,3 +1,12 @@
+"""This module provides convenient geometrical functions as well as the Point dataclass and Polygon dataclass
+
+Example:
+    import geometry (note maybe don't do a full import)
+
+
+
+"""
+
 import math
 import numpy as np
 from dataclasses import dataclass
@@ -19,6 +28,9 @@ class Point:
         dx = self.x - other.x
         dy = self.y - other.y
         return math.sqrt(dy**2 + dx**2)
+
+    def decompose(self: Point)-> list[float, float]:
+        return [self.x, self.y]
 
 
 @dataclass
