@@ -24,7 +24,9 @@ def detect_objects(
 ):
     """Segment foreground objects inside the camera-visible projector area."""
     if frame.shape != background_frame.shape:
-        raise ValueError("Frame and calibration background must have matching shapes")
+        raise ValueError(
+            "Frame and calibration background must have matching shapes"
+        )
 
     foreground = cv2.absdiff(frame, background_frame)
     gray = cv2.cvtColor(foreground, cv2.COLOR_BGR2GRAY)
@@ -194,7 +196,9 @@ def object_detection():
             projector_bounds,
             foreground_history=foreground_history,
         )
-        bounds = get_projector_space_object_bounds(contours, camera_calibration)
+        bounds = get_projector_space_object_bounds(
+            contours, camera_calibration
+        )
 
         contour_debug = frame.copy()
         cv2.drawContours(contour_debug, contours, -1, (0, 0, 255), 2)
@@ -208,7 +212,9 @@ def object_detection():
         cv2.imshow(WINDOW_CONTOURS, contour_debug)
         cv2.imshow(WINDOW_FOREGROUND, foreground_mask)
 
-        output = np.zeros((projector.height, projector.width, 3), dtype=np.uint8)
+        output = np.zeros(
+            (projector.height, projector.width, 3), dtype=np.uint8
+        )
         for bound in bounds:
             cv2.polylines(
                 output,
@@ -221,5 +227,5 @@ def object_detection():
 
 
 # def main() -> None:
-print('hello')
+print("hello")
 object_detection()

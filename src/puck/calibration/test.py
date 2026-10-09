@@ -15,7 +15,6 @@ from .calibrate import calibrate
 logger = logging.getLogger(__name__)
 
 
-
 def logging_setup(log: bool, log_level: int) -> None:
     """Sets up the logging object and the level at which we are logging for different approaches, info vs debug.
 
@@ -27,13 +26,19 @@ def logging_setup(log: bool, log_level: int) -> None:
         logging.basicConfig(level=log_level)
         logger.info(f"Logging working at level {log_level}")
 
-def run_calibration(log: bool = False, log_level: int = 0,):
-    print("Hello from calibration!") ## Generic print to make sure that everything is working
-    logging_setup(True, 0) ## Setup the logger using the command line arguments
+
+def run_calibration(
+    log: bool = False,
+    log_level: int = 0,
+):
+    print("Hello from calibration!")
+    logging_setup(True, 0)
     calibration_info = calibrate()
     print(calibration_info.camera_to_projector_homography)
 
+
 def main() -> None:
     typer.run(run_calibration)
+
 
 main()

@@ -153,7 +153,9 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
     )
 
     # The fullscreen helper initially displays black.
-    black_screen = np.zeros((projector.height, projector.width, 3), dtype=np.uint8)
+    black_screen = np.zeros(
+        (projector.height, projector.width, 3), dtype=np.uint8
+    )
 
     # camera
     logger.info("Setting up camera")
@@ -260,7 +262,9 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
             # findChessboardCornersSB already returns sub-pixel corner positions.
             if debug:
                 display_image = gray_chessboard.copy()
-                cv2.drawChessboardCorners(display_image, corner_shape, corners, ret)
+                cv2.drawChessboardCorners(
+                    display_image, corner_shape, corners, ret
+                )
                 cv2.imshow(WINDOW_CHESSBOARD, display_image)
 
             # Compute a mapping from camera-image coordinates to projector
@@ -299,7 +303,9 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
                 "Camera-to-projector homography:\n%s",
                 np.array2string(homography, precision=8, suppress_small=True),
             )
-            logger.info("Homography inliers: %d/%d", inliers.sum(), len(inliers))
+            logger.info(
+                "Homography inliers: %d/%d", inliers.sum(), len(inliers)
+            )
             logger.info(
                 "Mean inlier reprojection error: %.3f projector pixels",
                 reprojection_errors[inliers].mean(),

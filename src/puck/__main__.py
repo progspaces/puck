@@ -43,6 +43,7 @@ def logging_setup(log: bool, log_level: int) -> None:
         logging.basicConfig(level=log_level)
         logger.info(f"Logging working at level {log_level}")
 
+
 def tk_setup() -> None:
     """Sets up the tkinter window where it will draw graphics."""
     base.tk.call("tk", "scaling", 2.0)
@@ -55,7 +56,7 @@ def tk_setup() -> None:
 
 def load_program_names(filename: str) -> list[str]:
     """Loads and returns a list of the names of existing programs.
-     
+
     This list is ordered such that a program can be indexed by its encoding.
 
     Args:
@@ -102,8 +103,7 @@ def camera_setup(camera_id: int) -> cv.VideoCapture:
 
 
 def camera_perspective_window_setup(window_name: str) -> None:
-    """Set up a window that will show you what the camera is seeing.
-    """
+    """Set up a window that will show you what the camera is seeing."""
     cv.namedWindow(
         window_name,
         cv.WINDOW_FREERATIO,
@@ -122,7 +122,7 @@ def average_pt(tag: Polygon) -> Point:
     return Point(int(sum_x / 4), int(sum_y / 4))
 
 
-def transform_point(point:Point, homography_matrix: np.ndarray) -> Point:
+def transform_point(point: Point, homography_matrix: np.ndarray) -> Point:
     """Transforms point from a detected point to a point in projection space."""
     assert homography_matrix.shape == (3, 3)
 
@@ -132,20 +132,20 @@ def transform_point(point:Point, homography_matrix: np.ndarray) -> Point:
     transformed = cv.perspectiveTransform(arr, homography_matrix)
     assert transformed.shape == (1, 1, 2)
 
-    transformed_coords = [int(c) for c in list(transformed[0,0])]
+    transformed_coords = [int(c) for c in list(transformed[0, 0])]
     return Point(transformed_coords[0], transformed_coords[1])
 
 
-def transform_shape(shape:Polygon, homography_matrix) -> Polygon:
-    """Transforms a shapes points from detected to projected.
-    """
+def transform_shape(shape: Polygon, homography_matrix) -> Polygon:
+    """Transforms a shapes points from detected to projected."""
     points = []
     for point in shape:
         points.append(transform_point(point, homography_matrix))
     return Polygon(points)
 
+
 def detect_paper_tags(
-    frame: np.typing.ArrayLike,homography_matrix: np.ndarray
+    frame: np.typing.ArrayLike, homography_matrix: np.ndarray
 ) -> list[tuple[Polygon, list[int]]]:
     """Takes in a frame of the video and determines what papers are within it.
 
@@ -161,8 +161,9 @@ def detect_paper_tags(
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
     tag_shapes = [Polygon.from_array(tag[0]) for tag in tags]
-    transformed_tag_shapes = [transform_shape(shape, homography_matrix) 
-                              for shape in tag_shapes]
+    transformed_tag_shapes = [
+        transform_shape(shape, homography_matrix) for shape in tag_shapes
+    ]
     if ids is not None and len(ids) == 4:
         # Check for invalid/bad ids
         bads = [x for x in ids if x > APRIL_LIMIT]
@@ -173,8 +174,9 @@ def detect_paper_tags(
             plt.figimage = copy
             logger.warning(f"Invalid AprilTag Value(s): {bads} detected")
             plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
-        averaged_paper = Polygon([average_pt(shape) 
-                                  for shape in transformed_tag_shapes])
+        averaged_paper = Polygon(
+            [average_pt(shape) for shape in transformed_tag_shapes]
+        )
 
         # TODO: Allow for multiple papers.
         return [(averaged_paper, ids)]
@@ -221,8 +223,7 @@ def create_and_update_actors(
     program_lookup: list[str],
     drawing_queue: Queue,
 ) -> None:
-    """Creates or updates Actors associated with a given program encoding
-    """
+    """Creates or updates Actors associated with a given program encoding"""
     if program_encoding >= len(program_lookup) or program_encoding < 0:
         print(
             f"There is no associated program with the encoding: {program_encoding}"
@@ -254,8 +255,7 @@ def create_and_update_actors(
 
 
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
-    """Draws the commands on the drawing queue onto the canvas.
-    """
+    """Draws the commands on the drawing queue onto the canvas."""
     if not drawing_queue.empty():  # TODO: change to 'while'
         message = drawing_queue.get()
         logger.debug(f"draw loop got message {message}")
@@ -316,10 +316,9 @@ def update(
     drawing_queue: Queue,
     canvas: Canvas,
     window_name: str,
-    homography_matrix: np.ndarray, 
+    homography_matrix: np.ndarray,
 ) -> None:
-    """Updates the system with event using visual input from the camera.
-    """
+    """Updates the system with event using visual input from the camera."""
     logger.debug("Called the Update Function")
 
     # Get a frame
@@ -328,7 +327,7 @@ def update(
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
     # Recognise and execute papers
-    for coords, tags in detect_paper_tags(frame,homography_matrix):
+    for coords, tags in detect_paper_tags(frame, homography_matrix):
         program_encoding = tags_to_paper_encoding(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
@@ -364,7 +363,7 @@ def update(
         drawing_queue,
         canvas,
         window_name,
-        homography_matrix
+        homography_matrix,
     )
 
 
@@ -380,7 +379,6 @@ def start_puck(
     print("Hello from puck!")
     logging_setup(log, log_level)
 
-
     tk_setup()
     program_lookup = load_program_names(program_lookup_file)
     encoding_to_actor: dict[str, Actor] = {}
@@ -391,8 +389,9 @@ def start_puck(
     calibration_info = calibrate()
     homography_matrix = calibration_info.camera_to_projector_homography
     if homography_matrix.all() == None:
-        logger.fatal(msg = "Homography Matrix failed to generate, " \
-        "nothing will work.")
+        logger.fatal(
+            msg="Homography Matrix failed to generate, nothing will work."
+        )
 
     # Start the main update loop soons
     base.after(
@@ -404,7 +403,7 @@ def start_puck(
         drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
-        homography_matrix
+        homography_matrix,
     )
 
     # Start the event loop
@@ -416,6 +415,6 @@ def start_puck(
 
 def main() -> None:
     """Runs the 'start_puck' function.
-    
+
     Wrapped up in typer.run so it can act as a CLI and take in CL args."""
     typer.run(start_puck)
