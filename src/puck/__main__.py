@@ -179,7 +179,9 @@ def detect_paper_tags(
         )
 
         # TODO: Allow for multiple papers.
-        return [(averaged_paper, ids)]
+        list_ids = [int(i) for i in list(ids)]
+        print(ids.shape)
+        return [(averaged_paper, list_ids)]
     else:
         return []
 
@@ -201,6 +203,11 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
     if APRIL_LIMIT not in tags:
         logger.warning(f"{APRIL_LIMIT} not found in {tags}")
         return None
+
+    for t in tags:
+        if t > APRIL_LIMIT:
+            logger.warning(f"{t} is greater than the april limit")
+            return None
 
     # Reorder based on the position of the APRIL_LIMIT tag
     pos = tags.index(APRIL_LIMIT)
