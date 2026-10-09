@@ -123,15 +123,17 @@ def average_pt(tag: Polygon) -> Point:
 
 
 def transform_point(point:Point, homography_matrix: np.ndarray) -> Point:
-    """Transforms point from a detected point to a point in projection space.
-    """
-    array1  = np.ndarray([point.x, point.y], dtype= np.float32)
-    print(array1)
-    print(array1.shape)
-    print(homography_matrix.shape)
-    return Point(cv.perspectiveTransform(array1,
-                                         homography_matrix))
+    """Transforms point from a detected point to a point in projection space."""
+    assert homography_matrix.shape == (3, 3)
 
+    arr = np.array([[[point.x, point.y]]], dtype=np.float32)
+    assert arr.shape == (1, 1, 2)
+
+    transformed = cv.perspectiveTransform(arr, homography_matrix)
+    assert transformed.shape == (1, 1, 2)
+
+    transformed_coords = [int(c) for c in list(transformed[0,0])]
+    return Point(transformed_coords[0], transformed_coords[1])
 
 
 def transform_shape(shape:Polygon, homography_matrix) -> Polygon:
