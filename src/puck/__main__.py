@@ -166,23 +166,28 @@ def detect_paper_tags(
     transformed_tag_shapes = [
         transform_shape(shape, homography_matrix) for shape in tag_shapes
     ]
-    if ids is not None and len(ids) == 4:
-        # Check for invalid/bad ids
-        bads = [x for x in ids if x > APRIL_LIMIT]
 
-        # Saves problematic frame
-        if len(bads) > 0:
-            copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
-            plt.figimage = copy
-            logger.warning(f"Invalid AprilTag Value(s): {bads} detected")
-            plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
+    # Check for invalid/bad ids
+    bad_indices = [i for i in range(len(ids)) if ids[i] > APRIL_LIMIT]
+    if len(bad_indices) > 0:
+        # Save problematic frame
+        bad_ids = [ids[i] for i in bad_indices]
+        copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
+        plt.figimage = copy
+        logger.warning(f"Invalid AprilTag Value(s): {bad_ids} detected")
+        plt.savefig(f"invalid_AprilTag_{datetime.now().isoformat()}.png")
+
+        # Filter out the bad items
+        tags = [tags[i] for i in range(len(tags)) if i not in bad_indices]
+        ids = [ids[i] for i in range(len(ids)) if i not in bad_indices]
+
+    if len(ids) == 4:
         averaged_paper = Polygon(
             [average_pt(shape) for shape in transformed_tag_shapes]
         )
 
         # TODO: Allow for multiple papers.
         list_ids = [int(i) for i in list(ids)]
-        print(ids.shape)
         return [(averaged_paper, list_ids)]
     else:
         return []
