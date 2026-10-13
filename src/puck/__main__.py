@@ -143,9 +143,10 @@ def transform_shape(shape: Polygon, homography_matrix: np.ndarray) -> Polygon:
     return Polygon(points)
 
 
-def detect_paper_tags(
+
+def detect_paper_tags_corners(
     frame: np.ndarray, homography_matrix: np.ndarray
-) -> list[tuple[Polygon, list[int]]]:
+) -> list[tuple[list[Polygon], list[int]]]:
     """Determines what papers are within a frame of video.
 
     Currently we are just looking for one paper at a time.
@@ -160,6 +161,7 @@ def detect_paper_tags(
     """
     april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
     tags, ids, _ = april_tag_detector.detectMarkers(frame)
+    print(f"Tags are {tags}")
     if ids is None:
         return []
     else:
@@ -182,7 +184,7 @@ def detect_paper_tags(
         transformed_tag_shapes = [
             transform_shape(shape, homography_matrix) for shape in tag_shapes
         ]
-
+        print(f"transformed tags are {transformed_tag_shapes}")
         assert len(ids_list) == len(transformed_tag_shapes)
 
         if len(ids_list) == 4:
@@ -190,7 +192,68 @@ def detect_paper_tags(
                 [average_pt(shape) for shape in transformed_tag_shapes]
             )
             ordered_averaged_paper, indices = ordered_rectangle(averaged_paper, averaged_paper[0])
+            print(f"ordered tags averaged {ordered_averaged_paper}")
 
+            # TODO: Allow for multiple papers.
+            ids_list = [int(i) for i in list(ids)]
+            ordered_ids_list = [ids_list[i] for i in indices]
+
+            return [(transformed_tag_shapes , ordered_ids_list)]
+        else:
+            return []
+
+
+
+
+def detect_paper_tags(
+    frame: np.ndarray, homography_matrix: np.ndarray
+) -> list[tuple[Polygon, list[int]]]:
+    """Determines what papers are within a frame of video.
+
+    Currently we are just looking for one paper at a time.
+    This needs to be increased in newer implementations.
+
+    Args:
+        frame: a frame of the video feed.
+        homography_matrix: a matrix to account for image distortion
+
+    Returns:
+        A list of papers and their associated list of four tags
+    """
+    april_tag_detector = cv.aruco.ArucoDetector(dictionary=DICT)
+    tags, ids, _ = april_tag_detector.detectMarkers(frame)
+    print(f"Tags are {tags}")
+    if ids is None:
+        return []
+    else:
+        # Check for invalid/bad ids
+        bad_indices = [i for i in range(len(ids)) if ids[i] > APRIL_LIMIT]
+        if len(bad_indices) > 0:
+            # Save problematic frame
+            bad_ids = [ids[i] for i in bad_indices]
+            logger.warning(f"Invalid AprilTag Value(s): {bad_ids} detected")
+            copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
+            cv.imwrite(f"invalid_AprilTag_{datetime.now().isoformat()}.png", copy)
+
+        # Assemble required data in lists, filtering out any bad IDs
+        ids_list = [int(ids[i]) for i in range(len(ids)) if i not in bad_indices]
+        tag_shapes: list[Polygon] = [
+            Polygon.from_array(tags[i][0])
+            for i in range(len(tags))
+            if i not in bad_indices
+        ]
+        transformed_tag_shapes = [
+            transform_shape(shape, homography_matrix) for shape in tag_shapes
+        ]
+        print(f"transformed tags are {transformed_tag_shapes}")
+        assert len(ids_list) == len(transformed_tag_shapes)
+
+        if len(ids_list) == 4:
+            averaged_paper = Polygon(
+                [average_pt(shape) for shape in transformed_tag_shapes]
+            )
+            ordered_averaged_paper, indices = ordered_rectangle(averaged_paper, averaged_paper[0])
+            print(f"ordered tags averaged {ordered_averaged_paper}")
 
             # TODO: Allow for multiple papers.
             ids_list = [int(i) for i in list(ids)]
@@ -226,8 +289,6 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
     # Reorder based on the position of the APRIL_LIMIT tag
     pos = tags.index(APRIL_LIMIT)
     ordered_tags = tags[pos + 1 :] + tags[:pos]
-    print(f"Unordered Tags: {tags}")
-    print(f"Ordered Tags: {ordered_tags}")
 
     # Convert into int by using tags as base-APRIL_LIMIT digits
     program_encoding = sum(
@@ -241,11 +302,12 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
 
 def create_and_update_actors(
     program_encoding: int,
-    current_coords: Polygon,
+    current_corners: list[Polygon],
     encoding_to_actor: dict[str, Actor],
     program_lookup: list[str],
     drawing_queue: Queue,
 ) -> None:
+    corner_A, corner_B, corner_C, corner_D = current_corners
     """Creates or updates Actors associated with a given program encoding"""
     if program_encoding >= len(program_lookup) or program_encoding < 0:
         print(
@@ -258,9 +320,11 @@ def create_and_update_actors(
     module = importlib.import_module(module_name)
 
     if t := encoding_to_actor.get(str(program_encoding)):
-        # This program is already running
-        # TODO: the id isn't used at the moment
-        t.send(("update_shape", ("id", 0), ("coordinates", current_coords)))
+        t.send(("update_corner", ("set_id", "A"), ("coordinates", corner_A)))
+        t.send(("update_corner", ("set_id", "B"), ("coordinates", corner_B)))
+        t.send(("update_corner", ("set_id", "C"), ("coordinates", corner_C)))
+        t.send(("update_corner", ("set_id", "D"), ("coordinates", corner_D)))
+
     else:
         # This program is not yet running
         t = Actor(target=module.run)
@@ -270,11 +334,33 @@ def create_and_update_actors(
         t.send(("drawing_queue", drawing_queue))
         t.send(
             (
-                "new_shape",
+                "new_corner",
                 ("type", "rectangle"),
-                ("coordinates", current_coords),
-            )
-        )
+                ("set_id", "A"),
+                ("coordinates", corner_A),
+            ))
+        t.send(
+            (
+                "new_corner",
+                ("type", "rectangle"),
+                ("set_id", "B"),
+                ("coordinates", corner_B),
+            ))
+        t.send(
+            (
+                "new_corner",
+                ("type", "rectangle"),
+                ("set_id", "C"),
+                ("coordinates", corner_C),
+            ))
+        t.send(
+            (
+                "new_corner",
+                ("type", "rectangle"),
+                ("set_id", "D"),
+                ("coordinates", corner_D),
+            ))
+
 
 
 def draw(drawing_queue: Queue, canvas: Canvas) -> None:
@@ -350,18 +436,17 @@ def update(
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
     # Recognise and execute papers
-    for coords, tags in detect_paper_tags(frame, homography_matrix):
+    for corners, tags in detect_paper_tags_corners(frame, homography_matrix):
         program_encoding = tags_to_paper_encoding(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
             create_and_update_actors(
                 program_encoding,
-                coords,
+                corners,
                 encoding_to_actor,
                 program_lookup,
                 drawing_queue,
             )
-
     draw(drawing_queue, canvas)
 
     # Handle quitting
