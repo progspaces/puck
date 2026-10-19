@@ -327,7 +327,7 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 break
-
+    cv2.destroyAllWindows()
     return CalibrationInfo(
         camera_to_projector_homography=homography,
         background_frame=background_frame,

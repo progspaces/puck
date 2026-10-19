@@ -23,9 +23,9 @@ Example:
 from collections.abc import Callable
 from queue import Queue
 from threading import Thread
-from typing import Self
-
-from .messages import KillMessage, Message
+from typing import Self, TYPE_CHECKING
+if TYPE_CHECKING:
+    from .messages import KillMessage, Message
 
 
 class Actor(Thread):

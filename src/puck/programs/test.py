@@ -36,7 +36,7 @@ def run(self: Actor) -> None:
     # Handle incoming messages
     while True:
         message = self.recieve()
-        logger.debug("run has been gotten {message}")
+        logger.debug(f"run has been gotten {message}")
         match message:
             case KillMessage():
                 break
