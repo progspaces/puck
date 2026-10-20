@@ -3,9 +3,8 @@ from enum import Enum
 from queue import Queue
 from typing import Any, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from .actor import Actor
-    from .geometry import Polygon
+from .actor import Actor
+from .geometry import Polygon
 
 
 @dataclass
@@ -20,7 +19,7 @@ class KillMessage(Message):
 
 @dataclass
 class DrawingQueueMessage(Message):
-    sender: Actor
+    sender: Actor[Message]
 
 
 @dataclass

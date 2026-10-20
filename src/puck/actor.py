@@ -23,11 +23,13 @@ Example:
 from collections.abc import Callable
 from queue import Queue
 from threading import Thread
-from typing import Self
-from .messages import KillMessage, Message
+from typing import Generic, Self, TypeVar
 
+# Type of object sent and received by actors via mailboxes.
+# In Puck, this will generally be the Message class.
+M = TypeVar("M")
 
-class Actor(Thread):
+class Actor(Generic[M], Thread):
     def __init__(self, target: Callable[[Self], None]):
         """Initialises an actor.
 
@@ -38,18 +40,14 @@ class Actor(Thread):
             mailbox: a queue which other actors and the main thread can send messages to.
         """
         super().__init__(target=target, args=(self,))
-        self.mailbox: Queue[Message] = Queue()
+        self.mailbox: Queue[M] = Queue()
 
-    def send(self, message: Message) -> None:
+    def send(self, message: M) -> None:
         self.mailbox.put(message)
 
-    def recieve(self) -> Message:
+    def recieve(self) -> M:
         """Get the first message from the mailbox.
 
         If the mailbox is empty, this hangs until a message exists.
         """
         return self.mailbox.get()
-
-    def end(self) -> None:
-        """Sends the 'kill' message to its own mailbox."""
-        self.send(KillMessage())

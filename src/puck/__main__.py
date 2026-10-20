@@ -249,7 +249,7 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
 def create_and_update_actors(
     program_encoding: int,
     current_coords: Polygon,
-    encoding_to_actor: dict[str, Actor],
+    encoding_to_actor: dict[str, Actor[Message]],
     program_lookup: list[str],
     drawing_queue: Queue[Message],
 ) -> None:
@@ -306,7 +306,7 @@ def draw(drawing_queue: Queue[Message], canvas: Canvas) -> None:
 
 def update(
     cam: cv.VideoCapture,
-    encoding_to_actor: dict[str, Actor],
+    encoding_to_actor: dict[str, Actor[Message]],
     program_lookup: list[str],
     drawing_queue: Queue[Message],
     canvas: Canvas,
@@ -340,7 +340,7 @@ def update(
     if cv.waitKey(1) == ord("q"):
         logger.info("In the stopping condition")
         for encoding, a in encoding_to_actor.items():
-            a.end()
+            a.send(KillMessage())
             logger.info(f"encoding asscoiated is : {encoding}")
             logger.info("Got past the end, onto Join now")
             a.join()
@@ -376,7 +376,7 @@ def start_puck(
 
     tk_setup()
     program_lookup = load_program_names(program_lookup_file)
-    encoding_to_actor: dict[str, Actor] = {}
+    encoding_to_actor: dict[str, Actor[Message]] = {}
     canvas = canvas_setup(base)
     drawing_queue: Queue[Message] = Queue()
     cam = camera_setup(camera_id)
