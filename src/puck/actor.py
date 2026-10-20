@@ -29,6 +29,7 @@ from typing import Generic, Self, TypeVar
 # In Puck, this will generally be the Message class.
 M = TypeVar("M")
 
+
 class Actor(Generic[M], Thread):
     def __init__(self, target: Callable[[Self], None]):
         """Initialises an actor.

@@ -280,7 +280,7 @@ def draw(drawing_queue: Queue[Message], canvas: Canvas) -> None:
     if not drawing_queue.empty():  # TODO: change to 'while'
         message = drawing_queue.get()
         logger.debug(f"draw loop got message {message}")
-        
+
         assert issubclass(type(message), DrawingQueueMessage)
 
         match message:
@@ -366,7 +366,7 @@ def start_puck(
     log_level: int = 0,
     camera_id: int = 0,
     program_lookup_file: str = "data/program_lookup.json",
-    camera_calibration: str = "data/camera_cal.npy"
+    camera_calibration: str = "data/camera_cal.npy",
 ) -> None:
     """Runs the puck recognition system"""
 
@@ -387,13 +387,13 @@ def start_puck(
         calibration_info = calibrate()
         calibration_info.save(camera_calibration)
     except UnpicklingError:
-        print("This is not a file type we expect to have. We are stopping the program.")
+        logger.fatal(
+            f"{camera_calibration} does not contain a calibration matrix. Terminating."
+        )
         return
     homography_matrix = calibration_info.camera_to_projector_homography
     if homography_matrix.all() == None:
-        logger.fatal(
-            msg="Homography Matrix failed to generate, nothing will work."
-        )
+        logger.fatal("Homography Matrix failed to generate. Terminating.")
 
     # Start the main update loop soons
     base.after(
