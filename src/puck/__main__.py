@@ -7,6 +7,7 @@ base = Tk()
 import importlib
 import json
 import logging
+from pickle import UnpicklingError
 from queue import Queue
 
 # External packages
@@ -385,7 +386,7 @@ def start_puck(
     except OSError:
         calibration_info = calibrate()
         calibration_info.save(camera_calibration)
-    except np.UnpicklingError:
+    except UnpicklingError:
         print("This is not a file type we expect to have. We are stopping the program.")
         return
     homography_matrix = calibration_info.camera_to_projector_homography
