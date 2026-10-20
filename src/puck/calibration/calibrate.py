@@ -22,11 +22,11 @@ WINDOW_MASK = "mask"
 class CalibrationInfo:
     camera_to_projector_homography: np.ndarray
 
-    def save(self, file_path):
-        np.save(file_path,self.camera_to_projector_homography)
+    def save(self, file_path: str) -> None:
+        np.save(file_path, self.camera_to_projector_homography)
 
     @classmethod
-    def load(cls, file_path):
+    def load(cls, file_path: str) -> CalibrationInfo:
         return cls(np.load(file_path))
 
 
@@ -334,6 +334,4 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
             if key == ord("q"):
                 break
     cv2.destroyAllWindows()
-    return CalibrationInfo(
-        camera_to_projector_homography=homography
-    )
+    return CalibrationInfo(homography)
