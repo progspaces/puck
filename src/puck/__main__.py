@@ -19,7 +19,7 @@ from numpy.typing import NDArray
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
 from .actor import Actor
-from .calibration.calibrate import calibrate
+from .calibration.calibrate import calibrate, CalibrationInfo
 from .messages import *
 
 # Global variables
@@ -365,6 +365,7 @@ def start_puck(
     log_level: int = 0,
     camera_id: int = 0,
     program_lookup_file: str = "data/program_lookup.json",
+    camera_calibration: str = "data/camera_cal.npy"
 ) -> None:
     """Runs the puck recognition system"""
 
@@ -379,7 +380,14 @@ def start_puck(
     drawing_queue: Queue[Message] = Queue()
     cam = camera_setup(camera_id)
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
-    calibration_info = calibrate()
+    try:
+        calibration_info = CalibrationInfo.load(camera_calibration)
+    except OSError:
+        calibration_info = calibrate()
+        calibration_info.save(camera_calibration)
+    except np.UnpicklingError:
+        print("This is not a file type we expect to have. We are stopping the program.")
+        return
     homography_matrix = calibration_info.camera_to_projector_homography
     if homography_matrix.all() == None:
         logger.fatal(
