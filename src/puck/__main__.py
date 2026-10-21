@@ -233,8 +233,8 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
     # Reorder based on the position of the APRIL_LIMIT tag
     pos = tags.index(APRIL_LIMIT)
     ordered_tags = tags[pos + 1 :] + tags[:pos]
-    print(f"Unordered Tags: {tags}")
-    print(f"Ordered Tags: {ordered_tags}")
+    logger.debug(f"Unordered Tags: {tags}")
+    logger.debug(f"Ordered Tags: {ordered_tags}")
 
     # Convert into int by using tags as base-APRIL_LIMIT digits
     program_encoding = sum(

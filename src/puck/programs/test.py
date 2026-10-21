@@ -32,6 +32,7 @@ def run(self: Actor[Message]) -> None:
     # These are lists that are for this actor to hold onto whatever graphical objects and actors it spawns off.
     # TODO: use sentinels in future Python?
     paper_highlight_shape_id: int | None = None
+    sent_draw_request = False
     spawned_actors: list[Actor[Message]] = []
 
     # Handle incoming messages
@@ -43,9 +44,10 @@ def run(self: Actor[Message]) -> None:
                 break
             case PaperLocationMessage(paper_location):
                 # Highlight the paper in white
-                if paper_highlight_shape_id is None:
+                if paper_highlight_shape_id is None and sent_draw_request == False:
                     drawing_queue.put(AddPolygonMessage(self, paper_location))
-                else:
+                    sent_draw_request = True
+                elif sent_draw_request == True:
                     drawing_queue.put(
                         UpdatePolygonMessage(
                             self, paper_highlight_shape_id, paper_location
