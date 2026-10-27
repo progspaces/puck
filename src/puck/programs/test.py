@@ -46,7 +46,9 @@ def run(self: Actor[Message]) -> None:
                 # Highlight the paper in white
                 if paper_highlight_shape_id is None:
                     if sent_draw_request == False:
-                        drawing_queue.put(AddPolygonMessage(self, paper_location))
+                        drawing_queue.put(
+                            AddPolygonMessage(self, paper_location)
+                        )
                         sent_draw_request = True
                 else:
                     assert sent_draw_request

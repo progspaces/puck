@@ -4,7 +4,7 @@ This module provides the Actor class for running Puck programs
 For every program in Puck there is an associated actor which runs its program in its own thread.
 This allows programs to be encapsulated and run concurrently alongside each other.
 
-In other actor systems, the program that runs might be referred to as a 'process'. 
+In other actor systems, the program that runs might be referred to as a 'process'.
 In our system, we call it the target function. This is because we are inheriting from the Python thread class, which requires a target function that it will run upon starting the thread.
 
 Each actor has a 'mailbox' which it uses to receive communication from other actors and the main thread in a controlled manner.
@@ -17,11 +17,11 @@ It can use 'end' to trigger joining the spawned thread to the main thread.
 Example 1:
     from actor import Actor
     import importlib
-    
+
     ...
     module_name = program_lookup[program_encoding]
     module = importlib.import_module(module_name)
-    
+
     actor = Actor(target=module.run)
     actor.start()
 
