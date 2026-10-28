@@ -16,12 +16,12 @@ import numpy as np
 import typer
 from datetime import datetime
 from numpy.typing import NDArray
+import pprint
+import chorus
 
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
-from .actor import Actor
 from .calibration.calibrate import calibrate, CalibrationInfo
-from .messages import *
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -190,19 +190,32 @@ def detect_paper_tags(
 
         assert len(ids_list) == len(transformed_tag_shapes)
 
+
         if len(ids_list) == 4:
-            averaged_paper = Polygon(
-                [average_pt(shape) for shape in transformed_tag_shapes]
-            )
+
+            average_to_shape= {}
+            average_paper_list = []
+            for shape in transformed_tag_shapes:
+                avg = average_pt(shape)
+                average_paper_list.append(avg)
+                average_to_shape.update({avg: shape})
+            averaged_paper = Polygon(average_paper_list)
+            
             ordered_averaged_paper, indices = ordered_rectangle(
                 averaged_paper, averaged_paper[0]
             )
 
+            average_point_list = [Point(x,y) for (x,y) in ordered_averaged_paper.unwrap()]
+
+            ordered_shape_list = [None] * 4
+            for avg, shape in average_to_shape.items():
+                i = average_point_list.index(avg)
+                ordered_shape_list[i] = shape
+
             # TODO: Allow for multiple papers.
             ids_list = [int(i) for i in list(ids)]
             ordered_ids_list = [ids_list[i] for i in indices]
-
-            return [(ordered_averaged_paper, ordered_ids_list)]
+            return [(ordered_shape_list, ordered_ids_list)]
         else:
             return []
 
@@ -248,10 +261,9 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
 
 def create_and_update_actors(
     program_encoding: int,
-    current_coords: Polygon,
-    encoding_to_actor: dict[str, Actor[Message]],
+    ordered_shape_list: list[Polygon],
+    encoding_to_actor_id: dict[str, chorus.ActorID],
     program_lookup: list[str],
-    drawing_queue: Queue[Message],
 ) -> None:
     """Creates or updates Actors associated with a given program encoding"""
     if program_encoding >= len(program_lookup) or program_encoding < 0:
@@ -260,55 +272,52 @@ def create_and_update_actors(
         )
         return
 
-    # TODO: use this to load modules dynamically
     module_name = "puck.programs." + program_lookup[program_encoding]
     module = importlib.import_module(module_name)
 
-    if not (t := encoding_to_actor.get(str(program_encoding))):
+    if not (aid := encoding_to_actor_id.get(str(program_encoding))):
         # This program is not yet running
-        t = Actor(target=module.run)
-        encoding_to_actor[str(program_encoding)] = t
-        t.start()
-        # TODO: pass as environment on construction instead
-        t.send(DrawingQueueReferenceMessage(drawing_queue))
+        aid= chorus.spawn(module.run, chorus.Proxy(chorus.me()))
+        encoding_to_actor_id[str(program_encoding)] = aid
 
-    t.send(PaperLocationMessage(current_coords))
+    for shape in ordered_shape_list:
+        print(shape)
+        
 
 
-def draw(drawing_queue: Queue[Message], canvas: Canvas) -> None:
-    """Draws the commands on the drawing queue onto the canvas."""
-    if not drawing_queue.empty():  # TODO: change to 'while'
-        message = drawing_queue.get()
-        logger.debug(f"draw loop got message {message}")
+# def draw(drawing_queue: Queue[Message], canvas: Canvas) -> None:
+#     """Draws the commands on the drawing queue onto the canvas."""
+#     if not drawing_queue.empty():  # TODO: change to 'while'
+#         message = drawing_queue.get()
+#         logger.debug(f"draw loop got message {message}")
 
-        assert issubclass(type(message), DrawingQueueMessage)
+#         assert issubclass(type(message), DrawingQueueMessage)
 
-        match message:
-            case AddPolygonMessage(sender, shape):
-                fill = "white"
-                outline = "blue"
-                width = 2
-                canvas_id = canvas.create_polygon(
-                    shape.unwrap(),
-                    fill=fill,
-                    outline=outline,
-                    width=width,
-                )
-                sender.send(CanvasIdMessage(canvas_id))
-            case UpdatePolygonMessage(_, shape_id, shape):
-                canvas.coords(shape_id, shape.flat_unwrap())
-            case _:
-                logger.error(f"Unexpected message {message}")
+#         match message:
+#             case AddPolygonMessage(sender, shape):
+#                 fill = "white"
+#                 outline = "blue"
+#                 width = 2
+#                 canvas_id = canvas.create_polygon(
+#                     shape.unwrap(),
+#                     fill=fill,
+#                     outline=outline,
+#                     width=width,
+#                 )
+#                 sender.send(CanvasIdMessage(canvas_id))
+#             case UpdatePolygonMessage(_, shape_id, shape):
+#                 canvas.coords(shape_id, shape.flat_unwrap())
+#             case _:
+#                 logger.error(f"Unexpected message {message}")
 
-        logger.debug("drawing loop finished")
-    canvas.pack()
+#         logger.debug("drawing loop finished")
+#     canvas.pack()
 
 
 def update(
     cam: cv.VideoCapture,
-    encoding_to_actor: dict[str, Actor[Message]],
+    encoding_to_actor_id: dict[str,chorus.ActorID],
     program_lookup: list[str],
-    drawing_queue: Queue[Message],
     canvas: Canvas,
     window_name: str,
     homography_matrix: np.ndarray,
@@ -321,40 +330,33 @@ def update(
     cv.imshow(window_name, frame)
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
-    # Recognise and execute papers
-    for coords, tags in detect_paper_tags(frame, homography_matrix):
+#     # Recognise and execute papers
+    for ordered_shape_list, tags in detect_paper_tags(frame, homography_matrix):
         program_encoding = tags_to_paper_encoding(tags)
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
             create_and_update_actors(
                 program_encoding,
-                coords,
-                encoding_to_actor,
+                ordered_shape_list,
+                encoding_to_actor_id,
                 program_lookup,
-                drawing_queue,
             )
 
-    draw(drawing_queue, canvas)
+    # draw(drawing_queue, canvas) ## LOOK INTO
 
-    # Handle quitting
+#     # Handle quitting
     if cv.waitKey(1) == ord("q"):
-        logger.info("In the stopping condition")
-        for encoding, a in encoding_to_actor.items():
-            a.send(KillMessage())
-            logger.info(f"encoding asscoiated is : {encoding}")
-            logger.info("Got past the end, onto Join now")
-            a.join()
-        logger.info("finished the joining and ending")
+        logger.info("In the stopping condition") 
+        # If crashing due to thread conditions, please consider .join
         base.quit()
 
-    # Run this function again shortly
+#     # Run this function again shortly
     base.after(
         TICK_LENGTH,
         update,
         cam,
-        encoding_to_actor,
+        encoding_to_actor_id,
         program_lookup,
-        drawing_queue,
         canvas,
         window_name,
         homography_matrix,
@@ -376,9 +378,10 @@ def start_puck(
 
     tk_setup()
     program_lookup = load_program_names(program_lookup_file)
-    encoding_to_actor: dict[str, Actor[Message]] = {}
+    encoding_to_actor_id: dict[str, chorus.ActorID ] = {}
+    # michael and david are a punks
     canvas = canvas_setup(base)
-    drawing_queue: Queue[Message] = Queue()
+    print(chorus.me())
     cam = camera_setup(camera_id)
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
     try:
@@ -400,9 +403,8 @@ def start_puck(
         TICK_LENGTH,
         update,
         cam,
-        encoding_to_actor,
+        encoding_to_actor_id,
         program_lookup,
-        drawing_queue,
         canvas,
         CAMERA_PERSPECTIVE_WINDOW_NAME,
         homography_matrix,
@@ -414,9 +416,11 @@ def start_puck(
     cam.release()
     cv.destroyAllWindows()
 
+def main_like():
+    chorus.run_main(start_puck)
 
 def main() -> None:
     """Runs the 'start_puck' function.
 
     Wrapped up in typer.run so it can act as a CLI and take in CL args."""
-    typer.run(start_puck)
+    typer.run(main_like)
