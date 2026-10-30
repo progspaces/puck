@@ -23,6 +23,7 @@ import chorus
 from .geometry import Point, Polygon, ordered_rectangle
 from .calibration.calibrate import calibrate, CalibrationInfo
 from .camera_processor import camera_setup, show_camera_pov,process_frame
+from .spatial_model import SpatialModel
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -51,19 +52,6 @@ def tk_setup() -> None:
     base.geometry("1920x1080+0+-1080")
 
 
-def load_program_names(filename: str) -> list[str]:
-    """Loads and returns a list of the names of existing programs.
-
-    This list is ordered such that a program can be indexed by its encoding.
-
-    Args:
-        filename: Filename to load from.
-    """
-    with open(filename) as f:
-        programs = json.load(f)
-    assert type(programs) is list
-    assert all(type(p) is str for p in programs)
-    return programs
 
 
 def canvas_setup(base: Tk) -> Canvas:
@@ -139,7 +127,6 @@ def create_and_update_actors(
 def update(
     cam: cv.VideoCapture,
     encoding_to_actor_id: dict[str,chorus.ActorID],
-    program_lookup: list[str],
     canvas: Canvas,
     homography_matrix: np.ndarray,
 ) -> None:
@@ -154,12 +141,7 @@ def update(
     for ordered_shape_list, program_encoding in process_frame(frame, homography_matrix):
         if program_encoding:
             logger.debug(f"Saw program encoding, {program_encoding}")
-            create_and_update_actors(
-                program_encoding,
-                ordered_shape_list,
-                encoding_to_actor_id,
-                program_lookup,
-            )
+            spatial_model.tell.update(program_encoding, ordered_shape_list)
 
     # draw(drawing_queue, canvas) ## LOOK INTO
 
@@ -175,7 +157,6 @@ def update(
         update,
         cam,
         encoding_to_actor_id,
-        program_lookup,
         canvas,
         homography_matrix,
     )
@@ -184,7 +165,6 @@ def start_puck(
     log: bool = False,
     log_level: int = 0,
     camera_id: int = 0,
-    program_lookup_file: str = "data/program_lookup.json",
     camera_calibration: str = "data/camera_cal.npy",
 ) -> None:
     """Runs the puck recognition system"""
@@ -193,11 +173,14 @@ def start_puck(
     print("Hello from puck!")
     logging_setup(log, log_level)
     tk_setup()
-    program_lookup = load_program_names(program_lookup_file)
     encoding_to_actor_id: dict[str, chorus.ActorID ] = {}
     canvas = canvas_setup(base)
     print(chorus.me())
     homography_matrix,cam = camera_setup(camera_id,camera_calibration)
+    spatial_model = chorus.spawn_server_with_proxy([SpatialModel()])
+
+
+
 
     # Start the main update loop soons
     base.after(
@@ -205,7 +188,6 @@ def start_puck(
         update,
         cam,
         encoding_to_actor_id,
-        program_lookup,
         canvas,
         homography_matrix,
     )
