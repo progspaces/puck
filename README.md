@@ -75,3 +75,29 @@ If you see any issues please open an issue on this repo and we will get to it as
 
 Previous work in this space include Julia's Moth domain specific programing language for programmable spaces as well as Naveen Vatti's MothVision computer vision system for programmable spaces.
 
+## Configuring the VSCode debugger for Puck
+As Puck is structured as an application it can be a little tricky to set up the VSCode debugger. Assuming you have install it as discussed in [Dependancies](###Dependancies), do the following:
+
+1. Select the `uv` managed virtual environment `.venv` as the current interpreter. Open the command pallette and choose **Python: Select Interpreter** and select the `.venv` in the Puck project directory.
+
+2. Add a debugger configuration to the file `.vscode/launch.json` in the Puck project directory. If the file does not exist, make it! Though it is include in the default for the Puck project. Something like:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Puck",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "program": "${workspaceFolder}/.venv/bin/puck",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}
+```
+
+3. Do some debugging! Set some breakpoints in the left of the editor then open **Run and Debug**, select **Debug Puck**. Happy hacking!
