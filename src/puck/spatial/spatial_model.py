@@ -36,11 +36,6 @@ def load_program_names(filename: str) -> list[str]:
 program_lookup = load_program_names(PROGRAM_LOOKUP_FILE)
 
 
-def invert_dict(my_dict):
-    inverted_dict = {v: k for k, v in my_dict.items()}
-    return inverted_dict
-
-
 @dataclass
 class SpatialModel:
     main: ActorID
@@ -76,8 +71,7 @@ class SpatialModel:
             self.actor_id_time_since_seen[aid] += 1
             if self.actor_id_time_since_seen[aid] > KILL_TIME:
                 terminate(aid)
-                actor_id_to_encoding = invert_dict(self.encoding_to_actor_id)
-                encoding = actor_id_to_encoding[aid]
+                encoding = self.actor_id_to_paper_record[aid].encoding
                 del self.actor_id_to_paper_record[aid]
                 del self.encoding_to_actor_id[encoding]
                 del self.encoding_to_paper_record[encoding]
