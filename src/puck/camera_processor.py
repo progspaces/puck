@@ -1,5 +1,6 @@
 # Standard packages
 import logging
+from typing import cast
 
 # External Packages
 import cv2 as cv
@@ -29,13 +30,13 @@ def camera_perspective_window_setup(window_name: str) -> None:
     cv.resizeWindow(window_name, 600, 500)
 
 
-def show_camera_pov(frame):
+def show_camera_pov(frame: np.ndarray) -> None:
     cv.imshow(CAMERA_PERSPECTIVE_WINDOW_NAME, frame)
 
 
 def camera_setup(
     camera_id: int, camera_calibration: str = "data/camera_cal.npy"
-) -> cv.VideoCapture:
+) -> tuple[np.ndarray, cv.VideoCapture]:
     """Set up your camera to get a videofeed input.
 
         Args:
@@ -58,10 +59,9 @@ def camera_setup(
         calibration_info.save(camera_calibration)
     except UnpicklingError:
         logger.fatal(
-            f"{camera_calibration} does not contain a calibration matrix.\
-            Terminating."
+            f"{camera_calibration} does not contain a calibration matrix."
         )
-        return
+        raise
     homography_matrix = calibration_info.camera_to_projector_homography
     if homography_matrix.all() == None:
         logger.fatal("Homography Matrix failed to generate. Terminating.")
@@ -81,7 +81,7 @@ def average_pt(tag: Polygon) -> Point:
 
 def detect_paper_tags(
     frame: np.ndarray, homography_matrix: np.ndarray
-) -> list[tuple[Polygon, list[int]]]:
+) -> list[tuple[list[Polygon], list[int]]]:
     """Determines what papers are within a frame of video.
 
     Currently we are just looking for one paper at a time.
@@ -142,15 +142,17 @@ def detect_paper_tags(
                 Point(x, y) for (x, y) in ordered_averaged_paper.unwrap()
             ]
 
-            ordered_shape_list = [None] * 4
+            ordered_shape_list: list[Polygon | None] = [None] * 4
             for avg, shape in average_to_shape.items():
                 i = average_point_list.index(avg)
                 ordered_shape_list[i] = shape
+            assert None not in ordered_shape_list
+            ordered_shapes = [cast(Polygon, s) for s in ordered_shape_list]
 
             # TODO: Allow for multiple papers.
             ids_list = [int(i) for i in list(ids)]
             ordered_ids_list = [ids_list[i] for i in indices]
-            return [(ordered_shape_list, ordered_ids_list)]
+            return [(ordered_shapes, ordered_ids_list)]
         else:
             return []
 
@@ -216,7 +218,9 @@ def tags_to_paper_encoding(tags: list[int]) -> int | None:
     return program_encoding
 
 
-def process_frame(frame, homography_matrix):
+def process_frame(
+    frame: np.ndarray, homography_matrix: np.ndarray
+) -> list[tuple[list[Polygon], int | None]]:
     frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
     return [
         (ordered_shape_list, tags_to_paper_encoding(tags))

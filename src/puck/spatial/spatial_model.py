@@ -47,9 +47,9 @@ class SpatialModel:
     )
     encoding_to_actor_id: dict[int, ActorID] = field(default_factory=dict)
 
-    actor_id_time_since_seen: dict[ActorID, int]= field(default_factory=dict)
+    actor_id_time_since_seen: dict[ActorID, int] = field(default_factory=dict)
 
-    def update(self, visible_papers: list[PaperRecord]):
+    def update(self, visible_papers: list[PaperRecord]) -> None:
         actor_id_to_seen: dict[ActorID, bool] = {
             aid: False for aid in self.actor_id_to_paper_record
         }
@@ -61,7 +61,7 @@ class SpatialModel:
                 self.encoding_to_actor_id[paper.encoding] = aid
             else:
                 aid = self.encoding_to_actor_id[paper.encoding]
-                
+
             actor_id_to_seen[aid] = True
             self.actor_id_to_paper_record[aid] = paper
             self.encoding_to_paper_record[paper.encoding] = paper
@@ -78,11 +78,11 @@ class SpatialModel:
                 del self.actor_id_time_since_seen[aid]
                 logger.info(f"{aid} terminated because not seen")
 
-    def kill_all(self):
+    def kill_all(self) -> None:
         for aid in self.actor_id_to_paper_record.keys():
             terminate(aid)
             logger.info(f"{aid} terminated because puck ended")
 
-    def corners(self, aid):
+    def corners(self, aid: ActorID) -> list[Polygon]:
         paper_record = self.actor_id_to_paper_record[aid]
         return paper_record.tags

@@ -64,7 +64,7 @@ def update(
     encoding_to_actor_id: dict[str, chorus.ActorID],
     canvas: Canvas,
     homography_matrix: np.ndarray,
-    spatial_model: SpatialModel,
+    spatial_model: chorus.Proxy,
 ) -> None:
     """Updates the system with event using visual input from the camera."""
     logger.debug("Called the Update Function")
@@ -143,7 +143,7 @@ def start_puck(
 
 
 # @chorus.actors TODO: update so we can take in typer stuff.
-def main_like():
+def main_like() -> None:
     chorus.run_main(start_puck)
 
 
