@@ -2,20 +2,28 @@ from dataclasses import dataclass, field
 import importlib
 import json
 import logging
-
+import tkinter as tk
 from chorus import ActorID, spawn, terminate, me, Proxy
-
+from PIL import ImageTk, Image
 from ..geometry import Polygon
 
 KILL_TIME = 100
 PROGRAM_LOOKUP_FILE = "./data/program_lookup.json"
 logger = logging.getLogger(__name__)
+IMAGE_LOOKUP_FILE = "./data/image_lookup.json"
 
+def load_images(filename: str) -> list[tk.PhotoImage]:
+    """Loads and returns a list of the image objects 
+    This list is ordered such that a program can be indexed by its encoding.
 
-@dataclass
-class PaperRecord:
-    encoding: int
-    tags: list[Polygon]
+    Args:
+        filename: Filename to load from.
+    """
+    with open(filename) as f:
+        image_names = json.load(f)
+    assert type(image_names) is list
+    assert all(type(p) is str for p in image_names)   
+    return [ImageTk.PhotoImage(Image.open(image_name)) for image_name in image_names]
 
 
 def load_program_names(filename: str) -> list[str]:
@@ -34,7 +42,15 @@ def load_program_names(filename: str) -> list[str]:
 
 
 program_lookup = load_program_names(PROGRAM_LOOKUP_FILE)
+image_lookup = load_images(IMAGE_LOOKUP_FILE)
 
+@dataclass
+class PaperRecord:
+    encoding: int
+    tags: list[Polygon]
+
+    def get_image(self):
+        return image_lookup[self.encoding]
 
 @dataclass
 class SpatialModel:
@@ -86,3 +102,8 @@ class SpatialModel:
     def corners(self, aid: ActorID) -> list[Polygon]:
         paper_record = self.actor_id_to_paper_record[aid]
         return paper_record.tags
+
+    def images(self, aid: ActorID) -> list[Polygon]:
+        paper_record = self.actor_id_to_paper_record[aid]
+        print(paper_record)
+        return [paper_record.get_image()]

@@ -1,7 +1,7 @@
 from chorus import me, Proxy
 from ..geometry import Polygon
 from PIL import Image
-
+import tkinter as tk
 
 def corners(spatial: Proxy) -> list[Polygon]:
     corners: list[Polygon] = spatial.ask.corners(me())
@@ -23,6 +23,6 @@ def images(spatial: Proxy) -> list[Polygon]:
     images: list[Polygon] = spatial.ask.images(me())
     return images
 
-def create_image(canvas: Proxy, image: Image) -> int:
-    image_id: int = canvas.ask.create_image(image)
+def create_image(canvas: Proxy, img: Image) -> int:
+    image_id: int = canvas.ask.create_image(100, 100, image=img, anchor = tk.NW)
     return image_id
