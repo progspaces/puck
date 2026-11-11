@@ -18,7 +18,7 @@ from .spatial.spatial_model import SpatialModel, PaperRecord
 
 # Global variables
 logger = logging.getLogger(__name__)
-TICK_LENGTH = 16
+TICK_LENGTH = 1
 CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
 
 
@@ -74,13 +74,13 @@ def update(
     show_camera_pov(frame)
 
     # Recognise and execute papers
-    paper_records = [
-        PaperRecord(program_encoding, ordered_shape_list)
-        for ordered_shape_list, program_encoding in process_frame(
-            frame, homography_matrix
-        )
-        if program_encoding
-    ]
+    paper_records = []
+    for ordered_shape_list, program_encoding in process_frame(frame, homography_matrix):
+        if program_encoding:
+            for p in ordered_shape_list:
+                new = [(x+5, y+5) for x,y in p.unwrap()]
+            paper_records.append(PaperRecord(program_encoding, ordered_shape_list))
+
     spatial_model.tell.update(paper_records)
     chorus.process_pending([canvas])
 

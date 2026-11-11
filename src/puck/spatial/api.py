@@ -1,5 +1,6 @@
 from chorus import me, Proxy
 from ..geometry import Polygon
+from PIL import Image
 
 
 def corners(spatial: Proxy) -> list[Polygon]:
@@ -16,3 +17,12 @@ def create_polygon(canvas: Proxy, polygon: Polygon) -> int:
 def update_polygon(canvas: Proxy, graphical_id: int, polygon: Polygon) -> None:
     points = polygon.flat_unwrap()
     canvas.tell.coords(graphical_id, points)
+
+
+def images(spatial: Proxy) -> list[Polygon]:
+    images: list[Polygon] = spatial.ask.images(me())
+    return images
+
+def create_image(canvas: Proxy, image: Image) -> int:
+    image_id: int = canvas.ask.create_image(image)
+    return image_id

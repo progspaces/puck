@@ -1,6 +1,6 @@
 import logging
 import chorus
-from ..spatial.api import corners, update_polygon, create_polygon
+from ..spatial.api import corners, update_polygon, create_polygon, create_image, images
 
 
 def run(spatial: chorus.Proxy, canvas: chorus.Proxy) -> None:
@@ -12,3 +12,7 @@ def run(spatial: chorus.Proxy, canvas: chorus.Proxy) -> None:
                 polygon_ids[i],
                 corner,
             )
+
+
+def run(spatial: chorus.Proxy, canvas: chorus.Proxy) -> None:
+    image_ids = [create_image(canvas, c) for c in images(spatial)]
