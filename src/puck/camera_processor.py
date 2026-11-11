@@ -11,6 +11,7 @@ from datetime import datetime
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
 from .calibration.calibrate import calibrate, CalibrationInfo
+from .offset import size_of_second
 
 # Global Variables
 logger = logging.getLogger(__name__)
@@ -26,7 +27,7 @@ def camera_perspective_window_setup(window_name: str) -> None:
         window_name,
         cv.WINDOW_FREERATIO,
     )
-    cv.moveWindow(window_name, 0, 300)
+    cv.moveWindow(window_name, 0, size_of_second()[0])
     cv.resizeWindow(window_name, 600, 500)
 
 
@@ -106,9 +107,12 @@ def detect_paper_tags(
             bad_ids = [ids[i] for i in bad_indices]
             logger.warning(f"Invalid AprilTag Value(s): {bad_ids} detected")
             copy = cv.aruco.drawDetectedMarkers(frame, tags, ids)
-            cv.imwrite(
-                f"invalid_AprilTag_{datetime.now().isoformat()}.png", copy
-            )
+            # cv.imwrite(
+            #     f"invalid_AprilTag_{datetime.now().isoformat()}.png", copy
+            # )
+            # Commented out so we don't save a billion photos, 
+            # Left so we can easily uncomment when needed again
+            # Probably should make a flag.
 
         # Assemble required data in lists, filtering out any bad IDs
         ids_list = [

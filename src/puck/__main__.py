@@ -15,11 +15,12 @@ import chorus
 # Local packages and modules
 from .camera_processor import camera_setup, show_camera_pov, process_frame
 from .spatial.spatial_model import SpatialModel, PaperRecord
+from .offset import offset_string,size_of_second
 
 # Global variables
 logger = logging.getLogger(__name__)
-TICK_LENGTH = 16
-CANVAS_HEIGHT, CANVAS_WIDTH = 1080, 1920
+TICK_LENGTH = 1
+CANVAS_HEIGHT, CANVAS_WIDTH = size_of_second()
 
 
 def logging_setup(log: bool, log_level: int) -> None:
@@ -36,12 +37,12 @@ def logging_setup(log: bool, log_level: int) -> None:
 
 def tk_setup() -> None:
     """Sets up the tkinter window where it will draw graphics."""
-    base.tk.call("tk", "scaling", 2.0)
+    # base.tk.call("tk", "scaling", 2.0)
     base.title("Tkinter Widget Size")
-    base.wm_attributes("-fullscreen", True)
+    # base.wm_attributes("-fullscreen", True)
 
     # Assume 1080p double-monitor setup.
-    base.geometry("1920x1080+0+-1080")
+    base.geometry(offset_string()) 
 
 
 def canvas_setup(base: Tk) -> Canvas:
