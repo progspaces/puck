@@ -38,5 +38,5 @@ warn_unused_configs = true
 [tool.ruff]
 line-length = 79
 
-[tool.uv.sources]
-chorus-actors = { path = "../../chorus/chorus", editable = true }
+# [tool.uv.sources]
+# chorus-actors = { path = "../../chorus/chorus", editable = true }

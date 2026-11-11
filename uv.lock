@@ -82,19 +82,11 @@ wheels = [
 [[package]]
 name = "chorus-actors"
 version = "0.1.3"
-source = { editable = "../../chorus/chorus" }
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = ">=2.4.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "ruff", specifier = ">=0.15.21" },
-    { name = "shibuya", specifier = ">=2026.7.12" },
-    { name = "sphinxcontrib-mermaid", specifier = ">=2.1.1" },
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/b9/d530abca7beb9098ae34c0f0ff7bd529e57d50ca43ede8290e9fe720c83f/chorus_actors-0.1.3.tar.gz", hash = "sha256:4074ba8fc6ff32697ec08fb0c6d80f9995a695ff867a18a6cc9e98b9bebe9122", size = 9847, upload-time = "2026-11-04T15:06:25.749Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d8/af/318f4f1f3cbf09ddaf9e94f6e61f70e68f9943d96730fabfd3918bd1bd3e/chorus_actors-0.1.3-py3-none-any.whl", hash = "sha256:30a5efedbfa14032fe0e2e4c171dd950f17e0d6f72f0356b93bc9292ac8eaca9", size = 13607, upload-time = "2026-11-04T15:06:24.869Z" },
 ]
-docs = [{ name = "sphinx", specifier = ">=9.1.0" }]
 
 [[package]]
 name = "colorama"
@@ -645,7 +637,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "chorus-actors", editable = "../../chorus/chorus" },
+    { name = "chorus-actors" },
     { name = "matplotlib", specifier = ">=3.11.2" },
     { name = "opencv-python", specifier = ">=5.0.0.93" },
     { name = "screeninfo", specifier = ">=0.8.1" },
