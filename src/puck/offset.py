@@ -1,20 +1,18 @@
-from screeninfo import get_monitors
+import screeninfo
 
-def offset_string():
-    monitors = get_monitors()
-    if len(monitors) == 1:
-        raise Exception("You do not seem to have a secondary monitor plugged "
-        "in. Please remedy this.")
-    for m in monitors:
+
+def secondary_monitor() -> screeninfo.Monitor:
+    for m in screeninfo.get_monitors():
         if not m.is_primary:
-            return f"{m.width}x{m.height}+{m.x}+-{m.y}"
+            return m
+    raise RuntimeError("No secondary monitor plugged in")
 
-def size_of_second():
-    monitors = get_monitors()
-    if len(monitors) == 1:
-        raise Exception("You do not seem to have a secondary monitor plugged "
-        "in. Please remedy this.")
-    for m in monitors:
-        if not m.is_primary:
-            return m.height, m.width
 
+def offset_string() -> str:
+    m = secondary_monitor()
+    return f"{m.width}x{m.height}+{m.x}+-{m.y}"
+
+
+def size_of_second() -> tuple[int, int]:
+    m = secondary_monitor()
+    return m.height, m.width
