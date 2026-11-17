@@ -29,10 +29,22 @@ class CalibrationInfo:
     def load(cls, file_path: str) -> CalibrationInfo:
         return cls(np.load(file_path))
 
+def ask_for_projectors() -> Monitor:
+    monitors = get_monitors()
+    for i, m in enumerate(monitors):
+        print(
+            f"Monitor {i}: {m.width} x {m.height} at ({m.x}, {m.y}),",
+            f"is primary -> {m.is_primary}"
+        )
+    choice = input("What monitor is the projector? [0]")
+    chosen =monitors[int(choice)]
+    monitors.pop(int(choice))
+    unchosen = monitors[0]
+    return (chosen, unchosen)
+
 
 def get_projector() -> Monitor:
     monitors = get_monitors()
-
     for i, monitor in enumerate(monitors):
         logger.info(
             "Monitor %d: %dx%d at (%d, %d)",
@@ -45,39 +57,41 @@ def get_projector() -> Monitor:
 
     if len(monitors) < 2:
         raise RuntimeError("No second monitor/projector found")
-
-    return monitors[0]
+    print(monitors)
+    return monitors[1]
 
 
 def make_fullscreen_projector_window(
-    window_name: str,
-    projector: Monitor,
+    window_name: str,chosen: Monitor,
+    unchosen: Monitor,
 ) -> None:
     """Create and show a fullscreen black window on the projector display."""
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-
+    print(chosen)
+    print(unchosen)
     # OpenCV does not reliably create the native window until the first image
     # is shown and GUI events have been processed. Materialise it before asking
     # the window manager to make it fullscreen.
     black_screen = np.zeros(
-        (projector.height, projector.width, 3),
+        (chosen.height, chosen.width, 3),
         dtype=np.uint8,
     )
-    cv2.moveWindow(window_name, projector.x, projector.y)
-    cv2.resizeWindow(window_name, projector.width, projector.height)
+    cv2.moveWindow(window_name, unchosen.x, unchosen.y)
+    cv2.resizeWindow(window_name, chosen.width, chosen.height)
     cv2.imshow(window_name, black_screen)
+    print(black_screen.shape)
     cv2.waitKey(100)
 
     # Move once more now that the native window exists, then fullscreen it on
     # the display containing that position.
-    cv2.moveWindow(window_name, projector.x, projector.y)
+    cv2.moveWindow(window_name, unchosen.x, unchosen.y)
     cv2.setWindowProperty(
         window_name,
         cv2.WND_PROP_FULLSCREEN,
         cv2.WINDOW_FULLSCREEN,
     )
-    # Refresh after changing the native window style. Some backends otherwise
-    # defer fullscreen until the next frame is rendered.
+    # # Refresh after changing the native window style. Some backends otherwise
+    # # defer fullscreen until the next frame is rendered.
     cv2.imshow(window_name, black_screen)
     cv2.waitKey(250)
 
@@ -153,16 +167,16 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
 
     # Projector
     logger.info("Setting up projector")
-    projector = get_projector()
+    chosen, unchosen = ask_for_projectors()
 
     make_fullscreen_projector_window(
         WINDOW_PROJECTOR,
-        projector,
+        chosen, unchosen
     )
 
     # The fullscreen helper initially displays black.
     black_screen = np.zeros(
-        (projector.height, projector.width, 3), dtype=np.uint8
+        (chosen.height, chosen.width, 3), dtype=np.uint8
     )
 
     # camera
@@ -173,7 +187,7 @@ def calibrate(debug: bool = True) -> CalibrationInfo:
 
     # make the chessboard
     logger.info("Generating calibration board")
-    board_size = (projector.width, projector.height)
+    board_size = (chosen.width, chosen.height)
     board_shape = (8, 6)
     board, board_points = make_chessboard(board_size, board_shape)
     logger.info(
