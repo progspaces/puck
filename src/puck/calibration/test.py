@@ -1,44 +1,55 @@
+# saved_cal = ""
+
+# try:
+#     cal = load(saved_cal)
+# except OSError:
+#     calibration_info = calibrate()
+#     calibration_info.save(camera_calibration)
+
 # Setup tkinter early (necessary on MacOS).
-from tkinter import Tk
+from tkinter import Tk, Canvas, NW
 
+
+from PIL import ImageTk, Image
 base = Tk()
+import cv2 as cv
+from puck.calibration.calibration import make_camera_to_real,project_chessboard
+from puck.camera_processor import camera_setup
+from puck.offset import offset_string,size_of_second
 
-# Standard packages
-import logging
+CANVAS_HEIGHT, CANVAS_WIDTH = size_of_second()
 
-# External packages
-import typer
+def tk_setup() -> None:
+    """Sets up the tkinter window where it will draw graphics."""
+    # base.tk.call("tk", "scaling", 2.0)
+    base.title("Tkinter Widget Size")
+    # base.wm_attributes("-fullscreen", True)
 
-from .calibrate import calibrate
-
-# Global variables
-logger = logging.getLogger(__name__)
+    # Assume 1080p double-monitor setup.
+    base.geometry(offset_string()) 
 
 
-def logging_setup(log: bool, log_level: int) -> None:
-    """Sets up the logging object and the level at which we are logging for different approaches, info vs debug.
+def canvas_setup(base: Tk) -> Canvas:
+    """Set up a Tk.Canvas object on the base object.
 
     Args:
-        log (bool): To log or not to log that is the question. (Turns on logging)
-        log_level (int): Level of logging you wish to have outputted.
+        base: an instance of Tk(), also commonly referred to as "root".
     """
-    if log:
-        logging.basicConfig(level=log_level)
-        logger.info(f"Logging working at level {log_level}")
+    canvas = Canvas(
+        base, height=CANVAS_HEIGHT, width=CANVAS_WIDTH, background="black"
+    )
+
+    # Allows canvas to be seen by the user.
+    canvas.pack()
+    return canvas
 
 
-def run_calibration(
-    log: bool = False,
-    log_level: int = 0,
-) -> None:
-    print("Hello from calibration!")
-    logging_setup(True, 0)
-    calibration_info = calibrate()
-    print(calibration_info.camera_to_projector_homography)
 
-
-def main() -> None:
-    typer.run(run_calibration)
-
+def main():
+    tk_setup()        
+    canvas = canvas_setup(base)
+    project_chessboard(canvas)
+    base.mainloop()
+    print("end")
 
 main()

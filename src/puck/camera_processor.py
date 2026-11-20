@@ -10,7 +10,7 @@ from datetime import datetime
 
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
-from .calibration.calibrate import calibrate, CalibrationInfo
+# from .calibration.c import calibrate, CalibrationInfo
 from .offset import size_of_second
 
 # Global Variables
