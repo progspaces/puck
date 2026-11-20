@@ -9,11 +9,11 @@
 # Setup tkinter early (necessary on MacOS).
 from tkinter import Tk, Canvas, NW
 
-
+import time
 from PIL import ImageTk, Image
 base = Tk()
 import cv2 as cv
-from puck.calibration.calibration import make_camera_to_real,project_chessboard
+from puck.calibration.calibration import project_chessboard, get_photos, chessboard_matrix,combo
 from puck.camera_processor import camera_setup
 from puck.offset import offset_string,size_of_second
 
@@ -48,7 +48,14 @@ def canvas_setup(base: Tk) -> Canvas:
 def main():
     tk_setup()        
     canvas = canvas_setup(base)
-    project_chessboard(canvas)
+    cam = cv.VideoCapture(0)
+    # project_chessboard(canvas)
+
+    # time.sleep(10)
+    # photos = get_photos(cam, 1) 
+
+    base.after(5, project_chessboard, canvas)
+    base.after(500,combo, cam, 1 , canvas)
     base.mainloop()
     print("end")
 

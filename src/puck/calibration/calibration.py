@@ -58,31 +58,36 @@ def chessboard_matrix(gray_photos:list[np.ndarray], cam_view_canvas:tk.Canvas| N
     ret, mtx, _, _, _ = cv.calibrateCamera(objpoints, imgpoints, gray_frame.shape[::-1], None, None)
     return mtx
 
-def get_photos(cam:cv.VideoCapture, cam_view_canvas:tk.Canvas, n: int) -> list[np.ndarray]:
+def get_photos(cam:cv.VideoCapture, n: int) -> list[np.ndarray]:
     cal_photos = []
     if cam.isOpened(): 
         rval, frame = cam.read() 
             ## refactor into tkinter
-        cv.imshow("preview", frame)
-        for c in range(n):
-            while True:
-                print(f"This is photo {c+1}")
-                key = cv.waitKey(0)
-                rval, frame = cam.read() 
-                if not rval:
-                    print("Something is wrong with the camera, rval is false, press a key when fixed")
-                elif key == 112:  ##  press p
-                    ## refactor into tkinter
-                    cv.imshow("preview", frame)
-                elif key == 32: #space to capture
-                    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                    cal_photos.append(gray)
-                    break
+        # cv.imshow("preview", frame)
+        # for c in range(n):
+        #     while True:
+        #         print(f"This is photo {c+1}")
+        #         # key = cv.waitKey(0)
+        #         rval, frame = cam.read() 
+        #         if not rval:
+        #             print("Something is wrong with the camera, rval is false, press a key when fixed")
+        #         elif key == 112:  ##  press p
+        #             ## refactor into tkinter
+        #             # cv.imshow("preview", frame)
+        #             pass
+        #         elif key == 32: #space to capture
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        cal_photos.append(gray)
+        #             break
         ## refactor into tkinter
-        cv.destroyWindow("preview")
+        # cv.destroyWindow("preview")
         cam.release()
         return cal_photos
     
+
+def combo(cam, count, canvas):
+    print(chessboard_matrix(get_photos(cam, count), canvas))
+
 
 def project_chessboard(canvas:tk.Canvas):
     canvas.create_image(400, 100, image=CHESSBOARD_IMG, anchor = tk.NW)
