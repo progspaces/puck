@@ -10,7 +10,7 @@ from datetime import datetime
 
 # Local packages and modules
 from .geometry import Point, Polygon, ordered_rectangle
-# from .calibration.c import calibrate, CalibrationInfo
+from .calibration.calibration import Calibration, calibrate
 from .offset import size_of_second
 
 # Global Variables
@@ -40,11 +40,11 @@ def camera_setup(
 ) -> tuple[np.ndarray, cv.VideoCapture]:
     """Set up your camera to get a videofeed input.
 
-        Args:
-            camera_id (int): camera id, typically 0 or 1
-    s
-        Returns:
-            cv.VideoCapture: video feed
+    Args:
+        camera_id: camera id, typically 0 or 1
+
+    Returns:
+        Video feed from the camera
     """
     cam = cv.VideoCapture(camera_id)
 
@@ -54,7 +54,7 @@ def camera_setup(
 
     camera_perspective_window_setup(CAMERA_PERSPECTIVE_WINDOW_NAME)
     try:
-        calibration_info = CalibrationInfo.load(camera_calibration)
+        calibration_info = Calibration.load(camera_calibration)
     except OSError:
         calibration_info = calibrate()
         calibration_info.save(camera_calibration)
@@ -63,7 +63,7 @@ def camera_setup(
             f"{camera_calibration} does not contain a calibration matrix."
         )
         raise
-    homography_matrix = calibration_info.camera_to_projector_homography
+    homography_matrix = calibration_info.camera_to_proj
     if homography_matrix.all() == None:
         logger.fatal("Homography Matrix failed to generate. Terminating.")
 

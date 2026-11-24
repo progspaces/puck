@@ -45,7 +45,7 @@ def canvas_setup(base: Tk) -> Canvas:
 
 
 
-def main():
+def main() -> None:
     tk_setup()        
     canvas = canvas_setup(base)
     cam = cv.VideoCapture(0)

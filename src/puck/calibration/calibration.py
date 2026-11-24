@@ -8,12 +8,12 @@ CHESSBOARD_COLS = 9
 CHESSBOARD_FILE = "data/chessboard9by6.png"
 CHESSBOARD_IMG = ImageTk.PhotoImage(Image.open(CHESSBOARD_FILE).resize((1000,700)))
 
-class Calibration():
+class Calibration:
     camera_to_real: np.ndarray
     camera_to_proj: np.ndarray 
     real_to_proj: np.ndarray 
 
-    def __init__(self, camera_to_real, camera_to_proj):
+    def __init__(self, camera_to_real: np.ndarray, camera_to_proj: np.ndarray):
         self.camera_to_real = camera_to_real
         self.camera_to_proj = camera_to_proj
         self.real_to_proj = np.linalg.inv(self.camera_to_real) @ self.camera_to_proj
@@ -55,41 +55,42 @@ def chessboard_matrix(gray_photos:list[np.ndarray], cam_view_canvas:tk.Canvas| N
             cv.imshow('img', img)
             cv.waitKey(500)
 
-    ret, mtx, _, _, _ = cv.calibrateCamera(objpoints, imgpoints, gray_frame.shape[::-1], None, None)
+    _, mtx, _, _, _ = cv.calibrateCamera(objpoints, imgpoints, gray_frame.shape[::-1], None, None)
     return mtx
 
 def get_photos(cam:cv.VideoCapture, n: int) -> list[np.ndarray]:
     cal_photos = []
-    if cam.isOpened(): 
-        rval, frame = cam.read() 
-            ## refactor into tkinter
-        # cv.imshow("preview", frame)
-        # for c in range(n):
-        #     while True:
-        #         print(f"This is photo {c+1}")
-        #         # key = cv.waitKey(0)
-        #         rval, frame = cam.read() 
-        #         if not rval:
-        #             print("Something is wrong with the camera, rval is false, press a key when fixed")
-        #         elif key == 112:  ##  press p
-        #             ## refactor into tkinter
-        #             # cv.imshow("preview", frame)
-        #             pass
-        #         elif key == 32: #space to capture
-        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        cal_photos.append(gray)
-        #             break
-        ## refactor into tkinter
-        # cv.destroyWindow("preview")
-        cam.release()
-        return cal_photos
+    if not cam.isOpened():
+        raise OSError("Camera is not open")
+    rval, frame = cam.read() 
+    # TODO: refactor into tkinter
+    # cv.imshow("preview", frame)
+    # for c in range(n):
+    #     while True:
+    #         print(f"This is photo {c+1}")
+    #         # key = cv.waitKey(0)
+    #         rval, frame = cam.read() 
+    #         if not rval:
+    #             print("Something is wrong with the camera, rval is false, press a key when fixed")
+    #         elif key == 112:  ##  press p
+    #             ## refactor into tkinter
+    #             # cv.imshow("preview", frame)
+    #             pass
+    #         elif key == 32: #space to capture
+    #             break
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    cal_photos.append(gray)
+    # TODO: refactor into tkinter
+    # cv.destroyWindow("preview")
+    cam.release()
+    return cal_photos
     
 
-def combo(cam, count, canvas):
+def combo(cam: cv.VideoCapture, count: int, canvas: tk.Canvas | None) -> None:
     print(chessboard_matrix(get_photos(cam, count), canvas))
 
 
-def project_chessboard(canvas:tk.Canvas):
+def project_chessboard(canvas:tk.Canvas) -> None:
     canvas.create_image(400, 100, image=CHESSBOARD_IMG, anchor = tk.NW)
     print("hello")
 
