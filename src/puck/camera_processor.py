@@ -110,7 +110,7 @@ def detect_paper_tags(
             # cv.imwrite(
             #     f"invalid_AprilTag_{datetime.now().isoformat()}.png", copy
             # )
-            # Commented out so we don't save a billion photos, 
+            # Commented out so we don't save a billion photos,
             # Left so we can easily uncomment when needed again
             # Probably should make a flag.
 

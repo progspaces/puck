@@ -15,7 +15,7 @@ import chorus
 # Local packages and modules
 from .camera_processor import camera_setup, show_camera_pov, process_frame
 from .spatial.spatial_model import SpatialModel, PaperRecord
-from .offset import offset_string,size_of_second
+from .offset import offset_string, size_of_second
 
 # Global variables
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ def tk_setup() -> None:
     # base.wm_attributes("-fullscreen", True)
 
     # Assume 1080p double-monitor setup.
-    base.geometry(offset_string()) 
+    base.geometry(offset_string())
 
 
 def canvas_setup(base: Tk) -> Canvas:

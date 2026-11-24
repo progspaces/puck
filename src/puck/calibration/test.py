@@ -11,13 +11,20 @@ from tkinter import Tk, Canvas, NW
 
 import time
 from PIL import ImageTk, Image
+
 base = Tk()
 import cv2 as cv
-from puck.calibration.calibration import project_chessboard, get_photos, chessboard_matrix,combo
+from puck.calibration.calibration import (
+    project_chessboard,
+    get_photos,
+    chessboard_matrix,
+    combo,
+)
 from puck.camera_processor import camera_setup
-from puck.offset import offset_string,size_of_second
+from puck.offset import offset_string, size_of_second
 
 CANVAS_HEIGHT, CANVAS_WIDTH = size_of_second()
+
 
 def tk_setup() -> None:
     """Sets up the tkinter window where it will draw graphics."""
@@ -26,7 +33,7 @@ def tk_setup() -> None:
     # base.wm_attributes("-fullscreen", True)
 
     # Assume 1080p double-monitor setup.
-    base.geometry(offset_string()) 
+    base.geometry(offset_string())
 
 
 def canvas_setup(base: Tk) -> Canvas:
@@ -44,19 +51,19 @@ def canvas_setup(base: Tk) -> Canvas:
     return canvas
 
 
-
 def main() -> None:
-    tk_setup()        
+    tk_setup()
     canvas = canvas_setup(base)
     cam = cv.VideoCapture(0)
     # project_chessboard(canvas)
 
     # time.sleep(10)
-    # photos = get_photos(cam, 1) 
+    # photos = get_photos(cam, 1)
 
     base.after(5, project_chessboard, canvas)
-    base.after(500,combo, cam, 1 , canvas)
+    base.after(500, combo, cam, 1, canvas)
     base.mainloop()
     print("end")
+
 
 main()
